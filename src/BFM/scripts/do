@@ -1,0 +1,10 @@
+#!/bin/bash
+export INCLUDE_DIAGNOS_40=40
+DEFINES="-DINCLUDE_PELCO2 -DINCLUDE_BENCO2 -DINCLUDE_BENPROFILES -DINCLUDE-MACROPHYT -DINCLUDE_DIAGNOS_PRF"
+#export DEFINES="-DINCLUDE_TRACK"
+
+./GenerateGlobalBFMF90Code $DEFINES -read ./GlobalDefsBFM.model \
+		-from ../proto -to .  -actions statemem allocmem netcdfmem \
+		-to . -actions headermem  
+
+

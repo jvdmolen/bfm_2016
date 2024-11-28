@@ -1,0 +1,591 @@
+#include "DEBUG.h"
+#include "INCLUDE.h"
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50-g
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!BOP
+!
+! !ROUTINE: MacroPhyto
+! 
+! DESCRIPTION
+!   This process describes the dynamics of all phytoplankton
+!    groups in the ERSEM model. The differences in behaviour
+!    are expressed by differences in parameter-values only.
+!
+!
+!
+
+!   This file is generated directly from OpenSesame model code, using a code
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij.
+!   structure of the code based on ideas of M. Vichi.
+!
+! !INTERFACE
+  subroutine MacroPhytoDynamics(macro, ppmcsc,ppmcac, ppmcan, ppmcap,ppmcal)
+!
+! !USES:
+
+  ! For the following Pelagic-states fluxes are defined: Q6c, G2o, &
+  ! K3n, K4n, K1p, R1n, Q6n, R1p, Q6p, K5s
+  ! The following global scalar vars are used: SUNQ, ThereIsLight
+  ! The following Pelagic 1-d global boxvars are modified : jBIQ6s
+  ! The following Pelagic 1-d global boxvars  are used: ETW_Ben, EIR_Ben
+  ! The following Pelagic 2-d global boxvars  are used: qpMc, qnMc, qsmcac, qlBc
+  ! The following 0-d global parameters are used: ChlLightFlag, LightForcingFlag
+  ! The following global constants are used: RLEN
+  ! The following constants are used: HOURS_PER_DAY
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Modules (use of ONLY is strongly encouraged!)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  use global_mem, ONLY:RLEN,ZERO,DONE,NZERO,LOGUNIT
+#ifdef NOPOINTERS
+  use mem,  ONLY: D2STATE
+#else
+  use mem, ONLY: D2STATE,O2o,N3n,N4n,N1p
+#endif
+  use mem, ONLY:ppO2o, ppR1c,ppR2c,ppR6c,ppR6n,ppR6p, &
+    ppN4n, ppN3n,ppO3c, ppN1p, ppR1n, ppR1p, &
+    iiR1,iiR2,iiPel,iiBen, &
+    psur_dyn=>psur, &
+    fr_lim_Ma_n,fr_lim_Ma_p,sdMs,NO_BOXES_XY,NO_BOXES, &
+    ThereIsLight,xEPS,SUNQ,EIR,ETW,Nun,flux_vector, &
+    LocalDelta,max_change_per_step,sunMI,sugMI
+
+!  use mem, ONLY: Source_D3_VECTOR
+
+
+#ifdef INCLUDE_PELCO2
+  use mem,  ONLY: HCO3
+#endif
+  use constants,  ONLY: HOURS_PER_DAY,MW_C,p_qnUc
+  use constants,  ONLY: GET,POSITIVE,NEGATIVE
+  use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p,ChlLightFlag, &
+                        LightForcingFlag,p_epsChla
+  use mem_MacroPhyto
+  use LimitRates, ONLY:LimitChange_vector,DoubleLimitChange_vector
+
+! use mem,  ONLY: Output2d_1,Output2d_2,Output2d_3, Output2d_4
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! The following vector functions are used:eTq_vector, MM_vector, insw_vector
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  use mem_globalfun,   ONLY: eTq_vector, insw_vector,exp_limit
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! The source code of next routines of called in this prcocess description
+  ! can be found in ModuleMacroPhyto.f90:
+  ! recalc_pel_to_ben,sourcesink_flux_vector_m3m2,flux_vector_m3m2
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
+
+! !INPUT!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  integer,intent(IN)  :: macro
+  integer,intent(IN) :: ppmcsc
+  integer,intent(IN) :: ppmcac
+  integer,intent(IN) :: ppmcan
+  integer,intent(IN) :: ppmcap
+  integer,intent(IN) :: ppmcal
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+!
+! !AUTHORS
+!   ERSEM group + J.G. Baretta-Bekker + W.Ebenhoeh
+!     P. Ruardij (NIOZ)
+!
+!
+! COPYING
+!
+!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!EOP
+!-------------------------------------------------------------------------!
+!BOC
+!
+!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Set up Local Variable for copy of state var. object
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN),dimension(NO_BOXES_XY):: mcsc
+  real(RLEN),dimension(NO_BOXES_XY):: mcac
+  real(RLEN),dimension(NO_BOXES_XY):: mcan
+  real(RLEN),dimension(NO_BOXES_XY):: mcap
+  real(RLEN),dimension(NO_BOXES_XY):: mcal
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN)                        :: sudc !max growth rate related to max.number of divions perday.
+  real(RLEN),dimension(NO_BOXES_XY) :: clmcac,clmcan,clmcap
+  real(RLEN),dimension(NO_BOXES_XY) :: e_N
+  real(RLEN),dimension(NO_BOXES_XY) :: e_l
+  real(RLEN),dimension(NO_BOXES_XY) :: e_s
+  real(RLEN),dimension(NO_BOXES_XY) :: e_t_mcsc
+  real(RLEN),dimension(NO_BOXES_XY) :: cAx
+  real(RLEN),dimension(NO_BOXES_XY) :: e_xarea
+  real(RLEN),dimension(NO_BOXES_XY) :: qnMc,qpMc,qlMc
+  real(RLEN),dimension(NO_BOXES_XY) :: eiMi
+  real(RLEN),dimension(NO_BOXES_XY) :: eNChl
+  real(RLEN),dimension(NO_BOXES_XY) :: eirl
+  real(RLEN),dimension(NO_BOXES_XY) :: xEPSl
+  real(RLEN),dimension(NO_BOXES_XY) :: dl
+  real(RLEN),dimension(NO_BOXES_XY) :: r,s
+  real(RLEN),dimension(NO_BOXES_XY) :: eo,et
+  real(RLEN),dimension(NO_BOXES_XY) :: cg
+  real(RLEN),dimension(NO_BOXES_XY) :: c_xany  !used to define a concentration :any rate with unit any-mass/m2
+  real(RLEN),dimension(NO_BOXES_XY) :: c_xm3  !used to define a concentration :any rate with unit any-mass/m3
+  real(RLEN),dimension(NO_BOXES_XY) :: r_xany  !used to define a rate :any rate with unit any-mass/m2/d
+  real(RLEN),dimension(NO_BOXES_XY) :: temp_layer  
+  real(RLEN),dimension(NO_BOXES_XY) :: e_xsw
+  real(RLEN),dimension(NO_BOXES_XY) :: e_xlim
+  real(RLEN),dimension(NO_BOXES_XY) :: sumc,sumc0
+  real(RLEN),dimension(NO_BOXES_XY) :: sadap
+  real(RLEN),dimension(NO_BOXES_XY) :: jugc
+  real(RLEN),dimension(NO_BOXES_XY) :: sea,ses
+  real(RLEN),dimension(NO_BOXES_XY) :: srs,sra,srt
+  real(RLEN),dimension(NO_BOXES_XY) :: slc
+  real(RLEN),dimension(NO_BOXES_XY) :: jufc
+  real(RLEN),dimension(NO_BOXES_XY) :: jupp,jupn
+  real(RLEN),dimension(NO_BOXES   ) :: rumxx
+  real(RLEN),dimension(NO_BOXES   ) :: cqun3,r3
+  real(RLEN),dimension(NO_BOXES   ) :: fr_lim
+  real(RLEN),dimension(NO_BOXES_XY) :: jumn,jump,jum3n,jum4n,jumun
+  real(RLEN),dimension(NO_BOXES_XY) :: junc,junn,jun3n,jun4n,junun,junp
+  real(RLEN),dimension(NO_BOXES_XY) :: misp,misn
+  real(RLEN),dimension(NO_BOXES_XY) :: rrc
+  real(RLEN),dimension(NO_BOXES_XY) :: rr2c
+  real(RLEN),dimension(NO_BOXES_XY) :: rr1c,rr1n,rr1p
+  real(RLEN),dimension(NO_BOXES_XY) :: rr6c,rr6n,rr6p
+  real(RLEN),dimension(NO_BOXES_XY) :: Irr
+  real(RLEN),dimension(NO_BOXES_XY) :: rho_Chl
+  real(RLEN),dimension(NO_BOXES_XY) :: rate_Chl
+  real(RLEN),dimension(NO_BOXES_XY) :: new_Chl
+  real(RLEN),dimension(NO_BOXES_XY) :: flChydrate
+  real(RLEN),dimension(NO_BOXES_XY) :: m3tm2,m3tm3
+  real(RLEN),dimension(NO_BOXES_XY) :: psur
+  integer,dimension(NO_BOXES_XY)    :: inlayer
+  integer                           ::iout,j
+
+  real(RLEN),external                ::GetDelta
+
+
+  if (NO_BOXES_XY==1.and.save_status(macro,NO_BOXES_XY)==0) return;
+  if (save_Status(macro,NO_BOXES_XY).ne.1) &
+  write(LOGUNIT,*)'save_status:',save_Status(macro,NO_BOXES_XY),macro,NO_BOXES_XY
+
+!write(LOGUNIT,*)'start macrophytodynamics'
+
+  mcsc = D2STATE(ppmcsc,:)
+  mcac = D2STATE(ppmcac,:)
+  mcan = D2STATE(ppmcan,:)
+  mcap = D2STATE(ppmcap,:)
+  mcal = D2STATE(ppmcal,:)
+
+  inlayer=layermsm(macro,:)
+
+  m3tm2=Depth_Msc(macro,:)
+  m3tm3=DONE
+  psur= farm_surface(macro,:)/surface
+  !surface of the frond
+  psur_dyn(macro,:)= mcsc *p_pAqc(macro) * psur
+  !in the recalculation from m3->m2 the surface of the floating body
+  !limit the distribution of the frond over the grid surface.
+  psur=min(psur,psur_dyn(macro,:))
+
+  !get average vertical extinction in layer
+  call recalc_pel_to_ben(GET,inlayer,xEPS,m3tm3,m3tm3,xEPSl)
+  !get light per./m3 at the upperside of the layer
+  call recalc_pel_to_ben(GET,inlayer,EIR,m3tm3,m3tm3,eirl)
+
+  !Calculate extinction without macrophytes
+  r=xEPSl-mcal/m3tm2*p_epsChla
+  !assume maximal thickness of macrophytolayer p_xthick_m
+  s=mcal/p_xthick_m*p_epsChla
+  !in layer with macrophytes the vertical extinction is:
+  r=r+s
+  ! average light in macrophyt layer
+  eirl= eirl*exp(-0.5*p_xthick_m*r)
+  !get value per./m3 in one layer
+ 
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Stuctural model
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !Minimal Carbon Reserve (p_plmcsc(macro)=0.05)
+  clmcac=p_plMsc(macro)* mcsc
+  !structured N reserve (p_qnRc=0.036)
+  clmcan=p_qnlc(macro) *mcsc
+  !structured P reserve (p_qpRc=0.0??)
+  clmcap=p_qplc(macro) *mcsc
+
+  e_N=max(ZERO,min(DONE-clmcac/max(NZERO,mcac-mcsc), &
+          DONE-clmcan/mcan,DONE-clmcap/mcap))
+
+  e_l= insw_vector(eirl)
+  ! calculation of area from the strutural biomass c-> A  p_pAqc=83.e-6 m2/mgC
+
+  cAx=mcsc*p_pAqc(macro)/p_plants_a(macro)
+  e_xarea=p_xmA1(macro) * exp(-(cAx/p_mAx(macro))**2) +p_xmA2(macro)
+
+  ! no growth above 19 degrees of structural mass
+  call recalc_pel_to_ben(GET,inlayer,ETW,m3tm3,m3tm3,temp_layer)
+  temp_layer=max(ZERO,19.0-temp_layer)
+  e_t_mcsc=min(DONE,2.0*temp_layer/(temp_layer+2.0))
+
+  r=exp(p_epsilon(macro)*cAx)
+  sdMs(macro,:)=p_sm(macro)*1.0D-6*r/(DONE+1.0D-6*(r-DONE))
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Temperature response of Phytoplankton
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   call recalc_pel_to_ben(GET,inlayer,ETW,m3tm3,m3tm3,temp_layer)
+   et  =   eTq_vector(temp_layer,  p_q10(macro))
+   call recalc_pel_to_ben(GET,inlayer,O2o,m3tm3,m3tm3,c_xm3)
+   eo  =   min(DONE,exp(-p_clO2o(macro)/c_xm3))
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  !  Copy  state var. object in local var
+  !  A small concentration is to avoid that one of the state vars. --->0.0
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Phytoplankton growth is limited by nitrogen and phosphorus
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !biomass per square meter
+  qnMc(:)=max(ZERO,mcan/(NZERO+mcsc))
+  qpMc(:)=max(ZERO,mcap/(NZERO+mcsc))
+  qlMc(:)=mcal/(NZERO+mcsc)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !Photosynthesis (Irradiance EIR_Ben is in uE m-2 s-1, Irr is mid-inlayer EIR
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  !growth is coupled to the strucural biomass..........
+  e_s=1.0
+! eNChl=(DONE-exp(-eNChl))/(NZERO+eNChl)
+  eiMi=DONE
+  if ( ChlLightFlag== 2) then
+    Irr=max( NZERO, eirl/ xEPSl/ m3tm2*(DONE- exp(-xEPSl* m3tm2)))
+    eiMi=max(ZERO, DONE- exp_limit(- qlMc/p_qchlc(macro)/ p_Ke(macro)* Irr))
+!   write(LOGUNIT,*) 'eiMI:',eirl,xEPSL,m3tm2,qlMc,Irr,eiMi
+  end if
+
+  select case ( LightForcingFlag)
+    case ( 1 ) ; sumc  = p_sum(macro)* et*  eiMi
+    case ( 2 ) ; sumc =  p_sum(macro)* et* eiMi*( SUNQ/ HOURS_PER_DAY)
+    case ( 3 ) ; sumc  = p_sum(macro)* et* eiMi* ThereIsLight
+  end select
+
+  sumc=max(ZERO,sumc)
+  !low oxygen  dependent mortality
+  ! sdMs  =   sdMs+ p_srs(macro)*et* (DONE-eo)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Rest processes
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  srs  =   eo* et* p_srs(macro)
+
+#ifdef INCLUDE_PELCO2
+  ! GET THE CONCENTRATION PER M3 IN ONE LAYER.
+  call recalc_pel_to_ben(GET,inlayer,HCO3,m3tm2,m3tm3,c_xany)
+  r_xany  = sumc*mcsc/MW_C
+  !2 ways to limit Phyto:
+  call LimitChange_vector(POSITIVE,r_xany,c_xany,max_change_per_step,e_xlim)
+  call recalc_pel_to_ben(GET,inlayer,HCO3,m3tm3,m3tm3,c_xm3)
+  sumc=sumc*min(e_xlim,c_xm3/(100.0D+00+c_xm3))                  ! gross production
+#endif
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Activity processes
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! special Macrophyto excretion
+! sea=  sumc* p_gamma(macro) *max(ZERO,mcac-mcsc-clmcac )/mcsc
+! sea=  sumc* (DONE-exp(-p_gamma(macro)  &
+!                           *max(ZERO,(mcsc-min(mcap/p_qplc(macro),mcan/p_qnlc(macro)))/mcsc)))
+  sea=  sumc* (DONE-exp(-p_gamma(macro)  &
+                            *max(ZERO,mcac-(mcsc-clmcac))/mcsc))
+
+  sra=p_pu_ra(macro)*max(ZERO, sumc- sea)
+  ses=ZERO
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Potential-Net prim prod. (mgC /m3/d):
+  !  a. limit prim prod at high temperature with the (maximum) number of
+  !     divisions per day by make use of the length of the light period.
+  !  c. assume that activity respiration increases with temperature and
+  !     is NOT limited by the number of divisions per day.
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  dl=(SUNQ/ HOURS_PER_DAY)
+
+  s  =   max(  ZERO, dl*( sumc- sea -sra)-ses -srs)  ! net production
+  sudc=p_xdiv(macro)*log(2.0D+00)
+  r= s*min(DONE,2.0*sudc/(sudc+s))
+  cg=DONE
+  where (sumc.gt.ZERO) cg=min(DONE,(r+(ses+srs))/(NZERO+s))
+  sumc=cg*sumc; sea=cg*sea
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Correct for mortality : in order to model an effective
+  ! mortality at the end of the bloom it is necessary to make all Phaeo
+  ! which will die during next time-step inactive, otherwise the mortality
+  ! is counteracted by the new production
+  r=DONE-sdMs(macro,:)*LocalDelta
+  sumc0=sumc
+  sumc=r*sumc;
+
+  sugMI(macro,:)=sumc
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Apportioning over R1 and Q6:
+  ! Cell lysis generates both DOM and POM.
+  ! The nutr.-depleted cell has a nutrient-carbon ratio equal to p_q?lc.
+  ! Assuming that this structural part is not easily degradable,
+  ! at least a fraction equal to the minimum quota is released as POM.
+  ! Therefore, nutrients (and C) in the structural part go to Q6.
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  r=sdMs(macro,:)*mcac
+  rr1c  =  p_pe_R1c* r
+  rr6c  =  (DONE-p_pe_R1c)* r
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! total processes
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  srt  =   sra+ srs     ! total specific respiration
+  slc  =   sea+ sra+ sdMs(macro,:)  ! specific loss terms
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Production, productivity and respiration flows
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  sadap=max(srt,sumc0)
+
+  jugc=sumc * mcsc  ! gross production
+  call findnan(jugc,NO_BOXES_XY,iout)
+  if ( iout.gt.0) then
+!   write(LOGUNIT,*),'MacroP jugc',macro,jugc,sumc,sumc0,sea,sdMs(macro,:),mcal
+    write(LOGUNIT,*),'MacroP jugc',macro,jugc,sumc,sumc0,sea,sdMs(macro,:),p_sum, et, eiMi,qlMc,p_qchlc,p_Ke,Irr
+  endif
+  call sourcesink_flux_vector_m3m2(inlayer, iiPel, ppO3c,iiBen,ppmcac, &
+                                        jugc,m3tm2,psur )
+  r_xany=jugc/MW_C !rate in oxygen/m2
+  call flux_vector_m3m2(inlayer, iiPel, ppO2o,iiPel,ppO2o, r_xany,m3tm2,psur )
+  rrc  =   srt* mcsc  ! total actual respiration
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Potential-Net prim prod. (mgC /m3/d)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  jufc  =   max(  ZERO, ( sumc- slc)* mcsc)  ! net production
+
+  !Initalization of 3d calculations
+  !recalc temperature and larger depth to 3d-variables
+  !look into 1 m2 meter recalculated to m3
+  r=mcac*et;  
+  call recalc_ben_to_pel(GET,inlayer,r,m3tm2,psur,r3)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! START 3D-PART
+  ! Macrophytes are in the pelagic part of the model,altought in one
+  ! layer. For calculation of the nutreint uptake we assum that MacroP
+  ! is a 3d-variable filled with 0s except one
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Nutrient Uptake: calculate maximal uptake of N,P
+  ! Check if C-fixation is larger to make of all C new biomass
+  ! If not increase excretion of C
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! rumxx,rum3n rump are 3d-variables: ------
+
+  fr_lim=fr_lim_Ma_n(macro,:) 
+
+  rumxx(:)  =  max(ZERO,p_qun(macro)* N4n(:)* r3)
+  call DoubleLimitChange_vector(POSITIVE,rumxx,N4n,fr_lim ,max_change_per_step)
+  call recalc_pel_to_ben(GET,inlayer,rumxx,m3tm2,psur,jum4n)
+  j=inlayer(1)
+! write(LOGUNIT,*) 'j,rumxx,N4n,r3,p_qun:',j,rumxx(j),N4n(j),r3(j),p_qun
+
+
+  cqun3  =  p_lN3N4n(macro)/( p_lN3N4n(macro)+ N4n(:))
+  rumxx(:)  =  max(ZERO,p_qun(macro)* N3n(:)* r3* cqun3(:))
+  call DoubleLimitChange_vector(POSITIVE,rumxx,N3n,fr_lim ,max_change_per_step)
+  call recalc_pel_to_ben(GET,inlayer,rumxx,m3tm2,psur,jum3n)
+
+  cqun3  =  p_lureaN4n(macro)/( p_lureaN4n(macro)+ N4n(:))
+  rumxx(:)  =  max(ZERO,p_qun(macro)* Nun(:)* r3* cqun3(:))
+  call DoubleLimitChange_vector(POSITIVE,rumxx,Nun,fr_lim ,max_change_per_step)
+  call recalc_pel_to_ben(GET,inlayer,rumxx,m3tm2,psur,jumun)
+
+  fr_lim=fr_lim_Ma_p(macro,:) 
+
+  rumxx(:)   =  max(ZERO,p_qup(macro)* N1p(:)* r3(:) )
+  call DoubleLimitChange_vector(POSITIVE,rumxx,N1p,fr_lim ,max_change_per_step)
+  call recalc_pel_to_ben(GET,inlayer,rumxx,m3tm2,psur,jump)
+! write(LOGUNIT,*) 'MPH:',j,p_qup,rumxx(j),N1p(j),r3(j),psur,fr_lim_Ma_p(1,j),m3tm2,jump
+  !correct for  surface of the macrophyte
+
+  !recalc 3d-fluxes (../m3) in inlayer to 2d-fluxes (../m2)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !end 3d-PART
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+  ! N uptake brom 2 sources: nitrate, ammonium, organic N, from buffer incell.
+  jumn(:)  =   jum4n(:) +jum3n(:) +jumun(:)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Check if which fraction C-fixation can be used for new biomass
+  ! by checking the potential nutrient avilability
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+! junc(:) = max(ZERO,min( jufc(:), jumn(:)/p_qnlc, jump(:)/p(macro)_qplc))
+  junc(:) = max(ZERO,jufc(:))
+  
+  sunMI(macro,:)=junc/(NZERO+mcsc)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! C flows ; phyto --> detritus
+  ! a. activity excretion of sugars:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   flChydrate  =   (sea+ses)* mcsc
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! b.stress:All C which cannot be used for growth is excreted :
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  rr2c=ZERO;
+  select case (p_iRI(macro))
+     case (iiR1) ; rr1c=rr1c+ flChydrate   ! carbon to let grow bacteria as a protection against viruses
+     case (iiR2) ; rr2c=rr2c+ flChydrate   !
+  end select
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! C flows: calculate fluxes
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  call flux_vector_m3m2(inlayer, iiBen, ppmcac,iiPel, ppR1c, rr1c,m3tm2,psur)
+  call flux_vector_m3m2(inlayer, iiBen, ppmcac,iiPel, ppR2c, rr2c,m3tm2,psur)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Respiration flows
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  call sourcesink_flux_vector_m3m2(inlayer,iiBen,ppmcac,iiPel,ppO3c, &
+                                                           rrc,m3tm2,psur)
+  r_xany=(rrc/ MW_C)     ! source/sink.o
+  call flux_vector_m3m2(inlayer, iiPel, ppO2o,iiPel,ppO2o, -r_xany,m3tm2,psur)
+
+  r_xany=p_suMs(macro) *e_N * e_xarea *e_l *mcsc*insw_vector(mcac-mcsc) *et *e_t_mcsc
+
+
+  call flux_vector( iiBen, ppmcsc,ppmcsc, r_xany)
+  r_xany=max(ZERO,(mcsc-mcac)/GetDelta()) *0.1+sdMs(macro,:)*mcsc
+  call flux_vector( iiBen,ppmcsc,ppmcsc, -r_xany)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Nutrient dynamics: NITROGEN
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+! Intracellular missing amount of N
+  jupn = p_xqn(macro) *p_qnRc(macro)* junc
+  misn = (sadap*(p_xqn(macro)* p_qnRc(macro)-qnMc)-qnMc*srs)* mcsc
+
+  junn  =   min( jumn, jupn+ misn)  ! actual uptake of NI
+
+  e_xsw  =   insw_vector(junn)
+  jun4n  =   e_xsw* junn* jum4n(:)/( NZERO+ jumn)  ! actual uptake of Nn
+  jun3n  =   e_xsw* junn* jum3n(:)/( NZERO+ jumn)  ! actual uptake of Nn
+  junun  =   e_xsw* junn* jumun(:)/( NZERO+ jumn)  ! actual uptake of Nn
+  call findnan(jun4n,NO_BOXES_XY,iout)
+  if ( iout.gt.0) then
+    write(LOGUNIT,*),'MacroP',jun4n,junn,junc,jupn,misn,r
+  endif
+
+  call flux_vector_m3m2(inlayer,iiPel,ppN4n,iiBen,ppmcan,jun4n,m3tm2,psur)
+  call flux_vector_m3m2(inlayer,iiPel,ppN3n,iiBen,ppmcan,jun3n,m3tm2,psur)
+  call flux_vector_m3m2(inlayer,iiPel,ppR1n,iiBen,ppmcan,junun,m3tm2,psur)
+  s=junun/p_qnUc
+  call flux_vector_m3m2(inlayer,iiPel,ppR1c,iiBen,ppmcac,s,m3tm2,psur)
+  ! correction in winter situation of negative growth to keep nutrients
+  ! below max.ratio
+  call flux_vector_m3m2(inlayer,iiBen,ppmcan,iiPel,ppN4n, &
+                                        -junn*(DONE -e_xsw),m3tm2,psur)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Nuttrient dynamics: PHOSPHORUS
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Intracellular missing amount of P
+  jupp  =   p_xqp(macro)* p_qpRc(macro)* junc
+  misp = (sadap*(p_xqp(macro)* p_qpRc(macro)-qpMc)- srs* qpMc)* mcsc
+  junp  =   min( jump,jupp+ misp)  ! actual uptake
+  
+  e_xsw  =   insw_vector(junp)
+
+  call flux_vector_m3m2(inlayer,iiPel,ppN1p,iiBen,ppmcap,junp*e_xsw,m3tm2,psur )
+  ! correction in winter situation of negative growth to keep nutrients
+  ! below max.ratio
+  call flux_vector_m3m2(inlayer,iiBen,ppmcap,iiPel,ppN1p,&
+                              -junp*(DONE-e_xsw) ,m3tm2,psur)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Excretion of N and P to PON and POP
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  r=sdMs(macro,:)*qnMc*mcac;s=mcan-p_qnRc(macro)*1.0D-10*mcac
+  ! extreme cases no flux at lower below :
+  call LimitChange_vector(NEGATIVE,r,s,max_change_per_step)
+  rr1n  =   p_pe_R1n* r
+  rr6n  =   r- rr1n
+
+  r=sdMs(macro,:)*qpMc*mcac;s=mcap-p_qpRc(macro)*1.0D-10*mcac
+  ! extreme cases no flux at lower below :
+  call LimitChange_vector(NEGATIVE,r,s,max_change_per_step)
+  rr1p  =   p_pe_R1p* r
+  rr6p  =   r- rr1p
+
+  if ( ChlLightFlag== 2) then
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ! Chl-a synthesis and photoacclimation
+    ! Carbon fixation is limited at high temperatures leading to a
+    ! lower growth rate.
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      eNChl= max(NZERO,(qnMc(:)-p_qnlc(macro))/qnMc(:))
+      rho_Chl = p_qchlc(macro)* p_qchlc(macro)* eiMi /qlMc* p_Ke(macro)/ Irr* eNChl
+
+!     rho_Chl = p_qchlc(macro)* p_sum(macro)* cg * eiMi* mcsc/&
+!             (p_alpha_chl(macro)*(mcal+ NZERO)* Irr)*  eNChl
+
+! total synthesis, only when there is net production (run > 0)
+      new_Chl = rho_Chl*(( sumc- sra)* mcsc-flChydrate)
+      rate_Chl = new_Chl- sdMs(macro,:)* mcal+ min( &
+                 ZERO, sumc- slc+ sdMs(macro,:))* max( ZERO, mcal- p_qchlc(macro)* mcac) &
+                 -et*p_sdchl_d(macro) * mcal
+      ! AT high light intensities Light-equipment is damaged by O2-radicals.
+      ! consequence are: degradtion of Chl, and water products mainly N and C
+      r=p_sdchl_l(macro) * (DONE-exp(-eirl/p_EIR(macro)))
+      rate_Chl=rate_Chl-mcal * r
+      rr6n=rr6n+eNChl*p_qnRc(macro)*mcac *r
+      rr6c=rr6c+eNChl* mcac*r
+      s=mcal-p_qchlc(macro)*1.0D-10
+      call LimitChange_vector(NEGATIVE,rate_Chl,s,max_change_per_step)
+      call flux_vector( iiBen, ppmcal,ppmcal, rate_Chl)
+  endif
+
+  call flux_vector_m3m2(inlayer,iiBen,ppmcac,iiPel,ppR6c,rr6c,m3tm2,psur )
+  call flux_vector_m3m2(inlayer,iiBen,ppmcan,iiPel,ppR6n,rr6n,m3tm2,psur )
+  call flux_vector_m3m2(inlayer,iiBen,ppmcap,iiPel,ppR6p,rr6p,m3tm2,psur )
+! call flux_vector_m3m2(inlayer,iiBen,ppmcal,iiPel,ppmcal,- rr6l,m3tm2,psur)
+  call flux_vector_m3m2(inlayer, iiBen, ppmcap,iiPel,ppR1p,rr1p,m3tm2,psur)
+  call flux_vector_m3m2(inlayer, iiBen, ppmcan,iiPel,ppR1n, rr1n,m3tm2,psur)
+
+!write(LOGUNIT,*)'end macrophytodynamics'
+
+  end

@@ -1,0 +1,146 @@
+module Daan
+
+    private
+    
+    public change_fish_predation
+    
+    contains
+
+    subroutine change_fish_predation()
+    
+        use time,        only: fsecs  
+        use mem_Daan,    only: seconds_between_changes, &
+                               delta_p_smd, p_smd_min, p_smd_max
+        use mem_MesoZoo, only: p_smd
+        use mem,         only: Daanput2d_1,Daanput2d_2,Daanput2d_3,Daanput2d_4
+        
+        Daanput2d_1 = p_smd(1)
+        Daanput2d_2 = delta_p_smd
+        Daanput2d_3 = p_smd_min
+        Daanput2d_4 = p_smd_max
+
+        if ( seconds_between_changes == 0.0 .or. delta_p_smd == 0) RETURN
+
+        if ( mod(fsecs,seconds_between_changes) == 0.0 ) then
+            if ( p_smd(1).le.p_smd_min .or. p_smd(1).ge.p_smd_max ) then
+                write(*,*) 'Changing direction of change in "fish predation"...'
+                delta_p_smd = - delta_p_smd
+            end if
+            write(*,*) 'Changing "fish predation":'
+            write(*,*) '    p_smd was    ', p_smd(1)
+            p_smd = p_smd + delta_p_smd
+            where ( p_smd < 0.0 ) p_smd = 0.0
+            write(*,*) '    p_smd now is ', p_smd(1)
+        end if
+        
+    end subroutine change_fish_predation
+    
+end module Daan
+    
+!    elemental function divide(denominator, nominator)
+
+!        implicit none
+
+!        REALTYPE             :: divide
+!        REALTYPE, intent(IN) :: denominator, nominator
+
+!        if ( denominator == 0.0 ) then
+!            divide = 0.0
+!        else
+!            divide = denominator/nominator
+!        end if
+
+!    end function divide
+
+!    function add_to_concentration(local_concentrations, total_additions)
+!    !DJG calculates new concentrations of nutrients after additions or removals.
+!    !DJG Adds or removes while leaving the concentration distribution over depth
+!    !DJG scaled to the maximum local density in tact. Removes less if that would
+!    !DJG lead to negative denisties, leaving the ratios in which the different
+!    !DJG nutrients are removed in tact. At least, that is what I hope. Haven't
+!    !DJG tested the code sufficiently to be sure. 
+
+!        use meanflow,   only: depth
+!        use global_mem, only: RLEN
+!        use bio_var,    only: nlev
+
+!        implicit none
+
+!        REALTYPE, dimension(4,nlev)             :: add_to_concentration
+!        REALTYPE, dimension(4,nlev), intent(IN) :: local_concentrations
+!        REALTYPE, dimension(4),      intent(IN) :: total_additions
+!        REALTYPE, dimension(4)                  :: total_concentrations
+!        REALTYPE, dimension(4,nlev)             :: local_additions
+!        REALTYPE, dimension(4,nlev)             :: new_local_concentrations
+!        REALTYPE, dimension(4,nlev)             :: rel_realized_additions
+!        REALTYPE                                :: relative_change
+!        integer                                 :: i, j
+
+!        write (*,*) 'Adding or removing nutrients...'
+        
+!        do i = 1,4
+!            if ( total_additions(i) .ne. 0.0 ) then
+!                total_concentrations(i) = sum(local_concentrations(i,:)*depth)
+!                do j = 1,nlev
+!                    local_additions(i,j) = divide(&
+!                                 total_additions(i)*local_concentrations(i,j), & 
+!                                             total_concentrations(i))
+!                    new_local_concentrations(i,j) = max(&
+!                          local_concentrations(i,j) + local_additions(i,j), 0.0)
+!                    rel_realized_additions(i,j) = divide(&
+!                                               new_local_concentrations(i,j) &
+!                                                 - local_concentrations(i,j), &
+!                                                           local_additions(i,j))
+!                end do
+!            else
+!                do j=1,nlev
+!                    local_additions(i,j) = 0.0
+!                    rel_realized_additions = 1.0
+!                end do
+!            end if
+!        end do
+
+!        relative_change = minval(rel_realized_additions)
+!        if ( relative_change > 0.9999 ) then
+!            relative_change = 1.0
+!        else
+!            write(*,*)'Removing less because nutrient concentrations are too low.'
+!        end if
+!        add_to_concentration &
+!                      = local_concentrations + (local_additions*relative_change)
+                      
+!    end function add_to_concentration
+
+!    !DJG
+!    subroutine add_nutrients()
+
+!        use time,       only: fsecs
+!        use mem,        only: N1p, N3n, N4n, N5s
+!        use mem_Param,  only: seconds_between_changes, &
+!                              deltaN1p, deltaN3n, deltaN4n, deltaN5s
+!        use global_mem, only: RLEN
+!        use bio_var,    only: nlev
+
+!        implicit none
+
+!        REALTYPE, dimension(4,nlev) :: concentrations
+
+!        if ( seconds_between_changes == 0.0 .or. (deltaN1p==0.0 .and. &
+!               deltaN3n==0.0 .and. deltaN4n==0.0 .and. deltaN5s==0.0) ) then
+!            RETURN
+!        end if
+
+!        if ( mod(fsecs,seconds_between_changes) == 0.0 ) then
+!            concentrations(1,:) = N1p
+!            concentrations(2,:) = N3n
+!            concentrations(3,:) = N4n
+!            concentrations(4,:) = N5s
+!            concentrations = add_to_concentration(concentrations, &
+!                                   (/ deltaN1p, deltaN3n, deltaN4n, deltaN5s /))
+!            N1p = concentrations(1,:)
+!            N3n = concentrations(2,:)
+!            N4n = concentrations(3,:)
+!            N5s = concentrations(4,:)            
+!        end if
+
+!    end subroutine add_nutrients

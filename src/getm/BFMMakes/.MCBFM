@@ -1,0 +1,3 @@
+export GTMDIR='/home/rua/biocluster/GOTM_SOURCES/getm-2.2.2'
+export BFMDIR='/home/rua/biocluster/GOTM_SOURCES/bfm_20180104'
+export edcomp='gvim -d'

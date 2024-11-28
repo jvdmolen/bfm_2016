@@ -1,0 +1,124 @@
+#include "DEBUG.h"
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50-g
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!BOP
+!
+! !ROUTINE: ControlNutsBdy.f90
+!
+! DESCRIPTION
+!   !
+    ! Limits open boundary nutrient values to internal values and switches 
+    ! open boundary off for conditions with significant primary production
+    ! This routine is meant to use in 3D-model to calculate 3D boundary conditions.
+
+!
+! !INTERFACE
+  SUBROUTINE ControlNutsBdy(cc3d_bdy_values,cc3d_inside,cc3d_bdy_forcing, &
+      cc3d_bdy_minval,cc3d_bdy_maxval,bdy_on,numc,kmax,mode, &
+      no_gradient_ico_missing_values)
+
+!
+! !USES:
+  ! The following global scalar vars are used: &
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Modules (use of ONLY is strongly encouraged!)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  use global_mem, ONLY:RLEN,LOGUNIT,ZERO
+  use mem, ONLY: iiPhytoPlankton,iiN,iiP,iiS,PhytoPlankton,ppN3n,ppN1p,ppN4n,ppN5s
+
+!  
+! call:
+!SUBROUTINE ControlNutsBdy(cc3d(ib,i,j,:),cc3d(:,i+1,j,:),cc3d_bdy &
+! (bio_bounds,:,m),cc3d_bdy_min(ib),cc3d_bdy_max(ib),bdy_on,numc,kmax,mode)
+!
+! !AUTHORS
+!   J. van der Molen, P. Ruardij
+!
+! !REVISION_HISTORY
+!
+! JM uses the structure of CalcBndyConcentration.F90
+!
+! COPYING
+!   
+!   Copyright (C) 2006 P. Ruardij and M. Vichi
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!EOP
+!-------------------------------------------------------------------------!
+!BOC
+!
+!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
+  integer,intent(IN)                    :: kmax,numc,mode
+  integer(RLEN),intent(OUT)             :: bdy_on(0:kmax)
+  !nutrient values on the boundary
+  real(RLEN),intent(OUT)                :: cc3d_bdy_values(0:kmax)     
+  !all BFM values one point in
+  real(RLEN),intent(IN)                 :: cc3d_inside(1:numc,0:kmax)  
+  !boundary forcing values nuts
+  real(RLEN),intent(IN)                 :: cc3d_bdy_forcing(0:kmax)    
+  real(RLEN),intent(IN)                 :: cc3d_bdy_minval,cc3d_bdy_maxval
+  logical,intent(IN)                    :: no_gradient_ico_missing_values
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! local variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN)                             :: phyto_mass(0:kmax)
+  real(RLEN),parameter                   :: close_fact=0.4
+  integer                                :: k,i,iinutrient
+
+      
+  bdy_on=1
+  ! calculate biomass phytoplankton in appropriate nutrient type
+  ! set boundary condition
+  if ( no_gradient_ico_missing_values) then
+    cc3d_bdy_values(:) = cc3d_bdy_forcing(:) 
+    where (cc3d_bdy_values(:)<ZERO)
+      cc3d_bdy_values(:)= &
+                max(cc3d_bdy_minval,min(cc3d_bdy_maxval,cc3d_inside(mode,:)))
+      bdy_on(:)=-1
+    endwhere
+    do i=1,kmax
+      if (bdy_on(i)<0.and.bdy_on(i+1)==1)  &
+        cc3d_bdy_values(i)=(cc3d_bdy_values(i)+cc3d_inside(mode,i)) * 0.5
+    enddo
+  else
+    ! find nutrient type
+    select case (mode)
+      case (ppN3n) ; iinutrient=iiN
+      case (ppN4n) ; iinutrient=iiN
+      case (ppN1p) ; iinutrient=iiP
+      case (ppN5s) ; iinutrient=iiS
+    end select
+    phyto_mass=ZERO
+    do i=1,iiPhytoPlankton
+      phyto_mass(1:kmax)=phyto_mass(1:kmax)+PhytoPlankton(i,iinutrient)
+    enddo
+    where(phyto_mass(:) > close_fact*cc3d_bdy_forcing(:))
+      cc3d_bdy_values=cc3d_inside(mode,:)
+      bdy_on=0
+    elsewhere 
+      bdy_on=1
+    endwhere  
+  endif
+
+  end
+!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

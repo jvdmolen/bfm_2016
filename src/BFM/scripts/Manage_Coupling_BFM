@@ -1,0 +1,477 @@
+	#!/bin/bash
+
+	MAKEDIR="BFMMakes"
+	pwd_makedir="$PWD/$MAKEDIR"
+	if [ ! -d "$pwd_makedir" ] ; then
+	  echo "Error: Wrong use of this script"
+	  echo "1. This script work only in the getm or gotm directory in a"
+	  echo "   in the scr dir of the bfm model"
+	  echo "2. And only where the directory $MAKEDIR is present"
+	  exit
+	fi
+	if [ -f "$pwd_makedir/.MCBFM" ] ; then
+	  . $pwd_makedir/.MCBFM
+	else
+	  edcomp="gvim -d"
+	fi
+	gtm=`echo $PWD | grep -o -E '[^/]+$'` 
+	GTM=`echo $gtm | tr '[:lower:]' '[:upper:]'`
+	MAKEDIR="BFMMakes"
+	BFMGTMSRC="BFM${GTM}SRC"
+	yy="${GTM}DIR"
+
+        m="$@"
+	if [ -z "$m" ] ; then
+	   echo "for more info about this script rerun this script with -help"
+	   exit
+	fi
+	for m in $@ ; do
+	  xx=`echo $m |grep -o  -E '=|^-'`
+	  if [ "$xx" = "=" ] ; then
+	    xx=`echo $m |grep -o -E '^[A-Za-z0-9]+'`
+	    if [ "$xx" = "$yy" ] ; then
+	       GTMDIR=`echo $m |grep -o -E '[^=]+$'`
+	    elif [ "$xx" = "BFMDIR" ] ; then   
+	       BFMDIR=`echo $m |grep -o -E '[^=]+$'`
+	    elif [ "$xx" = "onlydir" ] ; then   
+	       onlydir=`echo $m |grep -o -E '[^=]+$'`
+	       echo "onlydir=$onlydir"
+	    else
+	      echo "No such dir-option: $xx"
+	      exit 1
+	    fi
+	    echo "GTMDIR=$GTMDIR"
+	  elif [ "$xx" = "-" ] ; then
+	    option=`echo $m |grep -o -E '[A-Za-z0-9_]+$'`
+	    xx=`echo $option | grep -E '^(couple|uncouple|list|pref|compare|check|test|info)'`
+	    if [ "$option" = "help" ] ; then
+	      echo "	options to modfiy defaults option:"
+	      echo "	BFMDIR=<name>   (default BFMDIR=$HOME/bfm) " 
+	      echo "	GOTMDIR=<name>  (default GOTMDIR=$HOME/bfm) (only valid when you are in gotm-dir) "
+	      echo "	GETMDIR=<name>  (default GETMDIR=$HOME/bfm)  only valid when you are in getm-dir)"
+	      echo "	onlydir=<name>  : Test only for 1 dir presebt in GETMIDR or GOTMDIR"
+	      echo "	-uncouple       : Uncouple bfm from $gtm"
+	      echo "	-couple     : couple bfm to $gtm (default)"
+	      echo "	-list       : list all replaced/new files  "
+	      echo "	-help       : print this information and exit program"
+	      echo "	-pref       : set preferences for editors... and set default GOTM/GETM dir"
+	      echo "	-compare    : compare original with BFM=version"
+	      echo "	-check      : Check is meant that when you make change(s) in the makefiles, the program"
+	      echo "	              checks :"
+	      echo "	               -the number of  for left-right for {} and ()"
+	      echo "	               -if a makefile in the gotm or in getm is  recently modified then"
+	      echo "	                the version in the BMMakes directory, the program asks"
+	      echo "	                if you want to copy the new version into the BMMakes directory"
+	      echo "	-test       : test only, make no changes (works only for -couple -uncouple and -check)"
+	      echo "	options can be given in any sequence"
+	      exit
+	    elif [ "$option" = "info" ] ; then
+	      TEST="info"
+	    elif [ "$option" = "test" ] ; then
+	      TEST="TEST"
+	    elif [ -z "$xx" ] ; then
+	      echo "No such option"
+	      exit 1
+	    fi
+	  else
+	    echo "No such option: $m"
+	    exit 1
+	  fi
+	done
+
+	if [ -z "$option" ] ; then
+	  echo "no options given.See info wen running script with -help option"
+	  echo ""
+	fi
+	if [ ! -e $MAKEDIR ] ; then
+	   echo "This script is meant to manage the coupling of BFM with GETM"
+	   echo "and GOTM and can only be executed from the gotm or the getm"
+	   echo "directory within the bfm-tree. In these directories a map"
+	   echo "BFMMakes must be present and include Makefiles. These"
+	   echo "Makefiles will replace the Makefles in the gotm and/or"
+	   echo "getm tree and describe which FORTRAN sources are replaced "
+	   echo "or added by/with FORTRAN code present in the local gotm/getm "
+	   echo "directory. With the -help option information is given how "
+	   echo "to apply this script."
+	fi
+	if [ -z "$option" ] ; then
+	  exit
+	elif [ "$option" = "pref" ] ; then
+	  yy="${GTM}DIR"
+	  echo -n "Input the full path to the $yy-dir:"
+	  read -e GTMDIR 
+	  if [ ! -d "$GTMDIR" ] ; then
+	    echo "Error: $GTMDIR is not found!"
+            exit
+	  fi
+	  yy="BFMDIR"
+          xx=`echo $PWD | grep -o -E -e '^.*bfm[^/]+'`	
+          echo "expected default path for $yy is $xx"
+	  echo "Input the full path to $yy-dir"
+          echo -n "or <return> for the default value:"
+	  read -e BFMDIR 
+	  if [ -z "$BFMDIR" ] ; then
+	    BFMDIR=$xx
+	  fi
+	  if [ ! -d "$BFMDIR" ] ; then
+	    echo "Error: $BFMDIR is not found!"
+            exit
+	  fi
+	  xx=$edcomp
+	  echo -n "favorite editor to compare source codes/$xx/?"
+	  read -e  edcomp
+	  if [ -z "$edcomp" ] ; then
+	    edcomp=$xx
+	  fi
+	  echo "export GTMDIR='$GTMDIR'" > $pwd_makedir/.MCBFM
+	  echo "export BFMDIR='$BFMDIR'" >> $pwd_makedir/.MCBFM
+	  echo "export edcomp='$edcomp'" >>$pwd_makedir/.MCBFM
+	  exit
+	fi
+	if [ -z "$GTMDIR" ] ; then
+	  GTMDIR=`ls -d $HOME/$gtm`
+	  error=$?
+	  if [ "$error" -eq 0 ] ; then
+	     echo "it is assumed that $gtm is located in home directory: GOTMDIR=$GTMDIR" 
+	  else
+	     echo "error: no $gtm found"
+	     exit
+	  fi
+	fi
+	if [ -z "$BFMDIR" ] ; then
+	  BFMDIR=`( cd $PWD/../.. ; echo "$PWD" )`
+	# BFMDIR=`ls -d $HOME/bfm`
+	  echo "it is assumed that bfm is located in home directory: BFMDIR=$BFMDIR" 
+	fi
+	if [  "$onlydir" ] ; then
+	   if [ ! -d "$GTMDIR/src/$onlydir" ] ; then
+	    echo "$GTMDIR/src/$onlydir" 
+	      echo "Dir $onlydir does not exist"
+	      exit 1
+	   fi
+	fi
+
+	if [ "$TEST" ] ;  then
+	  version=`cat $GTMDIR/VERSION`
+
+	  echo  "GOTMDIR=$GTMDIR"
+	  echo  "BFMDIR=$BFMDIR"
+	  echo  "option=$option"
+	  echo "version=$version"
+	fi
+
+	  echo "Starting..."
+	  if [ "$onlydir" ] ; then
+	    makefiles="${onlydir}_Makefile "
+	  else
+	    makefiles=`(cd $MAKEDIR; ls *Makefile *Rules.make)`
+	  fi
+
+	  j=0
+	  i=0
+	  if [ ! -e "$MAKEDIR/VERSION_timestamp" ] ; then
+	      cat $GTMDIR/VERSION $GTMDIR/timestamp>$MAKEDIR/VERSION_timestamp
+	      echo "This version is deliverd without a time stamp in the $MAKEDIR"
+	      echo "If you have no experience in coupling leave this script"
+	      i=1
+	  fi
+	  for m in $makefiles ; do
+	    file=`echo $m |grep -o -E '[A-Za-z0-9.]+$'`
+	    dir=''
+	    if [ "`echo $m | grep _`" ] ; then
+	       dir=`echo $m |grep -o -E '[A-Za-z0-9]+_' |tr -d ' \n'|tr _ /`
+	       out=`echo "Directory:$GTMDIR/src/$dir ----------------"`
+	       if [ ! -d "$GTMDIR/src/$dir" ] ; then 
+		 echo "Directroy $dir is not found in $gtm directory"
+		 exit
+	       fi
+	    else
+	      dir='/'
+	      out=`echo  "Directory:$GTMDIR/src/ --------------"`
+	    fi
+	    if [ "$i" -eq "0" ] ; then
+	      version=`cat $GTMDIR/VERSION` 
+	       timestamp=`cat $GTMDIR/timestamp`  
+	       xx=`grep "$version" $MAKEDIR/VERSION_timestamp`
+	       yy=`grep "$timestamp" $MAKEDIR/VERSION_timestamp`
+	       if [ -z "$xx" ] ; then
+		 i=1
+		 echo "Warning: version number of gotm directory (`ls $GTMDIR/VERSION`)"
+		 echo "differ from the original one which was used to make this coupling"
+	       elif [ -z "$yy" ] ; then
+		 i=2
+		 echo "Warning: timestamp of gotm directory (`ls $GTMDIR/VERSION`)"
+		 echo "differ from the original one which was used  to make this coupling"
+	       fi
+	       if [ -z "$TEST" ] ; then
+	       if [ $i -gt 0 ] ; then
+		 echo "With the gotm with version (`head -1 $MAKEDIR/VERSION_timestamp `) the coupling"
+		 echo "was proven"
+		 echo "Please check carefully differences between the your version and the original one"
+		 echo "Coninue?(y/n)?"
+		 read -a xx
+		 xx=`echo $xx | grep -E 'n'`
+		 if [ "$xx" ] ;then
+		  exit
+		fi
+	       fi
+	       fi
+	       #check if Makefile is already coupled
+	    fi
+	  done
+
+  i=0
+  for m in $makefiles ; do
+    file=`echo $m |grep -o -E '[A-Za-z0-9.]+$'`
+    dir=''
+    if [ "`echo $m | grep _`" ] ; then
+       dir=`echo $m |grep -o -E '[A-Za-z0-9]+_' |tr -d ' \n'|tr _ /`
+       out=`echo "Directory:$GTMDIR/src/$dir ----------------"`
+       if [ ! -d "$GTMDIR/src/$dir" ] ; then 
+	 echo "Directroy $dir is not found in $gtm directory"
+	 exit
+       fi
+    else
+      dir='/'
+      out=`echo  "Directory:$GTMDIR/src/ --------------"`
+    fi
+    if [ "$option" = "couple" ] ; then
+      if [ $i -eq 0 ] ; then
+        xx=`grep -E "$BFMGTMSRC|BFM" $GTMDIR/src/$dir$file` 
+        if [ "$xx" ] ; then
+            echo "Error:Directories are already modified by a previous action by this script"
+	    echo "	To couple again bfm to $gtm first unicouple bmf from $gtm by executing"
+	    echo "	this script with the uncouple option"
+            if [ "$TEST" = "TEST" ] ; then
+              echo  -n "	However....."
+              echo  "we are only testing , script will in this case not be stopped"
+           else
+	    exit
+         fi
+       fi
+       i=1
+    fi  
+      if [ "$TEST" = "TEST" ] ; then
+        echo "----------------------Only TESTING--------------"
+      else
+        if [ "$m" = "Rules.make" ] ; then
+          yy="$MAKEDIR/$m"
+          zz=`grep  -n -E '^ *BFMDIR' $yy`
+          if [ "$zz" ] ; then 
+             zz=`echo $zz | grep -o -E '^[[:digit:]]+'`
+             sed -i -e "${zz}d" $yy ; sed -i -e "${zz}i\BFMDIR :=$BFMDIR" $yy 
+             echo "-----------------------------------------------------------"     	
+             echo "	In $file BFMDIR is set hard-coded.If you are planning "
+             echo "	to move bfm to another place," 
+             echo "	OR do sequently: "
+             echo "	uncouple bfm, move bfm to its new place, (re)couple bfm"
+             echo "	OR set the environmental BFMDIR"
+             echo "------------------------------------------------------------"     	
+          fi
+          yy="$MAKEDIR/$m"
+          xx=`echo $PWD | grep -o -E '[^/]+$' | tr '[:lower:]' '[:upper:]'`
+          nm=`echo "^ *${xx}DIR"`
+          xx=`echo "${xx}DIR"`
+#         echo "nm=$nm yy=$yy"
+          zz=`grep -n -E -e "$nm" $yy`
+#         echo "zz=$zz"
+          if [ "$zz" ] ; then 
+             zz=`echo $zz | grep -o -E '^[[:digit:]]+'`
+             sed -i -e "${zz}d" $yy ; sed -i -e "${zz}i\ $xx :=$GTMDIR" $yy 
+          fi
+        fi
+        cp $GTMDIR/src/$dir/$file $MAKEDIR/$m.orig  
+        mv $GTMDIR/src/$dir/$file $GTMDIR/src/$dir${file}.orig  
+        cp $MAKEDIR/$m $GTMDIR/src/$dir$file  
+      fi
+      echo "replacing $GTMDIR/src/$dir$file by  $MAKEDIR/$m" 
+      xx=`grep {$BFMGTMSRC} $MAKEDIR/$m`
+    elif [ "$option" = "list" ] ; then
+      xx=`grep {$BFMGTMSRC} $MAKEDIR/$m`
+      if [ -z "$xx" ] ; then
+        echo "$dir		*"
+      fi
+      nm=''
+      for f in $xx ;do
+        yy=`echo $f | grep -o -E '[[:alnum:]_]+\.o'`
+	if [ "$yy" ]; then
+          if [ -z "$zz" ] ; then
+            echo -e "In           Makefile Files   \t\t\tFiles\t\t\tFiles" 
+            echo -e "Directory    Changed Replaced\t\t\tAdded\t\t\tExcluded" 
+            echo "--------------------------------------------------"
+          fi
+	  zz=`grep $yy $MAKEDIR/$m | wc -l`
+	  yy=`echo $yy | grep -o -E '[[:alnum:]_]+\.'`
+	  qq="`ls ${yy}* |grep -o -E '[[:alnum:]_]+\.[[:alnum:]]+( |$)'`"
+	  if [ "$zz" -ge "2" ] ; then
+            echo -e "$dir\t\t*  $qq"
+	  else
+            echo -e "$dir\t\t*   \t\t\t$qq"
+            nm="$nm $yy"
+	  fi
+	fi
+      done
+      xx=`grep -E '[[:alnum:]_]+\.o' $MAKEDIR/$m`
+      lm=''
+      for f in $xx ;do
+        yy=`echo $f |grep -o -E '[[:alnum:]_]+\.o'|grep -o -E '^[[:alnum:]_]+'`
+        lm="$lm $yy"
+      done
+      # in lm a list of all .o files in the makefiles, (.o is removed from the file name.)
+      lm=`echo $lm | tr ' ' '\n' | sort | uniq | tr '\n' ' '`
+      # in nm files which do not presnet in the getmpdirectory and are extras files 
+      # needed for the coupling with bfm.
+      if [ "$nm" ] ; then
+        nm=`echo $nm | grep -o -E '(^| )[[:alnum:]_]+'| tr '\n' ' '`
+        lm=`echo "$lm $nm" | tr ' ' '\n' | sort | uniq -u | tr '\n' ' '`
+      fi
+      #in dm a list of all srouce present in gtm-directory
+      dm=`(cd $GTMDIR/src/$dir; ls *.[fF]90) 2>/dev/null | tr '\n' ' '`
+      dm=`echo $dm | grep -o -E '(^| )[[:alnum:]_]+'| tr '\n' ' '`
+      # in lm all files which are "unique" : appear only in dm or only in dm
+      lm=`echo "$lm $dm" | tr ' ' '\n' | sort | uniq -u | tr '\n' ' '`
+      # test of all .o files names  present in the "BFM-makefiles" are also present
+      # in the original ones Anwers are: only present in the bfm -makefile",  only present 
+      # original makefile , or present in both
+      for f in $lm ; do
+            xx=""
+            if [ -e $MAKEDIR/$m.orig ] ; then
+              xx="')"
+              yy=`grep $f.o $MAKEDIR/$m.orig`
+              if [ "$yy" ] ; then
+                 xx='")'
+              fi
+            fi
+            echo -e "$dir\t\t*   \t\t\t\t\t\t$f.F90 $xx"
+      done
+    elif [ "$option" = "check" ] ; then
+      xx=`cat $MAKEDIR/$m | grep -o -F '('`
+      l=`echo $xx | tr -d ' ' | wc -c`
+      xx=`cat $MAKEDIR/$m | grep -o -F ')'`
+      r=`echo $xx | tr -d ' ' | wc -c`
+      if [ $r -ne $l ] ; then
+        j=1
+        echo "$m:not equal number of left and right brackets  for '()'"
+      fi
+      xx=`grep -E "$BFMGTMSRC|BFM" $GTMDIR/src/$dir$file` 
+      if [ -z "$xx" ] ; then
+        echo "$GTMDIR/src/$dir$file is NOT a Makefile which couple code in this directory to $GTM"
+      else
+        xx=`cat $MAKEDIR/$m | grep -o -F '{'`
+        l=`echo $xx | tr -d ' ' | wc -c`
+        xx=`cat $MAKEDIR/$m | grep -o -F '}'`
+        r=`echo $xx | tr -d ' ' | wc -c`
+        if [ $r -ne $l ] ; then
+          j=1
+          echo "$m:not equal number of left and right brackets  for '{}'"
+        fi
+        if [ $j -eq 0 ] ; then
+          echo "$m: bracketes:Ok"
+        fi 
+        xx=`diff $GTMDIR/src/$dir/$file $MAKEDIR/$m`
+        if [ "$xx" ] ; then 
+         echo "differences between  $GTMDIR/src/${dir}$file and $MAKEDIR/$m"
+         xx=`ls -l --time-style='+>>%s' $GTMDIR/src/${dir}$file|\
+           grep -E -o '>>[[:digit:]]+'|grep -o -E '[[:digit:]]+'`
+         yy=`ls -l --time-style='+>>%s' $MAKEDIR/$m|\
+           grep -E -o '>>[[:digit:]]+'|grep -o -E '[[:digit:]]+'`
+         if [ $xx -gt $yy ] ; then
+           echo "Apparently \$${GTM}DIR/src/${dir}$file is recently modified"
+           xx=`cat $GTMDIR/src/${dir}$file | grep -o -F '{'`
+           l=`echo $xx | tr -d ' ' | wc -c`
+           xx=`cat $GTMDIR/src/${dir}$file | grep -o -F '}'`
+           r=`echo $xx | tr -d ' ' | wc -c`
+           if [ $r -ne $l ] ; then
+             echo "This file do not contain equal number of left/right brackets"
+             echo "Improve this file"
+           else
+             echo -n "Do you want to copy this file to $MAKEDIR/$m?"
+             read -a xx
+             xx=`echo $xx | grep -E '^y'`
+             if [ "$xx" ] ;then
+               cp $GTMDIR/src/${dir}$file  $MAKEDIR/$m
+               echo "File is copied!"
+             fi
+           fi
+         fi
+        fi
+      fi
+    elif [ "$option" = "compare" ] ; then
+      xx=`grep {$BFMGTMSRC} $MAKEDIR/$m`
+      for f in $xx ;do
+        yy=`echo $f | grep -o -E '[[:alnum:]_]+\.o'`
+	if [ "$yy" ]; then
+	  zz=`grep $yy $MAKEDIR/$m | wc -l`
+	  yy=`echo $yy | grep -o -E '[[:alnum:]_]+\.'`
+	  qq="`ls ${yy}*`"
+	  if [ "$zz" -ge "2" ] ; then
+            j=$((j+1))
+            if [ "$j" -eq "0" ] ; then  
+              files="$j:$qq"
+              ldirs="$j:$dir"
+            else
+              files="$files $j:$qq"
+              ldirs="$ldirs $j:$dir"
+            fi
+	  fi
+	fi
+      done
+    elif [ "$option" = "info" ] ; then
+      xx=`grep {$BFMGTMSRC} $MAKEDIR/$m`
+      for f in $xx ;do
+        yy=`echo $f | grep -o -E '[[:alnum:]_]+\.o'`
+	if [ "$yy" ]; then
+	  yy=`echo $yy | grep -o -E '[[:alnum:]_]+\.'`
+	  qq="`ls ${yy}* |grep -o -E '(^| )[[:alnum:]_]+\.[[:alnum:]]+( |$)'`"
+          zz=`grep  -n -E '^\! +\!BFM' $qq | grep -o -E '^[[:digit:]]+'`
+          if [ "$zz" ] ; then
+            echo "file=$qq ----------------------------------------------------"
+            yy=`grep  -n -E '^\! +\!DESCRIPTION' $qq | grep -m 1 -o -E '^[[:digit:]]+'`
+            if [ "$yy" ] ; then
+              if [ "$yy" -lt "$zz" ] ; then
+                tt=`sed -n "${yy},\\$p" $qq |grep  -m 1 -n -E '(^! *$|^ *$)'| grep -o -E '^[[:digit:]]+'`
+                tt=`expr $yy + $tt  - 1`
+                sed -n "$yy,${tt}p" $qq
+              fi
+            fi
+            tt=`sed -n "${zz},\\$p" $qq |grep  -m 1 -n -E '(^! *$|^ *$)'| grep -o -E '^[[:digit:]]+'`
+            tt=`expr $zz + $tt  - 1`
+            sed -n "$zz,${tt}p" $qq
+            echo ""
+          else
+            echo "$qq : no info about BFM extensions"
+          fi
+        fi
+      done
+    else
+#option uncouple
+      echo $out
+      if [ "$TEST" = "TEST" ] ; then
+        echo "----------------------Only TESTING--------------"
+      elif [ -e  "$MAKEDIR/$m.orig" ] ; then
+        cp $MAKEDIR/$m.orig  $GTMDIR/src/$dir/$file
+      elif [ -e  "$GTMDIR/src/$dir/${file}.orig" ] ; then 
+        mv $GTMDIR/src/$dir/${file}.orig $GTMDIR/src/$dir${file}  
+      fi
+      echo " Replacing $GTMDIR/src/$dir/$file with the original one"
+    fi
+  done
+  if [ "$option" = "compare" ] ; then
+    echo "Select File from:"
+    echo $files | tr ' ' '\n'
+    echo -n "Sequence number?"
+    read -a xx
+    f=`echo $files |grep -o -E "(^| )$xx:[^ ]+"`  
+    d=`echo $ldirs |grep -o -E "(^| )$xx:[^ ]+"`  
+    f=`echo $f | grep -o -E "[^:]+$"`
+    d=`echo $d | grep -o -E "[^:]+$"`
+    echo "f=$f d=$d"
+    $edcomp $f $GTMDIR/src/$d/$f
+  elif [ "$option" = "list" ] ; then
+    xx=`ls $MAKEDIR/*.orig`
+    if [ "$xx" ] ; then
+       echo ""
+       echo " ') Not (yet) included by GETM-group"
+       echo ' ") excluded  in BFM-set-up'
+    fi
+  fi

@@ -1,0 +1,248 @@
+#include "DEBUG.h"
+#include "INCLUDE.h"
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50-g
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!BOP
+!
+! !ROUTINE: LimitNutrientUptake
+!
+! DESCRIPTION
+!   The routine is a predictor/corrector to keep up the nutrients to
+!   minimal to (very) small positive values.
+!   Therfore the maximal nutrient uptake is limited to a
+!   rate which is fixed_fraction per delta.
+!
+!
+
+!
+! !INTERFACE
+      subroutine  LimitNutrientUptake
+!
+! !USES:
+      use global_mem, only: RLEN,ZERO,NZERO,DONE,LOGUNIT
+#ifdef NOPOINTERS
+      use mem,  ONLY: D3STATE
+#else
+      use mem,ONLY:Bac,B1c,Nun,N4n,N3n,N1p
+#endif
+      use mem, ONLY:  NO_BOXES, PhytoPlankton,iiPhytoPlankton,iiC, &
+      fr_lim_PI_n,fr_lim_B1_n,fr_lim_BN_n,fr_lim_PI_p,fr_lim_B1_p,pNaNt, &
+      Nun,Nup
+#ifdef INCLUDE_MACROPHYT
+      use mem, ONLY:iiMacroStructure,MacroStructure, &
+                         fr_lim_Ma_n,fr_lim_Ma_p,NO_BOXES_XY
+      use mem_Param,ONLY: CalcMacroPhyto
+      use constants,only:GET
+      use mem_MacroPhyto,ONLY:p_qunMa=>p_qun,p_qupMa=>p_qup,p_pAqcMa=>p_pAqc, &
+        save_MacroPhyt_status=>save_status,farm_surface, &
+        surface,recalc_ben_to_pel,layerMsm,Depth_layer_Msc
+#endif
+
+      use mem_Param,ONLY:CalcPhytoPlankton
+      use mem_Phyto,ONLY: p_quPn=>p_qun,p_quPp=>p_qup
+      use mem_PelBac,ONLY:p_quBn=>p_qun,p_quBp=>p_qup, &
+!        p_qnlBc=>p_qnlc,p_qplBc=>p_qplc, p_qnBc=>p_qnc,p_qpBc=>p_qpc, &
+         p_versionB1=>p_version,p_qunNa,p_qunNb,p_suNa,p_suNb, &
+         p_lureaNbN4n,p_lureaNaN4n,p_qnNc
+      use mem_Phaeo,ONLY:CALC_REL_NITRATE_UPTAKE,CALC_REL_PHOSPHATE_UPTAKE
+
+!
+!
+! !AUTHORS
+!   ERSEM group
+!     P. Ruardij (NIOZ)
+!
+!
+! COPYING
+!
+!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!EOP
+!-------------------------------------------------------------------------!
+!BOC
+!
+!
+     !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     ! Set up Local Variable for copy of state var. object
+     !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     ! Implicit typing is never allowed
+     !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     IMPLICIT NONE
+
+     integer     :: i
+     integer,dimension(NO_BOXES)  ::  Ntp,Ntn,iOne
+     real(RLEN), dimension(:), pointer  ::lcl_Phytoc
+     real(RLEN),dimension(iiPhytoPlankton,NO_BOXES)  :: prodPI_p,prodPI_n
+     real(RLEN),dimension(NO_BOXES)  :: r3,s3  !,reac
+     real(RLEN),dimension(NO_BOXES)  :: prodtn,prodtp,massmnc,massmpc
+     real(RLEN),dimension(NO_BOXES)  :: prodBN_n,prodB1_n,prodB1_p,masstc
+     real(RLEN),dimension(NO_BOXES)  :: don,dop,lim_qu
+#ifdef INCLUDE_MACROPHYT
+     real(RLEN),dimension(iiMacroStructure,NO_BOXES)::prodMa_n,prodMa_p
+     real(RLEN),dimension(NO_BOXES_XY)      ::mtm,psur_dyn,psur
+     real(RLEN),dimension(NO_BOXES)         ::x_runa,x_runb,x_ruca,x_rucb
+     integer,dimension(NO_BOXES_XY)                  ::i2
+     logical,dimension(iiMacroStructure)            ::activeMacro
+#endif
+     real(RLEN),dimension(NO_BOXES) :: x_runa,x_runb,x_ruca,x_rucb   !JM added
+
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     ! Modules (use of ONLY is strongly encouraged!)
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Nutrient Uptake: calculate maximal uptake of N, P
+     ! Check if C-fixation is # larger to make of all C new biomass
+     ! Assumed is that Si-depletion directly the growth rate in contradiction
+     ! to N and P.
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+      masstc=ZERO;Ntn=0;Ntp=0;iOne=1
+      do i = 1 , iiPhytoPlankton
+       if ( CalcPhytoPlankton(i)) then
+          lcl_Phytoc=>PhytoPlankton(i,iiC)
+          masstc=masstc+lcl_Phytoc
+          Ntn=Ntn+1;Ntp=Ntp+1
+       endif
+      enddo
+      masstc=masstc+B1c;Ntp=Ntp+iOne;Ntn=Ntn+iOne
+      if (p_versionB1== 5) Ntn=Ntn+Ione
+#ifdef INCLUDE_MACROPHYT
+      if (CalcMacroPhyto) then
+      activeMacro=.false.
+      do i=1,iiMacroStructure
+        activeMacro(i)=sum(save_MacroPhyt_status(i,:))>0
+        if (activeMacro(i)) then
+          mtm=Depth_layer_Msc(i,:)
+          lcl_Phytoc=>MacroStructure(i,iiC)
+          psur_dyn= lcl_Phytoc *p_pAqcMa(i) *farm_surface(i,:)/surface
+          !mmol/2 --> mmol/m3 above floating body
+          i2=layerMsm(i,:)*save_MacroPhyt_status(i,:)
+          call recalc_ben_to_pel(GET,i2,lcl_Phytoc,mtm,psur_dyn,r3)
+          where (r3.gt.ZERO)
+             masstc=masstc+r3;Ntn=Ntn+iOne;Ntp=Ntp+iOne
+          endwhere
+         endif
+       enddo
+       endif
+#endif
+      don=N4n+N3n+Nun
+      dop=N1p+Nup
+      massmnc=0.1*masstc/real(Ntn)
+      massmpc=0.1*masstc/real(Ntp)
+      prodtn=ZERO
+      prodtp=ZERO
+      do i = 1 , iiPhytoPlankton
+        if ( CalcPhytoPlankton(i)) then
+          lcl_Phytoc=>PhytoPlankton(i,iiC)
+          call PhaeocystisCalc(CALC_REL_NITRATE_UPTAKE,i, &
+                           lim_qu,don, p_quPn(i))
+!         prodPI_n(i,:)=lim_qu*p_quPn(i)*max(massmnc,lcl_Phytoc)
+          prodPI_n(i,:)=p_quPn(i)*max(massmnc,lcl_Phytoc)
+          call PhaeocystisCalc(CALC_REL_PHOSPHATE_UPTAKE,i, &
+                           lim_qu,dop, p_quPp(i))
+!         prodPI_p(i,:)=lim_qu*p_quPp(i)*max(massmpc,lcl_Phytoc)
+          prodPI_p(i,:)=p_quPp(i)*max(massmpc,lcl_Phytoc)
+          prodtn=prodtn+prodPI_n(i,:)
+          prodtp=prodtp+prodPI_p(i,:)
+        endif
+      enddo
+
+      !Bacteria
+      if (p_versionB1== 5) then
+        r3=Nun*p_lureaNbN4n/(p_lureaNbN4n+N4n)+N4n
+        s3=Nun*p_lureaNaN4n/(p_lureaNaN4n+N4n)+N4n
+        x_runa=p_qunNa*s3;x_ruca=p_suNa*p_qnNc
+        x_runb=p_qunNb*r3;x_rucb=p_suNb*p_qnNc
+        x_runa=x_runa*x_ruca/(NZERO+x_runa+x_ruca)
+        x_runb=x_runb*x_rucb/(NZERO+x_runb+x_rucb)
+        pNaNt=x_runa/(NZERO+x_runa+x_runb)
+        s3=(p_qunNa*pNaNt+p_qunNb*(DONE-pNaNt))
+        !Separate handling of nitrifiers.
+        r3=(B1c-Bac)
+        prodBN_n=s3*max(massmnc,Bac)
+        prodtn=prodtn+prodBN_n
+      else
+        r3=B1c
+      endif
+      prodB1_n=p_quBn*max(massmnc,r3)
+      prodB1_p= p_quBp*max(massmpc,B1c)
+      prodtn=prodtn+prodB1_n
+      prodtp=prodtp+prodB1_p
+
+#ifdef INCLUDE_MACROPHYT
+      fr_lim_Ma_n=ZERO
+      fr_lim_Ma_p=ZERO
+      do i=1,iiMacroStructure
+        if (activeMacro(i))then
+          prodMa_n=ZERO
+          prodMa_p=ZERO
+          mtm=Depth_layer_Msc(i,:)
+          psur=DONE
+       !mmol/2 --> mmol/m3 above floating body
+          i2=layerMsm(i,:)*save_MacroPhyt_status(i,:)
+          lcl_Phytoc=>MacroStructure(i,iiC)
+          psur_dyn= lcl_Phytoc *p_pAqcMa(i) *farm_surface(i,:)/surface
+          call recalc_ben_to_pel(GET,i2,lcl_Phytoc,mtm,psur_dyn,r3)
+       !For the  calculation of nutrient limitation add 1 mg C /m3
+       !Calculate frond surface macrophytes
+          where (r3.gt.ZERO)
+
+            prodMa_n(i,:)=p_qunMa(i)*max(massmnc,r3)
+            prodMa_p(i,:)=p_qupMa(i)*max(massmpc,r3)
+            prodtn=prodtn+prodMa_n(i,:)
+            prodtp=prodtp+prodMa_p(i,:)
+          endwhere
+         if (save_MacroPhyt_status(i,1)==1 &
+           .and.prodMa_p(i,layerMsm(i,1))<1.0D-10) write(LOGUNIT,*) &
+             'layerMsm,prodMa_p,prod_Ma_n,r3,s3,p_qupMa=', &
+          layerMsm(i,1),prodMa_n(i,layerMsm(i,1)),prodMa_p(i,layerMsm(i,1)), &
+          r3(layerMsm(i,1)),s3(layerMsm(i,1)),p_qupMa
+        endif
+      enddo
+#endif
+
+      fr_lim_BN_n=prodBN_n/prodtn
+      fr_lim_B1_n=prodB1_n/prodtn
+      fr_lim_B1_p=prodB1_p/prodtp
+
+#ifdef INCLUDE_MACROPHYT
+      do i=1,iiMacroStructure
+        if (activeMacro(i))then
+          mtm=Depth_layer_Msc(i,i)
+          psur=DONE
+       !mmol/2 --> mmol/m3 above floating body
+          lcl_Phytoc=>MacroStructure(i,iiC)
+          i2=layerMsm(i,:)*save_MacroPhyt_status(i,:)
+          call recalc_ben_to_pel(GET,i2,lcl_Phytoc,mtm,psur,r3)
+          where (r3.gt.ZERO)
+            fr_lim_Ma_n(i,:)=prodMa_n(i,:)/prodtn
+            fr_lim_Ma_p(i,:)=prodMa_p(i,:)/prodtp
+          endwhere
+!         j=layerMsm(i,1)
+!         write(LOGUNIT,*) 'LNU:',i,j,fr_lim_Ma_n(i,j),fr_lim_Ma_p(i,j)
+        endif
+      enddo
+#endif
+      do i=1, iiPhytoPlankton
+       if ( CalcPhytoPlankton(i)) then
+        fr_lim_PI_n(i,:)=prodPI_n(i,:)/prodtn
+        fr_lim_PI_p(i,:)=prodPI_p(i,:)/prodtp
+       endif
+      enddo
+      end
+!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

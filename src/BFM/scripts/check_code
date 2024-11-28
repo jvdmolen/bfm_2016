@@ -1,0 +1,414 @@
+#!/bin/bash
+# the next line restarts using tclsh \
+exec tclsh "$0" "$@"
+
+proc start_check_source args {
+global short printname
+
+# !INPUT PARAMETERS:
+#		mode = statemem    MoeuleMem.F90 is setupped
+#		mode = allocmem    AllocateMem.f90 is setupped
+#		mode = netcdfmem   set_var_info_bfm.F90 is setupped
+#		mode = headerm     INLUCDE.h is setupped
+# !DESCRIPTION:
+#      function to combine info from .proto file with info derived from global definition file
+#      into files of the BFM-tree.
+# !REVISION HISTORY:
+#
+#EOP
+#-------------------------------------------------------------------------
+#BOC
+
+set short 0
+set printname 0
+set largs $args ;if { [ llength $largs ]== 1  && ![regexp {^\-} $args ] } { set largs [ linsert $largs 0 "-file" ] }
+
+foralloptions item jtem $largs {
+   switch -regexp -- $item {
+      -file    { return [ check_source $jtem ] }
+      -short   { set short 1 }
+      -error   { set short 2 }
+      -name    { set printname 1 }
+      -help    { puts stdout "You can use this program in two ways:"
+                 puts stdout "  Without oprions: to check one file: ./check_code Phyto.F90"
+                 puts stdout "  With options. The following options are available:"
+                 puts stdout "    -file file/filelist: examples: -file Phyto.F90  -file *.F90"
+                 puts stdout "    -short: output is condensed"
+                 puts stdout "    -error: program only output when a local var. is wrongly used" 
+                 puts stdout "    -printname: file name is printed first before the info"
+                 return 0;
+                }
+      default  { puts stdout "No such option"; return 0  }
+   }
+}
+}
+proc foralloptions { uoption uvalues list script } {
+upvar $uoption option $uvalues values
+
+  foreach item [ eval splitargs $list ] {
+	set option [ lindex $item 0 ]
+	set values [ join [ lrange $item 1 end ] ]
+	uplevel $script
+  }
+}
+proc splitargs args {
+  if { $args == "" } return
+  foreach item $args {
+	if { ![ regsub ^- $item "|-" t ] } { set t $item }
+	lappend tmp $t
+   }
+  return [ lrange [ split $tmp | ] 1 end ]
+}
+
+proc check_source { files } {
+global short printname
+  foreach file $files {
+    if { [ llength $files ] >1 && $short<=1  } \
+                { puts stdout "$file ===============================================" }
+    set first 0; set one 1
+    if { [ file exist $file ] } {
+      set f1 [ open $file r ]
+      set content [ read $f1]
+      close $f1
+      set newinfo 1
+      set start 0
+      while { $newinfo >0 } {
+        set newinfo [ regexp -start $start -indices -line {^ *function|^ *subroutine|^ *SUBROUTINE} $content r ]
+        if { $newinfo } {  
+          if { $start > [ lindex $r 1] } { set start -1 } { set start [ lindex $r 1] }
+          if { $first> 0 && $newinfo } {
+            incr one
+  	    if {$short<=1 } { puts stdout "routine: $routine_name [ string repeat -+ 20 ]" }
+  	    set ret [ check_code [ string range $content $first [lindex $r 0] ] ]
+            if {$ret !=0 } { puts stdout "Exit with error " ; return 1 }
+          }
+        }
+        if { $newinfo } {
+  	  regexp -start [ expr [ lindex $r 1 ] +1 ] { *[A-za-z0-9]+} $content routine_name
+	  set first [ lindex $r 0 ]
+        }
+      }
+    } {
+     puts stdout "Error: No such file"
+    }
+
+    if { $first> 0 } {
+     if { $one> 1 && $short<=1  } \
+                  { puts stdout "routine: $routine_name [ string repeat -+ 20 ]" }
+     set ret [ check_code [ string range $content $first end ] ]
+     if {$ret !=0 } { puts stdout "Exit with error " ; return 1 }
+    }
+  }
+  return 0
+}
+
+
+
+proc check_code { content } {
+global short printname
+
+  set debug 1
+  set vars {} ; set aap {};set fun [ list sign min max exp log sum sqrt log10 abs isnan sum ]
+  set global $fun; set in_call {}
+  set notdef {}; set used_global {}; set set_global {};set mod_global {}; set set_local {}
+  set newinfo 1 ;set in_call {}
+  set start 0
+  while { $newinfo >0 } {
+    set newinfo [ regexp -start $start -indices -line "^.+$" $content r ]
+    # get one line, remove command,blank characters and LF at start
+    set tline [ string trim [ eval string range [ list $content ] $r ] ]
+    regexp {[^\!]*} $tline cc
+#   puts stderr "1:$cc"
+    while { [ regexp -indices {\&\ *$} $cc s ] } {
+       set start [ lindex $r 1]
+       set newinfo [ regexp -start $start -indices -line "^.+$" $content r ]
+        set i [catch  { set tline [ lrange [ string trim [ eval string range \
+                [ list $content ] $r ] ] 0 end ] } words ]
+       if { $i != 0 } { 
+         puts stderr "words=$words"  ; set ret $i 
+         puts stderr "i=$i" ; set ret $i 
+         puts stderr "line= [ string range $content $start [expr $start+80 ]] "; return 
+       }
+       regexp {[^\!]*} $tline tline
+       set cc [ string range $cc 0 [ expr [ lindex $s 0 ] -1 ] ]
+       if { [ regsub -all \; $tline \| tline] } { set tline [ join $tline ] }
+       append cc $tline
+    }
+    set words "^ *(if|IF|where|WHERE|CASE|case|select|SELECT)"
+    if { [ regexp $words $cc] } {
+      regsub {select|SELECT} $cc "" cc
+      if { ![ regexp " *(then|THEN) *$" $cc] } {
+#       puts stderr "1a:cc=$cc"
+	regsub -all { *(call|CALL)} $cc "@=" cc
+	regsub -all { *(return|RETURN)} $cc "@=1" cc
+	regsub -all { *(stop|STOP)} $cc "@=1" cc
+	if { [ set i [ expr [string last = $cc ] -1] ] >= 0 } {
+	  regexp -indices {[@A-Za-z]+[A-Za-z0-9_]* *$} [ string range $cc 0 $i ] i
+	  regsub -all = [string range $cc 0 [ expr [lindex $i 0 ] -1]] " " tmp
+	  set cc $tmp|[string range $cc [lindex $i 0 ] end]
+	  regsub $words $cc "\#=" cc
+#	 puts stderr "cc=$cc"
+	} else {
+	   regsub -all \= $cc " " cc; regsub $words $cc "\#=" cc
+	}
+      } else {
+	regsub -all \= $cc " " cc; regsub $words $cc "\#=" cc ; regsub " *(then|THEN) *$" $cc "" cc
+#       puts stderr "cc=$cc"	
+      }
+    }
+    if { [ regsub -all \; $cc \| cc] } { set cc [ join $cc ] }
+    set ccs [ split $cc \| ]
+    if { $debug == 1 } { puts stderr "ccs: $ccs" }
+    foreach item $ccs {
+      set cc [ string trim $item ]
+      if { $debug == 1 } { puts stderr "2: $cc" }
+      if { [ string length $cc ] > 0 } {
+         if { $debug == 1 } { puts stderr "2a:$cc" }
+	 regsub -- {^\ *(do|DO)} $cc "" cc
+	 regsub -all {^ *(call|CALL)} $cc "@=" cc
+	 if { ![ info exist use ] && [ regexp -indices \:\: $cc s ] && \
+          [regexp "^ *use|^ *if|^ *write|^ *LEVEL|^ *STDERR|^ *else" $cc ]==0 } {
+            if { $debug == 1 } { puts stderr "2b: $cc" }
+	    regexp {[A-Za-z0-9_,= ]+} [ string range $cc [ expr  [ lindex $s 1 ] +1 ] end ] tmp
+            regsub -all " " $tmp "" tmp; regsub -all {\,} $tmp " " tmp ; set tmp [ string trim $tmp ]
+            if { [ regexp =  $cc ] } { eval lappend  initialized_vars  $tmp }
+            if { $debug == 1 } { puts stderr "tmp=$tmp-------------" }
+            foreach jtem $tmp {
+              regexp {[A-Za-z][A-Za-z0-9_]*} $jtem kk; lappend set_local $kk
+	      if { [ regexp {intent|INTENT} $cc ] } { lappend in_call $kk } \
+	      elseif { [ regexp {external|EXTERNAL} $cc ] } { lappend in_call $kk } \
+              elseif { [ regexp = $jtem ] } { lappend notdef ${kk}\# }
+            }
+	 } elseif { ![ info exist use ] && [ regexp -indices = $cc s ] \
+               && [regexp "^ *read|^ *open|^ *use|^ *if|^ *write|^ *else" $cc ]==0 } {
+            if { $debug == 1 } { puts stderr "2c: $cc" }
+	    set tmp [ string range $cc 0 [ expr [lindex $s 0 ] -1 ] ]
+	    set after [ string range $cc [ expr [lindex $s 0 ] +1 ] end]
+	    regexp -indices {[^\(]+} $tmp i
+	    if { [ set with_index [ regexp {\(} $tmp ] ] } { regexp -indices {[^\(]+\(} $tmp i }
+	    set j [ lindex $i 1 ]; set word_end [ expr $j -$with_index ]
+	    if { $with_index } {
+		set before [ string range $tmp 0 $word_end ]
+		regsub -all {[\:\+\-\*\/\,\)]} [ string range $tmp [ expr $word_end +2 ] end ] " " tmp
+		append tmp " " $after
+		set after $tmp
+	    } else {
+		set before $tmp
+	    }
+            if { $debug == 1 } { puts stderr "1:after=$after-------------" }
+	    set before [ string trim $before ]
+            regsub -all = $after " " after
+	    regsub -all {[\"\\]+[^\"]*\"} $after "" after
+	    regsub -all {[\'\\]+[^\']*\'} $after "" after
+	    regsub -all {\.[A-Za-z]+\.} $after " " after
+	    set after [ string trim $after ]
+	    regsub -all {[0-9\.]+[DdeE]+[+-]+[0-9]+} $after "" after
+            if { $debug == 1 } { puts stderr "2:after=$after-------------" }
+	    regsub -all {[\+\-\*\(\),\:\/\>\<]} $after " " right
+	    regsub -all \ + $right " " right
+            regsub -all {'[^']+'}  $right " " right
+	    regsub -all {^[0-9]+\.+[0-9]*[dDeE]+[-]*[0-9]|\ [0-9]+\.+[0-9]*[dDeE]+[-]*[0-9]} $right "" right
+	    regsub -all {^[0-9]+\.+[0-9]*|\ [0-9]+\.+[0-9]*} $right "" right
+	    regsub -all {^[0-9]+|\ [0-9]+} $right "" right
+            if { $debug == 1 } { puts stderr "1:right=$right-------------" }
+	    set right_clean {};set set_global_flag 0
+	    if { [ lsearch -exact $vars $before ] <0 } {
+	       if { [ lsearch -exact $global $before ] >=0 } { set set_global_flag 1 } { lappend vars $before }
+	    }
+	    if { $before=="@" } {
+	      regsub -all {[A-Za-z]+[A-Za-z0-9_]*=} $right "" right
+	    }
+#	   puts stderr " $set_global_flag >$before<  ==   $right"
+	    set right [ string trim $right ] 
+            set i [ catch { set jtem [ lindex $right 0 ] } words ];
+            if { $i != 0 } { 
+              puts stderr "$words $i" ; set ret $i 
+              puts stderr "----------------------------------------------------"
+              puts stderr "line= [ string range $content $start [expr $start+80 ]] "; 
+              puts stderr "----------------------------------------------------";return 
+            }
+	    set cha * ;if { [regexp {^flux|^fixed_quota_flux|^sourcesink_flux} $jtem ] } { set cha @ }
+	    if { [ llength $right ] > 1 || $before != "@" } {
+	      foreach jtem $right {
+	       regexp {[^\(]+} $jtem item ;regsub -all " " $item "" item
+	       if { [ lsearch -exact $vars $item ] <0 } {
+		 if { [ lsearch -exact $global $item ] <0 } {
+		     if { [ lsearch -exact $notdef $item ] <0 } { lappend right_clean $item }
+		 } elseif { $item == $before } {
+		    if { [ lsearch -exact $mod_global $item ] <0 } { lappend mod_global $item }
+		    set set_global_flag 0
+		 } else {
+		   if { $before =="@" } { append item $cha }
+		   if { [ lsearch -exact $used_global $item ] <0 } { lappend used_global $item }
+		 }
+	       }
+	      }
+	    }
+	    if { $set_global_flag} {
+	      if { [ lsearch -exact $set_global $before ] <0 } { lappend set_global $before }
+	    }
+	    if { [ llength $right_clean] > 0 } {
+	       if { $before =="@" } { regsub -all { |$} $right_clean "$cha " right_clean }
+	       foreach item $right_clean {
+		   if { [ lsearch -exact $notdef $item ] <0 } { lappend notdef $item }
+	       }
+	    }
+	 } else {
+	   if { [ regexp "^ *use" $cc ] || [ info exist use ] } {
+	    set ii [ regsub {^ *(use|USE)+\ +[a-zA-Z0-9\_]+,+ *(only|ONLY):+ *} $cc "" right ]
+	    if { $ii } { set cc $right }
+	    if { $ii || [info exist use ] } {
+	      if { [ regsub {\& *$} $cc "" cc ] } { set use 1 } { catch {unset use} }
+	      regsub -all " " $cc "" cc
+	      regsub -all {=>[A-Za-z0-9_]+,|=>[A-Za-z0-9_]+ *$} $cc "," cc
+	      regsub {,$} $cc "" cc
+	      set cc [ split $cc , ]
+	      eval lappend global $cc
+	    }
+	   }
+	 }
+      }
+    }
+    set debug 0
+    if { $start > [ lindex $r 1] } { set start -1 } { set start [ lindex $r 1] }
+       if { [regexp s $aap] } break
+  }
+  if { $short <=1 } {
+    if { $printname==1 } { puts stdout $file }
+    if { [ llength $set_global ] } {
+      if { $short==1 } {
+        puts -nonewline stdout "GlobalSet:"
+      } else {
+        puts stdout ""
+        puts stdout "Global Variables which got a value :"
+      }
+      puts stdout [ lsort $set_global ]
+    }
+    if { [ llength $mod_global ] } {
+      if { $short==1 } {
+        puts -nonewline stdout "GlobalModified:"
+      } else {
+        puts stdout ""
+        puts stdout "Global Variables which values are modified :"
+      }
+      puts stdout [ lsort $mod_global ]
+    }
+    # Last block of warnings  about local variables
+  }
+  set tmp ""
+  foreach jtem $used_global {
+     regexp {[^\@\*]+} $jtem item
+     if { [ lsearch -exact $fun $item ] <0 } { lappend tmp $jtem }
+  }
+  if { $short==1 } {
+      puts -nonewline stdout "GlobalUsed:"
+  } elseif { $short==0 } {
+    puts stdout ""
+    puts stdout "Global Variables which used at (1) right-hand side of equation"
+    puts stdout "or (2) are used in a flux-defintion call (with @) or (3) are used in a call statement (with *) :"
+  }
+  if { $short <=1 } {
+    set tmp [ lsort $tmp ]
+    set h [ lsearch -all -regexp -inline $tmp {[^\@\*]$} ]; if { [ llength $h ] } { puts stdout "(1):$h" }
+    set h [ lsearch -all -regexp -inline $tmp {\@$} ]; if { [ llength $h ] } { puts stdout "(2):$h"}
+    set h [ lsearch -all -regexp -inline $tmp {\*$} ]; if { [ llength $h ] } { puts stdout "(3):$h" }
+  }
+  if { $short==1 } {
+      puts -nonewline stdout "LocalVarNotDefined:"
+  } elseif { $short== 0 } {
+      puts stdout ""
+      puts stdout "Variables (1) which are parameters or (2) parameters in call or" 
+      puts stdout "(3) locals which may be not defined or get their value in a call to another subroutine"
+      puts stdout "or (4) are used ONLY in a flux-defintion call (with @) "
+      puts stdout "or (5) are used ONLY in a call statement (with *) :"
+      puts stdout "or (6) got their value when defined (with #) :"
+  }
+  set notdef [ lsort $notdef ]
+  regsub -all {[\@\*\#]( |$)} $notdef " " h; set h [ string trim $h ]
+  set tmp ""
+  foreach item $h { if { [ lsearch -exact $set_local $item ] <0 } { lappend tmp $item } }
+  if { [ llength $tmp ] > 0 && $short<=1 } { puts stdout "(1):$tmp" }
+  set tmp ""
+  foreach item $h { if { [ lsearch -exact $set_local $item ] >=0 } { lappend tmp $item } }
+  if { $short <=1 } {
+    set h ""
+    foreach item $tmp { 
+       if { [ lsearch -exact $in_call $item ] >=0 } { 
+  	if { [ lsearch -exact $h $item ]<0 } { lappend h $item } 
+       }
+    }
+    if { [ llength $h ] > 0  } { puts stdout "(2):$h"} 
+  }
+  set h "" 
+  foreach item $tmp { if { [ lsearch -exact $in_call $item ] <0 } { 
+	if { [ lsearch -exact $h $item ]<0 } { lappend h $item } 
+     }
+  }
+  if { [ llength $h ] } { 
+     if {$short<= 1 } { puts stdout "(3):$h" }
+     set undeflocals $h
+  }
+  if {$short<= 1 } { 
+     set h [ lsearch -all -regexp -inline $notdef {\@$} ]; 
+     if { [ llength $h ] } { puts stdout "(4):$h"}
+  }
+  set h [ lsearch -all -regexp -inline $notdef {\*$} ]; 
+  if { [ llength $h ] &&  $short<=1  } { puts stdout "(5):$h" }
+  set tmp $h
+  set h [ lsearch -all -regexp -inline $notdef {\#$} ]; 
+  if { [ llength $h ] &&  $short<=1  } { puts stdout "(6):$h" }
+  eval lappend tmp $h
+  set h $tmp
+
+  if { [ info exist undeflocals ] } {
+    set tmp ""
+    foreach item $undeflocals {
+     if { [ lsearch -regexp $h ^$item ] <0  } { lappend tmp $item }
+    }
+    if { $tmp != "" } {
+      if {$short<= 1 } { puts stdout "" }
+      puts stdout "Error: Local variables are used the first time at the right hand side of an expression"
+      puts stdout "Error: Variables which are not initialized with a value: $tmp"
+      return 1
+    }
+  }
+
+  if {$short<= 1 } {
+    set tmp ""
+    regsub -all {\*|\@} $used_global "" used_global
+    foreach item $global {
+      if { [ lsearch -exact $mod_global $item ] <0 } {
+         if { [ lsearch -exact $used_global $item ] <0 } {
+    	   if { [ lsearch -exact $fun $item ] <0 } {
+  	     if { [ lsearch -exact $set_global $item ] <0 } { lappend tmp $item }
+	   }
+         }
+      }
+    }
+    if { [ llength $tmp ]> 0 } {
+      if { $short==1 } {
+        puts -nonewline stdout "GlobalReferencedNotUsed:"
+      } else {
+        puts stdout ""
+        puts stdout "Global Variables referenced in used-statement but not used:"
+      }
+      puts stdout [ lsort $tmp ]
+    }
+    regsub -all {[\@\*]( |$)} $notdef " " tmp; set tmp [ string trim $tmp];
+    set h {};eval lappend h $vars $tmp;set tmp "" 
+    foreach item $set_local { 
+      if { [ lsearch -exact $h $item ] <0 } { 
+         if { [ lsearch -exact $in_call $item ] <0 } { lappend tmp $item } 
+      }
+    }
+    if { [ llength $tmp ]> 0 } {
+       puts stdout  "Local variables defined but not used:"
+       puts stdout "$tmp" 
+    }
+  }
+  return 0
+}
+
+
+exit [ eval start_check_source $argv ]
+

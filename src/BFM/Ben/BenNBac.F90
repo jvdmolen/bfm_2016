@@ -1,0 +1,543 @@
+#include "DEBUG.h"
+#include "INCLUDE.h"
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50-g
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!BOP
+!
+! !ROUTINE: BenNBac
+!
+! DESCRIPTION
+!   !    This submodel describes the carbon dynamics and associated
+!    nutrient dynamics in benthic nitrifying bacteria (represented
+!    by state variables HN)
+!      Based on:Keen & Presser,1987 ,ArchBiol.147:73-79
+!      Based on :knowlegdeNBook geo,VU.nl
+!
+
+!   This file is generated directly from OpenSesame model code, using a code
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij.
+!   structure of the code based on ideas of M. Vichi.
+!
+! !INTERFACE
+  subroutine BenNBacDynamics
+!
+! !USES:
+
+  ! For the following Benthic-states fluxes are defined: Q6c, Q6n, Q6p, &
+  ! D6m, D7m, D8m
+  ! The following Benthic-states are used (NOT in fluxes): D1m, D2m
+  ! For the following Benthic-group-states fluxes are defined: &
+  ! BenDetritus, BenthicAmmonium, BenthicPhosphate
+  ! The following Benthic 1-d global boxvars  are used: ETW_Ben
+  ! The following Benthic 2-d global boxvars got a value:
+  ! The following constituent constants  are used: iiC, iiN, iiP
+  ! The following 0-d global parameters are used: p_d_tot, &
+  ! p_peZ_R1c, p_peZ_R1n, p_peZ_R1p, p_qro
+  ! The following global constants are used: RLEN
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Modules (use of ONLY is strongly encouraged!)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  use global_mem, ONLY:RLEN,ZERO,NZERO,DONE,LOGUNIT,DONE
+#ifdef NOPOINTERS
+  use mem,  ONLY: D2STATE
+#else
+  use mem, ONLY: Hac,HNc, HNn,HNp,D6m, D7m, D8m, D1m, K1p,K4n,&
+                          Qun,Q1c,Q6c, Q6n , Q6p,G2o,G3c,G3h
+#endif
+  use mem, ONLY: ppG3c, ppG2o, ppQ6c,ppQ6n, ppQ6p,ppQ1c,ppQ1n,ppQ1p,ppK4n, &
+    ppQun, ppD6m, ppD7m, ppD8m,ppK1p, ppHac,ppHNc,ppHNp,ppHNn,iiHN, iiBen, &
+    jKuK4n,jK4K3n,sK4K3, jnetHIc,ETW_Ben,G2_xavail_o, &
+    sourcesink_flux_vector, NO_BOXES_XY,flux_vector, fr_lim_HI_o, fr_lim_Ha_o, &
+    max_change_per_step, fr_lim_HI_n,fr_lim_Ha_n, fr_lim_HI_p, &
+    iiC,iiConsumption,LocalDelta,ppBenOrganisms,iiBenOrganisms
+
+  use mem_Param,  ONLY: p_peZ_R1c, p_peZ_R1n, p_peZ_R1p,&
+                        p_poro,p_p_ads_K1=>p_pK1_ae,p_qon_nitri
+  use mem_BenAmmonium, ONLY:p_p_ads_K4=>p_p,p_clM4n
+  use mem_BenNBac
+  use LimitRates, ONLY:LimitChange_vector,DoubleLimitChange_vector
+  use constants, ONLY:p_qnUc,MW_C,POSITIVE
+  use SourceFunctions,only: Source_D2_withgroup
+
+  USE BFM_ERROR_MSG, ONLY: set_warning_for_getm
+! use mem,  ONLY: Output2d_1,Output2d_2,Output2d_3, Output2d_4
+
+
+#ifdef INCLUDE_BENCO2
+  use mem,ONLY: HCO3ae
+  use mem_CO2,ONLY: p_qhK4K3n
+#endif
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! The following vector functions are used:eTq_vector, MM_vector, &
+  ! PartQ_vector, eramp_vector, insw_vector
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  use mem_globalfun, ONLY: eTq_vector, MM_vector, insw_vector
+
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
+
+! !INPUT:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+!
+! !AUTHORS
+!   P. Ruardij
+!
+!
+! !REVISION_HISTORY
+!
+!
+! COPYING
+!
+!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!EOP
+!-------------------------------------------------------------------------!
+!BOC
+!
+!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Set up Local Variable for copy of state var. object
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN)                         :: rscalar
+  integer                            ::iout
+  real(RLEN),dimension(NO_BOXES_XY)  :: cmm,clm,cm
+  real(RLEN),dimension(NO_BOXES_XY)  :: et,eo,ea
+  real(RLEN),dimension(NO_BOXES_XY)  :: rK4K3n,rK4K3An,rK4K3Bn
+  real(RLEN),dimension(NO_BOXES_XY)  :: smA,smB,sm
+  real(RLEN),dimension(NO_BOXES_XY)  :: misn,misp
+  real(RLEN),dimension(NO_BOXES_XY)  :: renn,renp
+  real(RLEN),dimension(NO_BOXES_XY)  :: rqt6c,rqt6n,rqt6p
+  real(RLEN),dimension(NO_BOXES_XY)  :: rumAc,rumBc
+  real(RLEN),dimension(NO_BOXES_XY)  :: rumAun,rumBun ! urea flux for nitrification + uptake
+  real(RLEN),dimension(NO_BOXES_XY)  :: rumA4n,rumB4n ! ammonium flux for nitrification + uptake
+  real(RLEN),dimension(NO_BOXES_XY)  :: rumAn,rumBn ! total flux for nitrification + uptake
+  real(RLEN),dimension(NO_BOXES_XY)  :: rum4n,rumun ! total flux for nitrification + uptake
+  real(RLEN),dimension(NO_BOXES_XY)  :: rump,rumAp,rumBp ! total flux for nitrification + uptake
+  real(RLEN),dimension(NO_BOXES_XY)  :: runAn,runBn ! flux available for uptake
+  real(RLEN),dimension(NO_BOXES_XY)  :: runc,runAc,runBc
+  real(RLEN),dimension(NO_BOXES_XY)  :: rugc,rugAc,rugBc
+  real(RLEN),dimension(NO_BOXES_XY)  :: reac,reaAc
+  real(RLEN),dimension(NO_BOXES_XY)  :: rrc,rrAc,rrBc,rrmAc,rrmBc
+  real(RLEN),dimension(NO_BOXES_XY)  :: ex_sw,rx_any_c,qx_any,cx_any,rx_any,px_any
+  real(RLEN),dimension(NO_BOXES_XY)  :: r_xnetgrowth_c
+  real(RLEN),dimension(NO_BOXES_XY)  :: r_xnetgrowth_Ac,r_xnetgrowth_Bc
+  real(RLEN),dimension(NO_BOXES_XY)  :: lim_r1,lim_r2,rA,rB
+  real(RLEN),dimension(NO_BOXES_XY)  :: runn,runp
+  real(RLEN),dimension(NO_BOXES_XY)  :: rupn,rupp
+  real(RLEN),dimension(NO_BOXES_XY)  :: supn
+  real(RLEN),dimension(NO_BOXES_XY)  :: qA,qB,iN
+  real(RLEN),dimension(NO_BOXES_XY)  :: lHac,lHbc
+  real(RLEN),dimension(NO_BOXES_XY)  :: m3pwtm2
+  real(RLEN),dimension(NO_BOXES_XY)  :: limit_oxygen_B,limit_oxygen_A,limit_nut
+  real(RLEN),dimension(NO_BOXES_XY)  :: limit_HCO3,limit_G3h
+  real(RLEN),dimension(NO_BOXES_XY)  :: M4n,Mun,M1p,Hbc
+  real(RLEN),dimension(NO_BOXES_XY)  :: cquMuAn,cquMuBn
+  real(RLEN),dimension(NO_BOXES_XY)  :: prumnnu_rumn
+  real(RLEN),dimension(NO_BOXES_XY)  :: r_xgrazing_c
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! External functions
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN), external  :: GetDelta
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  r_xgrazing_c=Source_D2_withgroup(ppHNc, &
+       ppBenOrganisms,iiBenOrganisms,iiC,iiConsumption)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Assign functional group-dependent parameters:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+      clm  =   ZERO
+      cm  =   D1m(:)
+      cmm  =   D1m(:)/ 2.0D+00
+
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Physiological temperature response
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=p=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  Hbc=max(ZERO,HNc-max(ZERO,Hac))
+
+! iN= (HNp/(NZERO+HNc)-p_qlpc)/(p_qpc-p_qlpc)
+  iN=max(ZERO,min((HNn/(NZERO+HNc)-p_qlnc)/(p_qnc-p_qlnc), &
+                                 (HNp/(NZERO+HNc)-p_qlpc)/(p_qpc-p_qlpc)))
+! r=ZERO
+
+  lHac=  insw_vector(Hac)
+  lHbc=  insw_vector(Hbc)
+  et  =   eTq_vector(  ETW_Ben(:),  p_q10)
+  eo = DONE-exp(- G2o(:)/D1m/p_poro / p_clO2o)
+  m3pwtm2=p_poro*(p_p_ads_K4+DONE)* D1m
+  M4n =   max(NZERO,K4n/m3pwtm2)
+  M1p =   max(NZERO,K1p/ p_poro/(p_p_ads_K1+DONE)/ D1m)
+  Mun =   max(NZERO,Qun/p_poro/D1m)
+  ea  =   DONE
+#ifdef INCLUDE_BENCO2
+  ea  =   MM_vector( HCO3ae,p_clHCO3)
+#endif
+  rscalar=NZERO+p_lureaN4bn
+  cquMuAn = rscalar/(rscalar+M4n)
+  rscalar=NZERO+p_lureaN4an
+  cquMuBn = rscalar/(rscalar+M4n)
+
+  !P uptake------------------------------------------------------------------
+  px_any=fr_lim_HI_p(iiHN,:)
+  rumAp=et*eo*ea* p_qupA*M1p*Hac*lHac
+  rumBp=et*eo*ea* p_qupB*M1p*Hbc*lHbc
+  rump=rumAp+rumBp
+  call DoubleLimitChange_vector(POSITIVE,rump,K1p,px_any, &
+                                         max_change_per_step,limit_nut)
+  rumAp=limit_nut*rumAp;rumBp=limit_nut*rumBp
+  rump=rumAp+rumBp
+  !N uptake------------------------------------------------------------------
+  px_any=fr_lim_Ha_n
+  rumA4n=et*eo*ea* p_qunA*M4n*Hac*lHac
+  call DoubleLimitChange_vector(POSITIVE,rumA4n,K4n,px_any,max_change_per_step)
+  px_any=fr_lim_HI_n(iiHN,:)-fr_lim_Ha_n
+  rumB4n=et*eo*ea* p_qunB*M4n*(Hbc)*lHbc
+  call DoubleLimitChange_vector(POSITIVE,rumB4n,K4n,px_any,max_change_per_step)
+  rum4n=rumA4n+rumB4n !total uptake of ammonium
+
+  px_any=fr_lim_Ha_n
+  rumAun=cquMuAn*p_qunA *et*eo*ea*Mun*Hac*lHac
+  rx_any_c=rumAun/p_qnUc
+  call DoubleLimitChange_vector(POSITIVE,rumAun,  Qun,px_any, &
+                                         max_change_per_step, lim_r1)
+  call DoubleLimitChange_vector(POSITIVE,rx_any_c,Q1c,px_any, &
+                                         max_change_per_step, lim_r2)
+  lim_r1=min(lim_r1,lim_r2)
+  rumAun=rumAun*lim_r1
+  px_any=fr_lim_HI_n(iiHN,:)-fr_lim_Ha_n
+  rumBun=cquMuBn*p_qunB *et*eo*ea*Mun*Hbc*lHbc
+  rx_any_c=rumBun/p_qnUc
+  call DoubleLimitChange_vector(POSITIVE,rumBun,  Qun,px_any, &
+                                        max_change_per_step, lim_r1)
+  call DoubleLimitChange_vector(POSITIVE,rx_any_c,Q1c,px_any, &
+                                        max_change_per_step,  lim_r2)
+  lim_r1=min(lim_r1,lim_r2)
+  rumBun=rumBun*lim_r1
+
+  !ammonium and urea uptake  by bacteria and archaea
+  rum4n=rumA4n+rumB4n
+  rumun=rumAun+rumBun
+  !nitrogen uptake by resp. archaea and bacteria
+  rumAn=rumA4n+rumAun
+  rumBn=rumB4n+rumBun
+  ! quotum urea:ammonium in uptake for resp archaea and bacteria
+  qA=rumAun/(NZERO+rumAn)
+  qB=rumBun/(NZERO+rumBn)
+  ! oxygen flux due top nitrification is defined in BenAmmonium.F90
+
+  ! p_qnNc : Reverse of Yield mgN/mmolrC
+  supn=p_qnc/p_qnNc
+  rumAc=iN* et*eo *p_suA * Hac(:)*lHac
+  rumBc=iN* et*eo *p_suB * Hbc*lHbc
+  rugAc=min(rumAc,rumAn/(p_qnNc*(DONE+supn)))
+  rugBc=min(rumBc,rumBn/(p_qnNc*(DONE+supn)))
+
+  rK4K3An=rugAc*p_qnNc
+  rK4K3Bn=rugBc*p_qnNc
+  rK4K3n=rK4K3Bn+rK4K3An
+  ! In case of low nutrients the gain is compared with the costs to be active
+  ! if the gain is zero ther is only a small loss for mainentnace respiration
+
+  limit_HCO3=DONE
+  limit_G3h=DONE
+#ifdef INCLUDE_BENCO2
+  !limitation on dissolved organic C
+  rx_any_c  =(rugAc+rugBc) ! prim prod recalculated to mmolC/m3 porewater
+  !limitation on lack of alkalinity
+  call LimitChange_vector(POSITIVE,rx_any_c,G3c,max_change_per_step,limit_HCO3)
+  rx_any =rK4K3n*p_qhK4K3n
+  call LimitChange_vector(POSITIVE,rx_any,G3h,max_change_per_step,limit_G3h)
+#endif
+  !limitation on dissolved  oxygen
+  rB=rK4K3n*p_qon_nitri*qB
+  px_any=fr_lim_HI_o(iiHN,:)-fr_lim_Ha_o
+  call DoubleLimitChange_vector(POSITIVE,rB,G2_xavail_o,px_any, &
+                                max_change_per_step,limit_oxygen_B)
+  rA=rK4K3n*p_qon_nitri*qA
+  px_any=fr_lim_Ha_o
+  call DoubleLimitChange_vector(POSITIVE,rA,G2_xavail_o,px_any, &
+                                max_change_per_step,limit_oxygen_A)
+  rugAc=rugAc*min(limit_G3h,limit_HCO3,limit_oxygen_A)
+  rrAc =rugAc *p_pra
+  rrmAc = et * p_srA * Hac(:)*lHac
+  runAc=rugAc-rrAc
+  ex_sw=insw_vector(runAc)
+  rK4K3An=rK4K3An*min(limit_G3h,limit_HCO3,limit_oxygen_A)*ex_sw
+  rumAn=rumAn*ex_sw
+  rrAc=rrAc*ex_sw
+  rugAc=rugAc*ex_sw
+  runAn=rumAn-rK4K3An
+
+  rugBc=rugBc*min(limit_G3h,limit_HCO3,limit_oxygen_B)
+  rrBc =rugBc *p_pra
+  rrmBc = et * p_srB * Hbc(:)*lHbc
+  runBc=rugBc-rrBc
+  ex_sw=insw_vector(runBc)
+  rK4K3Bn=rK4K3Bn*min(limit_G3h,limit_HCO3,limit_oxygen_B)*ex_sw
+  rumBn=rumBn*ex_sw
+  rrBc=rrBc*ex_sw
+  rugBc=rugBc*ex_sw
+  runBn=rumBn-rK4K3Bn
+
+  !In case of negative growth: we assume direct cystis formation
+  !leading: to a complate inactive nitrifier bacteria!
+  !sum of fluxes of nitrifying bacteria (Hbc) and archea (Hac) to total HNc
+  !uptake of C in urea  used for respiration.
+  !gross production
+  rugc=rugBc+rugAc
+  if (rugc(1).lt.0.0) then
+     write(LOGUNIT,*) 'HNc rugc<0 rugBc,rugAc,limit*', &
+            rugBc,rugAc,limit_G3h,limit_HCO3,limit_oxygen_B,limit_oxygen_A
+     write(LOGUNIT,*)'rumAc,rumAn,Hbc,Hac',rumAc,rumAn,Hbc,Hac
+     write(LOGUNIT,*)'et,eo,ea, p_qunA,M4n,Hac,lHac,K4n,HCO3ae,fr_lim_Ha_n`', &
+             et,eo,ea, p_qunA,M4n,Hac,lHac,K4n,HCO3ae,fr_lim_Ha_n
+  endif
+  call sourcesink_flux_vector(iiBen, ppG3c,ppHNc,  rugc)
+  call flux_vector(iiBen, ppG2o,ppG2o, rugc/MW_C)
+  !keep track of nitrifyiing archea (HAc!
+  call flux_vector(iiBen, ppHac,ppHac,rugAc)
+
+  !activity + maintenance  respiration
+  rrc=rrBc+rrAc+rrmAc+rrmBc
+
+  runAc=rugAc-rrAc-rrmAc                        !net growth of bacteria+archea
+  runBc=rugBc-rrBc-rrmBc                        !net growth of bacteria+archea
+  runc= runAc+runBc                        !net growth of bacteria+archea
+  rK4K3n=rK4K3Bn+rK4K3An               !corrected total nitrification!
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Calculation of potential nutrient uptake
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  ! a too high nutrient content of food is related to the food uptake (r < 0)
+  ! a too low  nutrient content of food is related to net growth      (r > 0)
+
+  cx_any=Hac*lHac+Hbc*lHbc
+  rupn=max(ZERO,runc*p_qnc-r_xgrazing_c*p_qnc)
+  qx_any=(p_qnc*cx_any-max(ZERO,HNn(:)))/(NZERO+cx_any)
+  misn = max(rrmAc+rrmBc,rugc)*qx_any
+  renn=max(-rupn-misn,-runAn-runBn)
+
+  rupp=max(ZERO,runc*p_qpc-r_xgrazing_c*HNp/(NZERO+cx_any))
+  qx_any=(p_qpc*cx_any-max(ZERO,HNp(:)))/(NZERO+cx_any)
+  misp = max(rrmAc+rrmBc,rugc)*qx_any
+  renp=max(-rupp-misp,-rump)
+
+  !nutrients need for growth
+
+  !net nutrient uptake
+
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Carbon correction: all C which cannot be used for growth due to
+  ! lack of nutrients is excreted!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  px_any=Hac*lHac/(Hac*lHac+Hbc)
+  r_xnetgrowth_c  =   min(  runc,(-renn)/ p_qlnc,(-renp)/ p_qlpc)
+  r_xnetgrowth_Bc =   min(  runBc,(DONE-px_any)*(-renn)/ p_qlnc, &
+                                              (DONE-px_any)*(-renp)/ p_qlpc)
+  r_xnetgrowth_Ac =   min(  runAc,px_any*(-renn)/ p_qlnc,px_any*(-renp)/ p_qlpc)
+  r_xnetgrowth_c  =   max(  r_xnetgrowth_c,  ZERO)
+  r_xnetgrowth_Ac =   max(  r_xnetgrowth_Ac, ZERO)
+  r_xnetgrowth_Bc =   max(  r_xnetgrowth_Bc, ZERO)
+  rK4K3An=rK4K3An*insw_vector(r_xnetgrowth_Ac)
+  rK4K3Bn=rK4K3Bn*insw_vector(r_xnetgrowth_Bc)
+  rK4K3n=rK4K3Bn+rK4K3An               !corrected total nitrification!
+
+  !excretion if gross fixation of carbon in case of nutrient limitation
+  reac =max(ZERO,runc-r_xnetgrowth_c)
+  reaAc =max(ZERO,runAc-r_xnetgrowth_Ac)
+  runc  =   r_xnetgrowth_c
+  jnetHIc(iiHN,:)=runc
+
+  ! excretion of nutrients or in case of "negative" growth
+  renn  =   renn *insw_vector(runc) -min(ZERO,misn)
+  call LimitChange_vector(POSITIVE,renn,HNn,max_change_per_step)
+  renp  =   renp *insw_vector(runc) -min(ZERO,misp)
+  call LimitChange_vector(POSITIVE,renp,HNp,max_change_per_step)
+
+  !total nitrification  - nutrients needed for growth
+  rx_any=max(ZERO,rK4K3n-max(ZERO,-renn))
+  sK4K3 =max(NZERO,(NZERO+rx_any)/m3pwtm2/(p_clM4n+ M4n(:)))
+  jK4K3n= sK4K3*m3pwtm2*M4n(:)
+  !calc fraction urea uptake
+  prumnnu_rumn=rumun/(NZERO+rum4n+rumun)
+  jKuK4n=jK4K3n*prumnnu_rumn
+
+  ! rate of urea uptake ( C-uptake is is already earlier defined)
+  call flux_vector(iiBen,ppQun,ppK4n,jKuK4n)
+  call sourcesink_flux_vector(iiBen,ppQ1c,ppG3c,jKuK4n/p_qnUc)
+  ! first order specific rate needed for diagnetic models of ammonium,nitrate
+! call findnan(sK4K3,NO_BOXES_XY,iout)
+! if ( iout.gt.0) then
+!    write(LOGUNIT,*) 'NaN for sK4K3'
+!    write(LOGUNIT,*) 'K4n=',K4n
+!    write(LOGUNIT,*) 'M4n=',M4n
+!    write(LOGUNIT,*) 'Qun=',Qun
+!    write(LOGUNIT,*) 'rum4n=',rum4n
+!    write(LOGUNIT,*) 'rumun=',runc
+!    write(LOGUNIT,*) 'renn=',renn
+!    write(LOGUNIT,*) 'misn=',misn
+!    write(LOGUNIT,*) 'rumAn,rumBn=',rumAn,rumBn
+!    write(LOGUNIT,*) 'HNc,Hac=',HNc,Hac
+!    write(LOGUNIT,*) 'HNn=',HNn
+! endif
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !flux respiration
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  call sourcesink_flux_vector(iiBen, ppHNc,ppG3c,  rrc)
+  call            flux_vector(iiBen, ppG2o,ppG2o, -rrc/MW_C)
+  !keep track of nitrifyiing archea (HAc)
+  call flux_vector(iiBen, ppHac,ppHac, -rrAc-rrmAc)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Calculation of mortality
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  ! This suggest that that in anoxic cirumstances cells keep in shape but
+  ! are inactive. No mortality at small biomasses
+  sm =p_thdo/ ( iN+ p_thdo)* p_sd
+
+  smA  =   sm+ p_sd2*Hac*lHac /D1m/p_poro
+  smB  =   sm+ p_sd2*Hbc*lHbc /D1m/p_poro
+  sm=max(ZERO, (smA*Hac*lHac+smB*Hbc*lHBc)/(NZERO+Hac*lHac+Hbc*lHbc))
+  cx_any=DONE
+  call LimitChange_vector(POSITIVE,sm,cx_any,max_change_per_step,lim_r1)
+  smA= smA *lim_r1;smB= smB *lim_r1;sm= sm *lim_r1
+
+  rqt6c  =   (Hac*lHac+Hbc*lHbc)* sm*( DONE- p_peZ_R1c)
+  rqt6n  =   max(ZERO,HNn(:)* sm*( DONE- p_peZ_R1n))
+  rqt6p  =   max(ZERO,HNp(:)* sm*( DONE- p_peZ_R1p))
+
+  if (rqt6c(1)<ZERO.or.reac(1)<ZERO) then
+   write(LOGUNIT,*) 'rqt6c,reac,HBc,Hac,Hnc,sm,runc,D1m:', &
+       rqt6c,reac,HBc,Hac,Hnc,sm,runc,D1m
+  endif
+
+  call flux_vector( iiBen, ppHNc,ppQ1c, reac+ (Hac*lHac+Hbc*lHbc)* sm* p_peZ_R1c )
+  call flux_vector( iiBen, ppHac,ppHac,-reaAc-Hac(:)*lHac* smA)
+  call findnan(reac+ (Hbc+Hac)* sm* p_peZ_R1c ,NO_BOXES_XY,iout)
+  call flux_vector( iiBen, ppHNn,ppQ1n, max(ZERO,  HNn(:)* sm* p_peZ_R1n) )
+  call flux_vector( iiBen, ppHNp,ppQ1p, max(ZERO,  HNp(:)* sm* p_peZ_R1p) )
+
+  call flux_vector( iiBen, ppHNc,ppQ6c, rqt6c )
+  call flux_vector( iiBen, ppHNn,ppQ6n, rqt6n )
+  call flux_vector( iiBen, ppHNp,ppQ6p, rqt6p )
+
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Fluxes
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  !uptake
+  rx_any=renn*prumnnu_rumn
+  call flux_vector(iiBen, ppQun,ppHNn, -rx_any        * insw_vector(-renn))
+  call flux_vector(iiBen, ppK4n,ppHNn, -(renn-rx_any) * insw_vector(-renn))
+  call flux_vector(iiBen, ppK1p,ppHNp, -renp * insw_vector(-renp))
+  !excretion
+  call flux_vector(iiBen, ppHNn,ppK4n,  renn * insw_vector(renn))
+  call flux_vector(iiBen, ppHNp,ppK1p,  renp * insw_vector(renp))
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Calculation of changes due to uptake of detritus in distribution
+  ! of state variables (Dx.m is a undetermined source)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  call flux_vector(iiBen, ppD6m,ppD6m,sign((cmm- abs(D6m))*rqt6c,D6m) &
+                                                      /(NZERO+ Q6c(:)))
+  call flux_vector(iiBen, ppD7m,ppD7m,sign((cmm- abs(D7m))*rqt6n,D7m)/ &
+                                                      (NZERO+ Q6n(:)))
+  call flux_vector(iiBen, ppD8m,ppD8m,sign((cmm- abs(D8m))*rqt6p,D8m)/ &
+                                                      (NZERO+ Q6p(:)))
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Artifical flux to be sure that the nitrifying bacteria stay alive
+  ! This is done to move some biomass of the archear to the bacteria at low
+  ! biomass of the bacteria
+  ! If proportion of of nitrifying bacteria is less then 0.01 of nitrifying
+  ! archea then there is a flux 10% of archea
+  ! which transfer into a bacteria
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  end
+
+  subroutine CalcLossHac()
+  use global_mem, ONLY:RLEN, DONE,NZERO,ZERO
+  use constants, ONLY:SEC_PER_DAY,POSITIVE
+  use mem,only: D2SINK,iiBen,ppHNc,ppHac,ppBenOrganisms,iiBenOrganisms, &
+    iiC,HNc,Hac,NO_BOXES_XY,flux_vector,max_change_per_step
+! use mem,  ONLY: Output2d_1,Output2d_2,Output2d_3, Output2d_4
+  use mem_BenNBac,ONLY:p_suA,p_suB
+  use LimitRates, ONLY:LimitChange_vector
+  use mem_globalfun, ONLY: insw_vector
+
+  implicit none
+  integer                                  ::i
+  REAL(RLEN),dimension(NO_BOXES_XY)        ::rmHnc
+  REAL(RLEN),dimension(NO_BOXES_XY)        ::rmHbc
+  REAL(RLEN),dimension(NO_BOXES_XY)        ::rmHac
+  REAL(RLEN),dimension(NO_BOXES_XY)        ::p,r
+  ! total of losses ( here only due to grazing)
+  rmHnc=ZERO
+  do i=1,iiBenOrganisms
+    rmHNc=rmHNc+ D2SINK( ppHNc,ppBenOrganisms(i,iiC),:)*SEC_PER_DAY
+  enddo
+  !Calculate part of Hac in Hnc and limit Hac to a minimum value
+  p=min(DONE,Hac/(NZERO+HNc))
+  !Calculate loss of Hac
+  rmHac=ZERO;rmHbc=ZERO
+  where (rmHnc>ZERO)
+    rmHac=rmHNc*p
+    !In this way for small number of Hnc grazing on Hac is limited.
+  !Calculate loss of Hbc (nitrifying bacteria)
+    p=min(DONE,(HNc-Hac)/(NZERO+HNc))
+    rmHbc=rmHNc*p
+  endwhere
+  !In this way for small number of HNc grazing on Hbc is limited.
+  p=insw_vector(HNc-Hac)
+  call LimitChange_vector(POSITIVE,rmHac,(Hac-0.01*HNc*p),max_change_per_step)
+  call LimitChange_vector(POSITIVE,rmHbc,(0.01*HNc*p),max_change_per_step)
+
+  ! redistriubte mortality over the 2 types, such that both survive
+  p=(rmHNc)/(NZERO+ rmHac+rmHbc)
+  rmHac=rmHac*p; rmHbc=rmHbc*p
+  call flux_vector(iiBen,ppHac,ppHac,-rmHac)
+  call flux_vector(iiBen,ppHNc,ppHNc,-(rmHac+rmHbc)+rmHNc)
+
+  p=insw_vector(Hac)
+  !keep track that proportion between HNc/Hac en Hac/Hnc always > 0.01
+  r=p_suB*max(ZERO,0.01*HNc-(HNc-Hac))-p_suA*max(ZERO,0.01*HNc-Hac)
+  call flux_vector(iiBen,ppHac,ppHac,-r)
+
+
+  return
+  end
+
+!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

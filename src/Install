@@ -1,0 +1,62 @@
+install tar from getm-website with getm-setups/v2.0.0
+
+-ftp gotm_ersem.tgz to local directory
+-unpack gotm_ersem.tgz
+
+-copy Rules.make to getm-setups/v2.0.0
+
+
+-Unpack for tar-files:
+    gotm
+    bfm
+    getm
+    nml
+
+-cd to new bfm/src
+-cd ./gotm
+
+
+-DO:   
+  ../BFM/scripts/Manage_Coupling_BFM -list    GOTMDIR=<directory where put gotm>
+
+ ( example../BFM/scripts/Manage_Coupling_BFM -list GETMDIR=/home/rua/GOTM_SOURCES/getm-2.2.2)
+
+You get a summary about the files which are replaced by the ones in bfm/gotm 
+directory or are added to the gotm
+       
+-DO:   
+../BFM/scripts/Manage_Coupling_BFM -couple GOTMDIR=<directory where put gotm>
+      
+All Makefiles in the directory BFMMakes replaces one the the gotm directory
+All original Makefiles are kept by renaming and copying them to the 
+                                                         BFMmakes directory
+-cd to getm-directory in the new bfm
+-DO:   
+../BFM/scripts/Manage_Coupling_BFM -list GETMDIR=<directory where put getm directoy>
+
+ You get a summary about the files which are replaced by the ones 
+in bfm/getm directory or are added to the gotm
+       
+DO:   
+../BFM/scripts/Manage_Coupling_BFM -couple  GETMDIR=<directory where put getm directory>
+      
+-First compile gotm
+-Compile getm from a directory in the getm-setups directory
+-Ready!
+
+All Makefiles in the directory BFMMakes replaces one the the getm directory
+All original Makefiles are kept by renaming and copying them to the 
+BFMmakes directory
+
+!!! The script Manage_Coupling_BFM works only if you are in a getm or 
+    gotm directory and if a directory BFMMakes is present!!
+
+!!! The script Manage_Coupling_BFM inlucde more options : 
+-do ../BFM/scripts/Manage_Coupling_BFM -help
+    ( example: -uncouple,-compare...................)
+
+
+The nml directory include all .nml  and .inp files which you need for a 3d run.
+
+
+

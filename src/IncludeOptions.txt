@@ -1,0 +1,18 @@
+#Make possible to output calculated profiles in sediment
+list(APPEND DEFINES  -DINCLUDE_DIAGNOS_PRF)
+
+#Include dynamics of CO2 in pelagic  ( modelling of DIC and Alkalinity)
+list(APPEND DEFINES  -DINCLUDE_PELCO2)
+
+#Include dynamics of CO2 in benthic  ( modelling of DIC and Alkalinity)
+list(APPEND DEFINES  -DINCLUDE_BENCO2)
+
+#Include modelling of macrophytes on floating bodies in the pelagic
+#list(APPEND DEFINES  -DINCLUDE_MACROPHYT)
+
+#Include the calculation of Depth where 1% of the light is available
+#list(APPEND DEFINES  -DINCLUDE_l1pop)
+
+#Include new processes 
+#list(APPEND DEFINES  -DINCLUDE_NEW)
+

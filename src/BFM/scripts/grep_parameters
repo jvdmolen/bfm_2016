@@ -1,0 +1,4 @@
+#!/bin/sh
+
+grep -v -E '^ *!|^ *use' $1 | grep -o -E '[^A-Za-z]p_[A-Za-z0-9_()]+' 
+

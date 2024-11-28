@@ -1,0 +1,666 @@
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50-g
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!BOP
+!
+! !ROUTINE: MacroPhyto
+!
+! DESCRIPTION
+!   Parameter values for the phytoplankton groups
+!
+!
+
+!   This file is generated directly from OpenSesame model code, using a code 
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij.
+!   structure of the code based on ideas of M. Vichi.
+!
+! !INTERFACE
+  module mem_MacroPhyto
+!
+! !USES:
+
+  use global_mem
+  use mem,  ONLY: NO_BOXES_XY,iiMacroContent
+  USE BFM_ERROR_MSG, ONLY: BFM_ERROR,set_warning_for_getm
+
+!  
+!
+! !AUTHORS
+!   Piet Ruardij
+!
+!
+!
+! !REVISION_HISTORY
+!   !
+!
+!
+! COPYING
+!   
+!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team 
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!EOP
+!-------------------------------------------------------------------------!
+!BOC
+!
+!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Default all is public
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  public
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! MacroPhyto PARAMETERS (read from nml)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  !
+  !  ---------------- Physiological parameters -----------------
+  !
+!Structural parameters
+  real(RLEN),dimension(iiMacroContent)  :: p_plMsc
+  real(RLEN),dimension(iiMacroContent)    :: p_pAqc
+  real(RLEN),dimension(iiMacroContent)    :: p_suMs
+  real(RLEN),dimension(iiMacroContent)    :: p_xmA1
+  real(RLEN),dimension(iiMacroContent)    :: p_xmA2
+  real(RLEN),dimension(iiMacroContent)    :: p_mAx
+  real(RLEN),dimension(iiMacroContent)    :: p_epsilon
+  real(RLEN),dimension(iiMacroContent)    :: p_gamma
+! depth at which macrophyt are cultivated.
+  real(RLEN),dimension(iiMacroContent)    :: p_depth  
+! Daynumber on which ReInitialization of macrophyt-biomass  by 
+! new floating bodies with young macrophyto in the water 
+  integer,dimension(iiMacroContent)       :: p_start  
+! daynumber on which floating bodies are harvested.
+  integer,dimension(iiMacroContent)       :: p_fin    
+! number of lines on one body
+  real(RLEN),dimension(iiMacroContent)    :: p_lines  
+! length of floating body
+  real(RLEN),dimension(iiMacroContent)    :: p_length_m 
+!distance between the lines
+  real(RLEN),dimension(iiMacroContent)    :: p_vdist_m   
+! number of plants per meter (a=n/m),dimension(iiMacroStructure)  
+  real(RLEN),dimension(iiMacroContent)    :: p_plants_a 
+! number of floating bodies.
+  real(RLEN),dimension(iiMacroContent)    :: i_fb     
+!initial condition mgC/mline
+  real(RLEN),dimension(iiMacroContent)    :: iMsc     
+!maximal thicksness of layer with macrophytes (sepcies dependent)
+  real(RLEN),dimension(iiMacroContent)    :: p_xthick_m     
+!Classice parameters
+  real(RLEN),dimension(iiMacroContent)    :: p_q10   
+! Doubling temperature
+  real(RLEN),dimension(iiMacroContent)    :: p_sum   
+! Maximal productivity at 10 degrees C
+  real(RLEN),dimension(iiMacroContent)    :: p_srs   
+! Respiration rate at 10 degrees C
+  real(RLEN),dimension(iiMacroContent)    :: p_ses   
+! Excretion rate at 10 degrees C
+  real(RLEN),dimension(iiMacroContent)    :: p_sm    
+! Maximal Mortality dependent on sutface Macrophyt 
+  real(RLEN),dimension(iiMacroContent)    :: p_pu_ea 
+! Fraction of pp excreted as PLOC/PDET
+  real(RLEN),dimension(iiMacroContent)    :: p_pu_ra 
+! Activity respiration rate
+  !
+  !  ---------------- Nutrient parameters in phytoplankton -----------------
+  !
+  real(RLEN),dimension(iiMacroContent)    :: p_qnRc !optimal quoata
+  real(RLEN),dimension(iiMacroContent)    :: p_qnlc !optimal quoata
+  real(RLEN),dimension(iiMacroContent)    :: p_xqn
+  real(RLEN),dimension(iiMacroContent)    :: p_qpRc
+  real(RLEN),dimension(iiMacroContent)    :: p_qplc !optimal quoata
+  real(RLEN),dimension(iiMacroContent)    :: p_xqp
+  real(RLEN),dimension(iiMacroContent)    :: p_qun
+  real(RLEN),dimension(iiMacroContent)    :: p_qup
+!NH4-conc. where limitation of NO3 uptake to 0.5 
+  real(RLEN),dimension(iiMacroContent)    :: p_lN3N4n 
+! NH4-conc. where limitation of urea uptake to 0.5 
+  real(RLEN),dimension(iiMacroContent)    :: p_lureaN4n
+  real(RLEN),dimension(iiMacroContent)    :: p_lN1
+! Initial slope P-I curve
+  real(RLEN),dimension(iiMacroContent)    :: p_alpha_chl  
+  real(RLEN),dimension(iiMacroContent)    :: p_Ke  
+  real(RLEN),dimension(iiMacroContent)    :: p_clO2o
+  integer,dimension(iiMacroContent)       :: p_iRI
+  integer     :: sw_mass_cons  
+!mass_cons==1:  harvest macrophyt is returned and mixed into the watercolumn
+                                            ! as R6 ( slow-degrading detritus )
+
+  !
+  !  ------------- Chlorophyll parameters -----------
+  !  skel: Skeletonema costatum pav: Pavlova lutheri
+  !  syn: Synechoccus sp. (significant alpha decrease with irradiance)
+  !  gyr: Gyrodinium sp. iso: Isochrysis galbana
+  !              skel     iso      syn      gyr
+! Specific turnover rate for Chla [d-1] in light
+  real(RLEN),dimension(iiMacroContent)    :: p_sdchl_l  
+! Specific turnover rate for Chla [d-1] in dark
+  real(RLEN),dimension(iiMacroContent)    :: p_sdchl_d  
+! Nutrient stress threshold for Sinking
+  real(RLEN),dimension(iiMacroContent)    :: p_esNI  
+! Fixed/Maximum quotum Chla:C dependent on ChlLightFlag [mg Chla (mg C)-1]
+  real(RLEN),dimension(iiMacroContent)     :: p_qchlc  
+! max number of division per day
+  real(RLEN),dimension(iiMacroContent)     :: p_xdiv  
+! ligt where above bleaching appears
+  real(RLEN),dimension(iiMacroContent)     :: p_EIR  
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Parameters valid only for one functional group/all functional groups:
+  integer     :: sw_rhochl ! to play with rho_chl an d to tryother formulations 
+  integer     :: p_limnut  ! switch for nut. limitation (Liebig is default)
+
+  integer status
+  logical,public                           :: init_flag(iiMacroContent)
+  logical                                  :: run_1d=.true.
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! julian daynumber of jan 1 of the running year:
+  integer,public,dimension(:,:),allocatable        :: save_day0
+  ! maximum surface which can be used by macrophytes :
+  real(RLEN),public,dimension(:,:),allocatable     :: farm_surface
+  !status==0: no macrophyt present. status==1: macrophyt are growing;
+  integer,public,dimension(:,:),allocatable        :: save_status
+  integer,public,dimension(:,:),allocatable        :: save_year
+  integer,public,dimension(:,:),allocatable        :: save_julian
+  integer,public,dimension(:,:),allocatable        :: layerMsm
+  real(RLEN),public,dimension(:,:),allocatable     :: Depth_Msc
+  real(RLEN),public,dimension(:),allocatable       :: surface
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
+
+  public InitMacroPhyto,flux_vector_m3m2,sourcesink_flux_vector_m3m2, &
+        recalc_pel_to_ben,recalc_ben_to_pel,test_MacroPhyto_status,  &
+        test_MacroPhytogroup_status, &
+        DeterminLayerWithMacroPhyto,AddMacroPhytAddToMassConservationNP
+  contains
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  subroutine InitMacroPhyto()
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  namelist /MacroPhyto_parameters/p_plMsc,p_pAqc,p_suMs,p_xmA1,p_xmA2,p_mAx,&
+    p_epsilon, p_gamma,p_depth, p_start,p_fin, p_lines,p_length_m, &
+    p_vdist_m,p_plants_a,i_fb,iMsc,p_xthick_m, &
+    p_q10, p_sum, p_srs, p_ses,p_sm, &
+    p_pu_ra, p_qnRc,p_qnlc, p_qpRc,p_qplc, &
+    p_qun, p_qup, p_xqn, p_xqp, p_iRI, &
+    p_lN3N4n,p_lureaN4n,p_lN1,p_alpha_chl,p_Ke,p_sdchl_l, &
+    p_sdchl_d,p_clO2o,p_qchlc,p_xdiv, p_EIR,sw_mass_cons
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  !BEGIN compute
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  !  Open the namelist file(s)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! julian daynumber of jan 1 of the running year:
+    allocate(save_day0(1:iiMacroContent,1:NO_BOXES_XY),stat=status)   !D3
+    !set everytimestep
+    allocate(farm_surface(1:iiMacroContent,1:NO_BOXES_XY),stat=status)
+    allocate(save_status(1:iiMacroContent,1:NO_BOXES_XY),stat=status) !D3
+    allocate(save_year(1:iiMacroContent,1:NO_BOXES_XY),stat=status)   !D3
+    allocate(save_julian(1:iiMacroContent,1:NO_BOXES_XY),stat=status) !D3
+    !set everytimestep Determin
+    allocate(layerMsm(1:iiMacroContent,1:NO_BOXES_XY),stat=status)    
+    !set everytimestep Determin
+    allocate(Depth_Msc(1:iiMacroContent,1:NO_BOXES_XY),stat=status)    
+    allocate(surface(1:NO_BOXES_XY),stat=status)     !D2
+    save_status=0;save_year=0;save_julian=0;sw_mass_cons=0
+    p_EIR=300.0
+    write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    write(LOGUNIT,*) "#  Reading MacroPhyto parameters.."
+    open(NMLUNIT,file='MacroPhyto.nml',status='old',action='read',err=100)
+    read(NMLUNIT,nml=MacroPhyto_parameters,err=101)
+    close(NMLUNIT)
+    write(LOGUNIT,*) "#  Namelist is:"
+    write(LOGUNIT,nml=MacroPhyto_parameters)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  !END compute
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  return
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Error Messages
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+100 call error_msg_prn(NML_OPEN,"InitMacroPhyto.f90","MacroPhyto.nml")
+101 call error_msg_prn(NML_READ,"InitMacroPhyto.f90","MacroPhyto_parameters")
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  end  subroutine InitMacroPhyto
+
+  subroutine flux_vector_m3m2(layer,from,source,tom,goal,rate,m3tm2,psur)
+  use mem, only:BoxNumberY,NO_BOXES_Y,BoxNumberX,NO_BOXES_X,BoxNumber, &
+                BoxNumberXY,flux_vector,flux,iiPel,iiBen
+  
+  implicit none
+  integer,intent(IN),dimension(NO_BOXES_XY)   :: layer
+  integer,intent(IN)                          :: from
+  integer,intent(IN)                          :: source
+  integer,intent(IN)                          :: tom
+  integer,intent(IN)                          :: goal
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY):: rate
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY):: m3tm2
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY):: psur
+
+  integer,external             :: D2toD1,D3toD1
+
+  if (from .ne. tom ) then
+    if ( minval(rate)<ZERO) then
+      write(LOGUNIT,*) 'flux_vector_m3m2: rate is negative from,source,tom,goal:',from,source,tom,goal
+      stop
+    endif
+  endif
+  if (from == tom.and.goal==iiBen ) then
+    if (abs(sum(m3tm2)-DONE) < 1.0e-6 ) then
+       stop 'flux_vector_m3m2: Use standard routine '
+    else
+       call flux_vector(from,source,goal,rate)
+    endif
+  else
+    DO BoxNumberY=1,NO_BOXES_Y
+      DO BoxNumberX=1,NO_BOXES_X
+        BoxNumberXY=D2toD1(BoxNumberX,BoxNumberY)
+        BoxNumber=D3toD1(BoxNumberX,BoxNumberY,layer(BoxNumberXY))
+        if ( from.eq.iiPel .and.tom.eq.iiBen) then
+          call flux(BoxNumberXY,iiBen,goal,goal,rate(BoxNumberXY))
+          call flux(BoxNumber,  iiPel,source,source, &
+                 -rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY))
+        elseif (from.eq.iiBen.and.tom.eq.iiPel) then
+          call flux(BoxNumberXY,iiBen,source,source,-rate(BoxNumberXY))
+          call flux(BoxNumber,  iiPel,goal,goal, &
+                rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY))
+        elseif (from.eq.iiPel.and.tom.eq.iiPel) then
+          call flux(BoxNumber,  iiPel,goal,goal, &
+                rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY))
+        endif
+      enddo
+    enddo
+  endif
+  end subroutine flux_vector_m3m2
+
+  subroutine sourcesink_flux_vector_m3m2(layer, from, source,tom,goal, &
+                                             rate,m3tm2,psur )  ! source/sink.c
+  use mem, only:BoxNumberY,NO_BOXES_Y,BoxNumberX,NO_BOXES_X,BoxNumber, &
+      BoxNumberXY,sourcesink_flux_vector,sourcesink_flux,iiPel,iiBen
+  
+  implicit none
+  integer,intent(IN),dimension(NO_BOXES_XY)   :: layer
+  integer,intent(IN)                          :: from
+  integer,intent(IN)                          :: source
+  integer,intent(IN)                          :: tom
+  integer,intent(IN)                          :: goal
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY) :: rate
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY) :: m3tm2
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY) :: psur
+
+  integer,external             :: D2toD1,D3toD1
+
+  if (from .ne. tom ) then
+    if ( minval(rate)<ZERO) then
+      write(LOGUNIT,*) 'sourcesink_flux_vector_m3m2: rate is negative from,source,tom,goal:',from,source,tom,goal
+      stop
+    endif
+  endif
+  if (from == tom.and.goal==iiBen ) then
+    if (abs(sum(m3tm2)-DONE) > 1.0e-6 ) then
+       stop 'sourcesink_flux_vector_m3m2: Use standard routine '
+    else
+       call sourcesink_flux_vector(from,source,goal,rate)
+    endif
+  else
+    DO BoxNumberY=1,NO_BOXES_Y
+      DO BoxNumberX=1,NO_BOXES_X
+        BoxNumberXY=D2toD1(BoxNumberX,BoxNumberY)
+        BoxNumber=D3toD1(BoxNumberX,BoxNumberY,layer(BoxNumberXY))
+        if ( from.eq.iiPel .and.tom.eq.iiBen) then
+          call sourcesink_flux(BoxNumberXY,iiBen,goal,goal,rate(BoxNumberXY))
+          call sourcesink_flux(BoxNumber,  iiPel,source,source, &
+                      -rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY))
+        elseif (from.eq.iiBen.and.tom.eq.iiPel) then
+          call sourcesink_flux(BoxNumberXY,iiBen,source,source, &
+                                                   -rate(BoxNumberXY))
+          call sourcesink_flux(BoxNumber,  iiPel,goal,goal, &
+                      rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY))
+        elseif (from.eq.iiPel.and.tom.eq.iiPel) then
+          call sourcesink_flux(BoxNumber,  iiPel,goal,goal, &
+                       rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY))
+        endif
+      enddo
+    enddo
+  endif
+  end subroutine sourcesink_flux_vector_m3m2
+
+  subroutine recalc_pel_to_ben(mode,layer,input,m3tm2,psur,inout)
+  use constants, ONLY:GET,ADD
+  use mem, only:BoxNumberY,NO_BOXES_Y,BoxNumberX,NO_BOXES_X,BoxNumber, &
+               BoxNumberXY,NO_BOXES
+  
+  implicit none
+  integer,intent(IN)                              :: mode
+  integer,intent(IN),dimension(NO_BOXES_XY)       :: layer
+  real(RLEN),intent(IN),dimension(NO_BOXES)       :: input
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY)    :: m3tm2
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY)    :: psur
+  real(RLEN),intent(INOUT),dimension(NO_BOXES_XY) :: inout
+
+  integer,external             :: D2toD1,D3toD1
+!write(LOGUNIT,*)'recalc_pel_to_ben'
+  if ( mode.ne.ADD) inout=ZERO
+  DO BoxNumberY=1,NO_BOXES_Y
+    DO BoxNumberX=1,NO_BOXES_X
+!write(LOGUNIT,*)'1'
+      BoxNumberXY=D2toD1(BoxNumberX,BoxNumberY)
+!write(LOGUNIT,*)'2,boxnumberxy: ',BoxNumberXY
+      BoxNumber=D3toD1(BoxNumberX,BoxNumberY,layer(BoxNumberXY))
+!write(LOGUNIT,*)'BoxNumber ',BoxNumber
+      select case (mode)
+        case (ADD)
+!write(LOGUNIT,*)'3'
+          inout(BoxNumberXY)=inout(BoxNumberXY)+ &
+                          input(BoxNumber)*m3tm2(BoxNumberXY)/psur(BoxNumberXY)
+        case (GET)
+!write(LOGUNIT,*)'4'
+           inout(BoxNumberXY)=input(BoxNumber)*m3tm2(BoxNumberXY)/psur(BoxNumberXY)
+      end select
+    enddo
+  enddo
+!write(LOGUNIT,*)'end recalc_pel_to_ben'
+  end subroutine recalc_pel_to_ben
+
+  subroutine recalc_ben_to_pel(mode,layer,rate,m3tm2,psur,inout)
+  use constants, ONLY:GET,ADD
+  use mem, only:BoxNumberY,NO_BOXES_Y,BoxNumberX,NO_BOXES_X,BoxNumber, &
+               BoxNumberXY,NO_BOXES
+  
+  implicit none
+  integer,intent(IN)                            :: mode
+  integer,intent(IN),dimension(NO_BOXES_XY)     :: layer
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY)  :: rate
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY)  :: m3tm2
+  real(RLEN),intent(IN),dimension(NO_BOXES_XY)  :: psur
+  real(RLEN),intent(INOUT),dimension(NO_BOXES)  :: inout
+
+  integer,external             :: D2toD1,D3toD1
+!write(LOGUNIT,*)'start recalc_ben_to_pel'
+  if ( mode.ne.ADD) inout=ZERO
+  DO BoxNumberY=1,NO_BOXES_Y
+    DO BoxNumberX=1,NO_BOXES_X
+      BoxNumberXY=D2toD1(BoxNumberX,BoxNumberY)
+      BoxNumber=layer(BoxNumberXY)
+      if (BoxNumber.gt.0) then
+        select case (mode)
+          case (ADD)
+            inout(BoxNumber)=inout(BoxNumber)+ &
+                rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY)
+          case (GET)
+            inout(BoxNumber)= &
+                rate(BoxNumberXY)/m3tm2(BoxNumberXY)*psur(BoxNumberXY)
+        end select
+      endif
+    enddo
+  enddo
+!write(LOGUNIT,*)'end recalc_ben_to_pel'
+  end subroutine recalc_ben_to_pel
+
+  subroutine test_MacroPhyto_status
+  implicit none
+  integer           ::i,j
+  do j=1,NO_BOXES_XY
+  do i=1,iiMacroContent
+    call test_MacroPhytogroup_status(i,j)
+  enddo
+  enddo
+  end subroutine test_MacroPhyto_status
+
+  subroutine test_MacroPhytogroup_status(macro,i,iout)
+  use mem,only: ResetSource_D2_vector,NO_BOXES,flux_vector
+  use mem,only: ppMacroStructure,ppMacroContent,ppR6c,ppR6p,ppR6n
+  use mem,only: MacroStructure,MacroContent,iiPel,OCDepth,Depth,iiC,iiN,iiP,iiL
+  use mem,only: Mcac,Msc
+#ifdef BFM_GOTM
+  use bio_var,only: julianday
+#else
+  use api_bfm,only: julianday
+#endif
+
+  use constants, ONLY:GET
+
+  implicit none 
+  integer,intent(IN)              :: macro
+  integer,intent(IN)              :: i
+  integer,optional,intent(OUT)     :: iout
+  integer                          :: iye,imo,ida,k
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Vectors used  of group vectors
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN), dimension(:), pointer  ::lcl_MacroPhyt
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN)                       :: rscalar
+  real(RLEN),dimension(NO_BOXES_XY):: psur,Msc_0,Ma1c_0,Ma1n_0,Ma1p_0,r2
+  real(RLEN),dimension(NO_BOXES)   :: r3
+  real(RLEN),external              :: GetDelta
+
+    k=0
+    if (present(iout)) then
+      iout=save_status(macro,i); k=1;
+    endif
+    
+    if (save_status(macro,i)==1) then
+      farm_surface(macro,i)= &
+           p_lines(macro)*p_length_m(macro)*p_vdist_m(macro)*i_fb(macro)
+      call DeterminLayerWithMacroPhyto(macro,i)
+    endif
+    if ( save_julian(macro,i) .ne. julianday ) then
+      call calendar_date(julianday,iye,imo,ida)
+      if (iye.ne.save_year(macro,i)) then
+        if ( save_year(macro,i).gt.0 .and. (imo.ne.1.or.ida.ne.1)) then
+         write(LOGUNIT,*) 'MMP save_year:',save_year(macro,i),macro,i
+         call BFM_ERROR("test_MacroPhyto_status",  &
+              "Something wrong with the days.....")
+        else 
+          if (save_year(macro,i).le.0) save_status(macro,i)=0
+          save_year(macro,i)=iye;
+          call julian_day(iye,1,1,save_day0(macro,i));
+          save_day0(macro,i)=save_day0(macro,i)-1;
+        endif
+      endif
+      if (present(iout)) then
+        write(LOGUNIT,*) 'MMP iout save_status',save_status(macro,i) 
+        write(LOGUNIT,*) 'MMP julianday-save_day0,p_start,julianday,i,macro', &
+          julianday-save_day0(macro,i),p_start(macro),julianday,i,macro 
+      endif
+      if ( julianday-save_day0(macro,i)==p_start(macro)) then
+        if (present(iout) ) then 
+          iout=2;init_flag(macro)=.true.
+          call set_warning_for_getm;return
+        elseif  ((.not.run_1d).and.(.not.init_flag(macro))) then
+           return
+        elseif ((run_1d.or.init_flag(macro)) &
+               .and.( i_fb(macro).le.NZERO.or.iMsc(macro).le.NZERO)) then
+         call BFM_ERROR("test_MacroPhyto_status",  &
+              "Something wrong with the initiation.....")
+        elseif (run_1d.or.init_flag(macro))  then
+          save_status(macro,i)=1;init_flag(macro)=.false.
+          farm_surface(macro,i)= &
+             p_lines(macro)*p_length_m(macro)*p_vdist_m(macro)*i_fb(macro)
+          call DeterminLayerWithMacroPhyto(macro,i)
+          rscalar=(DONE+p_plMsc(macro))*iMsc(macro) 
+                                       
+          lcl_MacroPhyt=>MacroStructure(macro,iiC)
+          lcl_MacroPhyt(i)=rscalar/(DONE+p_plMsc(macro))
+          lcl_MacroPhyt=>MacroContent(macro,iiC)
+          lcl_MacroPhyt(i)=rscalar
+          lcl_MacroPhyt=>MacroContent(macro,iiN)
+          lcl_MacroPhyt(i)=rscalar*p_qnRc(macro)
+          lcl_MacroPhyt=>MacroContent(macro,iiP)
+          lcl_MacroPhyt(i)=rscalar*p_qpRc(macro)
+          lcl_MacroPhyt=>MacroContent(macro,iiL)
+          lcl_MacroPhyt(i)=rscalar*p_qchlc(macro)
+          write(LOGUNIT,*) 'Initiating MacroPhytGrowth'
+          write(LOGUNIT,*) 'layer=',i,' type nr=',macro,' mcsc,mcac=',rscalar/(DONE+p_plMsc(macro)),rscalar
+          write(LOGUNIT,*) 'mcan,mcap=',rscalar*p_qnRc(macro),rscalar*p_qpRc(macro)
+          write(LOGUNIT,*) 'farm_surface,grid_surface,p:',farm_surface(macro,i),surface,farm_surface(macro,i)/surface
+        endif
+      elseif ( (julianday-save_day0(macro,i))==p_fin(macro) &
+                                         .and.save_status(macro,i)==1 ) then
+        if ( present(iout)) then
+          iout=-1;return
+        endif
+        if (sw_mass_cons ==1 ) then
+          !add only the new produced material to detritus:
+          !mixed of the whle water column
+          psur(i)=farm_surface(macro,i)/surface(i)
+          lcl_MacroPhyt=>MacroContent(macro,iiC)
+          r2(i)= max(ZERO,lcl_MacroPhyt(i))/GetDelta()
+          call recalc_ben_to_pel &
+              (GET,layerMsm(macro,:),r2, Depth_Msc(macro,:),psur,r3)
+          rscalar=sum(r3*Depth)/OCDepth(1);r3=rscalar
+          call flux_vector(iiPel,ppR6c,ppR6c,r3);
+          lcl_MacroPhyt=>MacroContent(macro,iiN)
+          r2(i)= max(ZERO,lcl_MacroPhyt(i))/GetDelta()
+          call recalc_ben_to_pel &
+              (GET,layerMsm(macro,:),r2, Depth_Msc(macro,:),psur,r3)
+          rscalar=sum(r3*Depth)/OCDepth(1);r3=rscalar
+          call flux_vector(iiPel,ppR6n,ppR6n,r3);
+          lcl_MacroPhyt=>MacroContent(macro,iiP)
+          r2(i)= max(ZERO,lcl_MacroPhyt(i))/GetDelta()
+          call recalc_ben_to_pel &
+              (GET,layerMsm(macro,:),r2, Depth_Msc(macro,:),psur,r3)
+          rscalar=sum(r3*Depth)/OCDepth(1);r3=rscalar
+          call flux_vector(iiPel,ppR6p,ppR6p,r3);
+        endif
+        !(ReSetting of state variables )
+        lcl_MacroPhyt=>MacroStructure(macro,iiC)
+        lcl_MacroPhyt(i)=ZERO
+        lcl_MacroPhyt=>MacroContent(macro,iiC)
+        lcl_MacroPhyt(i)=ZERO
+        lcl_MacroPhyt=>MacroContent(macro,iiN)
+        lcl_MacroPhyt(i)=ZERO
+        lcl_MacroPhyt=>MacroContent(macro,iiP)
+        lcl_MacroPhyt(i)=ZERO
+        lcl_MacroPhyt=>MacroContent(macro,iiP)
+        lcl_MacroPhyt(i)=ZERO
+        call ResetSource_D2_vector(ppMacroStructure(macro,iiC))
+        call ResetSource_D2_vector(ppMacroContent(macro,iiC))
+        call ResetSource_D2_vector(ppMacroContent(macro,iiN))
+        call ResetSource_D2_vector(ppMacroContent(macro,iiP))
+        call ResetSource_D2_vector(ppMacroContent(macro,iiL))
+        save_status(macro,i)=0
+        write(LOGUNIT,*) 'Finish MacroPhytGrowth'
+      else
+        !no start of finsih of farm culture possible
+      endif
+      save_julian(macro,i)=julianday
+    endif
+  end subroutine test_MacroPhytogroup_status
+
+  subroutine AddMacroPhytAddToMassConservationNP 
+
+  use mem,only:OCDepth,Depth,iiMacroContent,MacroContent,iiN,iiP
+  use mem,only:totPELp,totPELn,totSYSp,totSYSn, BoxNumberZ,NO_BOXES, Depth, &
+    NO_BOXES_Z,BoxNumberX,NO_BOXES_X,BoxNumberY,NO_BOXES_Y, &
+      BoxNumber,BoxNumberXY
+  use constants, ONLY:GET
+
+  implicit none 
+  real(RLEN),dimension(NO_BOXES_XY):: psur,massn,massp
+  real(RLEN),dimension(NO_BOXES)   :: rn
+  real(RLEN),dimension(NO_BOXES)   :: rp
+  real(RLEN),dimension(NO_BOXES_Z) :: d
+  integer                          :: f,t,macro 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! user defined external functions
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  integer, external  :: D3toD1
+  integer, external  :: D2toD1
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  if (sw_mass_cons .ne.1) return
+  massn=ZERO;massp=ZERO
+  do macro=1,iiMacroContent
+    where (save_status(macro,:)>0)
+      psur(:)=farm_surface(macro,:)/surface
+      massn=MacroContent(macro,iiN)
+      massp=MacroContent(macro,iiP)
+    endwhere
+  call recalc_ben_to_pel(GET,layerMsm(macro,:),massn,Depth_Msc(macro,:),psur,rn)
+  call recalc_ben_to_pel(GET,layerMsm(macro,:),massp,Depth_Msc(macro,:),psur,rp)
+    BoxNumberZ = NO_BOXES_Z
+    DO BoxNumberY=1,NO_BOXES_Y
+    DO BoxNumberX=1,NO_BOXES_X
+      BoxNumberXY=D2toD1(BoxNumberX,BoxNumberY)
+      if (save_status(macro,BoxNumberXY)==1) then
+        f=D3toD1(BoxNumberX,BoxNumberY,1)
+        t=D3toD1(BoxNumberX,BoxNumberY,BoxNumberZ)
+        d=Depth(f:t);
+        totPELn(BoxNumberXY)=totPELn(BoxNumberXY)+ sum(rn(f:t)* d)
+        totSYSn(BoxNumberXY)=totSYSn(BoxNumberXY)+ sum(rn(f:t)* d)
+        totPELp(BoxNumberXY)=totPELp(BoxNumberXY)+ sum(rp(f:t)* d)
+        totSYSp(BoxNumberXY)=totSYSp(BoxNumberXY)+ sum(rp(f:t)* d)
+      endif
+    ENDDO
+    ENDDO
+   enddo
+  return
+  end subroutine AddMacroPhytAddToMassConservationNP
+
+  subroutine DeterminLayerWithMacroPhyto(macro,n)
+  use mem, only:BoxNumberY,NO_BOXES_Y,BoxNumberX,NO_BOXES_X,&
+               BoxNumberXY,NO_BOXES,NO_BOXES_Z
+  use mem,ONLY: OCDEPTH,Depth
+  use mem_globalfun, ONLY: insw_vector
+
+
+  implicit none
+  integer,intent(in)                  :: macro
+  integer,intent(in)                  :: n
+  integer                             :: ifrom,ito,j
+  integer,dimension(1)                :: iloc
+  real(RLEN),dimension(NO_BOXES)      ::r
+  integer,external                    :: D2toD1,D3toD1
+  
+  if (save_status(macro,n)==1) then
+    DO BoxNumberY=1,NO_BOXES_Y
+    DO BoxNumberX=1,NO_BOXES_X
+      ifrom=D3toD1(BoxNumberX,BoxNumberY,1)
+      ito=D3toD1(BoxNumberX,BoxNumberY,NO_BOXES_Z)
+      BoxNumberXY=D2toD1(BoxNumberX,BoxNumberY)
+      if (BoxNumberXY==n) then
+        r=OCDEPTH(ifrom:ito)-p_depth
+        r(ifrom:ito)=-insw_vector(r(ifrom:ito))*1000.0
+        r(ifrom:ito)=r(ifrom:ito)+OCDEPTH(ifrom:ito)
+        iloc=minloc(r(ifrom:ito)); 
+        j=max(1,iloc(1)-1)+ifrom-1
+        layerMsm(macro,BoxNumberXY)=j
+        Depth_Msc(macro,BoxNumberXY)=DEPTH(j)
+      endif
+    enddo
+    enddo
+!write(LOGUNIT,*)'determinelayerwithmacrophyto1; layerMsm',layerMsm
+  endif
+!write(LOGUNIT,*)'determinelayerwithmacrophyto2; layerMsm',layerMsm
+  end subroutine DeterminLayerWithMacroPhyto
+
+
+  end module mem_MacroPhyto
+!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

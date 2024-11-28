@@ -1,0 +1,43 @@
+This is a special readme for the CEFAS people and GOTM developers.
+Actually, most of the bfm structure stems from gotm, particularly the 
+makefile, so I have to thank again the GOTM team for the good work done.
+The idea is that as long as there is no decision on how the gotm-bio interface 
+will evolve, I will keep all the needed modifications within the bfm 
+structure.
+There are only 3 files that needs to be patched in gotm in order to use the 
+bfm stuff (and also the other bio models).
+I have now included a patch that can be applied to the development version of 
+gotm as to last week.
+
+The code on this branch is closely coupled to the main BFM trunk but will always 
+have a special relation with gotm/getm. 
+
+Installing CEFAS BFM_GOTM
+1) Download the last gotm snapshot from the CVS
+export CVSROOT=:pserver:anonymous:anonymous@bbh.homelinux.net:/public/cvs
+export CVS_RSH=ssh
+cvs checkout -d gotm-cefas gotm
+
+2) Download the bfm from the svn repository
+svn checkout http://www.bo.ingv.it/svn/bfm/branches/cefas/bfm-src 
+$HOME/bfm-2.5e-cefas
+(one line statement)
+This statement downloads the latest revision for cefas in the directory 
+$HOME/bfm2.5e-cefas (created by the command itself).
+You can also browse the directory on-line by simply opening the URL above
+
+3)  set the GOTMDIR and BFMDIR environment variables (can use the scripts 
+bfm2.5e-cefas/bfm_env.(c)sh)
+
+4) apply the bfm patch to BFM_GPTM and make the executable 
+cd gotm-cefas
+patch -p0 < $BFMDIR/src/gotm/patch_gotm_bfm_2.5e
+cd src
+make
+
+5) download the running environment from the repository
+svn checkout http://www.bo.ingv.it/svn/bfm/branches/cefas/bfm-run 
+$HOME/bfm-run
+
+cd to bfm-run/gotm/oysterground
+make a link to the executable in $GOTMDIR/src  and (hopefully) run!

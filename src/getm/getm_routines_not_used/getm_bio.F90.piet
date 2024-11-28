@@ -1,0 +1,644 @@
+!w$Id$
+#include "cppdefs.h"
+!-----------------------------------------------------------------------
+!BOP
+!
+! !MODULE: getm_bio()
+!
+! !INTERFACE:
+   module getm_bio
+!
+! !DESCRIPTION:
+!
+! ! BFM
+!    This routine replaces the "standard" GETM-routine
+!    This version is fully adapted to couple BFM to GETM
+!
+! !USES:
+   use domain, only: imin,imax,jmin,jmax,ioff,joff
+   use domain, only: kmax
+   use domain, only: az,au,av
+#if defined(SPHERICAL) || defined(CURVILINEAR)
+   use domain, only: dxu,dxv,dyu,dyv,arcd1
+#else
+   use domain, only: dx,dy,ard1
+#endif
+   use variables_3d, only: uu,vv,ww,hun,hvn,ho,hn,dt
+   use variables_3d, only: nuh,T,S,rho,light
+#ifdef BFM_GOTM
+   use variables_bio_3d, only: cc3d,ffp,ffb,bio_missing,d3_pelvar_type
+   use variables_bio_3d, only: ccb3d,sw_CalcPhyto_2d, &
+                           cc3d_out,ccb3d_out, counter_ave,flag_out, &
+                           n_cc3d_out,n_ccb3d_out,adv3d_courant,adv3d_number
+#ifdef INCLUDE_DIAGNOS_PRF
+   use variables_bio_3d, only: ccb3d_prf,n_ccb3d_prf
+#endif
+   use variables_3d, only: taub
+!  use variables_bio_3d, only: cut,cvt      !JM added
+#else
+   use variables_3d, only: cc3d
+#endif
+   use advection_3d, only: do_advection_3d
+   use meteo, only: swr
+   use halo_zones, only: update_3d_halo,update_2d_halo, wait_halo,D_TAG
+   use bio, only: init_bio, do_bio,get_bio_updates
+   use bio, only: bio_calc
+   use bio_var, only: numc,cc
+#ifdef BFM_GOTM
+   use bio,only:init_var_bio,ActualStep_gotm=>ActualStep,ModelCallNr
+   use bio_bfm,only:set_env_bio_bfm,set_pointers_from_gotm_to_bfm,do_bio_bfm
+   use time,only:julianday,start
+   use bio_var, only: numbc,ccb,c1dimz, &
+          numc_diag,diag, numbc_diag,diagb, bio_setup, &
+          adv1d_courant,adv1d_number
+   use bfm_output,only:var_names,var_ids,var_ave, &
+          stPelStateS,stPelDiagS,stPelFluxS,stBenStateS,stBenDiagS,stBenFluxS, &
+          stPelStateE,stPelDiagE,stPelFluxE,stBenStateE,stBenDiagE,stBenFluxE
+#ifdef INCLUDE_DIAGNOS_PRF
+   use bio_var, only: numbc_prf
+   use bfm_output,only:stPRFDiagS,stPRFDiagE
+#endif
+   use gotm_error_msg, only: set_d3_model_flag_for_gotm,  &
+        output_gotm_error,get_warning_for_getm,reset_warning_for_getm
+   use exceptions, only:getm_error
+   use coupling_getm_bfm,only:fill_diagn_bfm_vars,DIAG_ADD,DIAG_INFO, &
+      getm_bfm_bennut_calc_initial,set_2d_grid_parameters,init_2d_grid, &
+      make_uv_flux_output,read_poro,diag_end_sections,make_river_flux_output
+   use mem,only:iiPhytoPlankton,sw_CalcPhyto,R6c,ppR6c
+#endif
+
+
+!
+! !PUBLIC DATA MEMBERS:
+   public init_getm_bio, do_getm_bio, init_calc_getm_bio
+
+#ifdef BFM_GOTM
+!  only for BFM:
+   integer                   :: calc_init_bennut_states=0
+   integer                   :: calc_uv_fluxes
+   logical, public           :: hotstart_bio=.true.
+   integer, public           :: ActualStep
+   logical,public            :: no_hortr_silt=.false.
+   logical,public            :: initial_bio_check=.true.
+#endif
+!
+! !PRIVATE DATA MEMBERS:
+   integer         :: bio_hor_adv=1
+   integer         :: bio_ver_adv=1
+   integer         :: bio_adv_split=1
+   REALTYPE        :: bio_AH=10.
+#ifdef STATIC
+   REALTYPE        :: delxu(I2DFIELD),delxv(I2DFIELD)
+   REALTYPE        :: delyu(I2DFIELD),delyv(I2DFIELD)
+   REALTYPE        :: area_inv(I2DFIELD)
+#else
+   REALTYPE, dimension(:,:), allocatable :: delxu,delxv
+   REALTYPE, dimension(:,:), allocatable :: delyu,delyv
+   REALTYPE, dimension(:,:), allocatable :: area_inv
+#endif
+!
+! !REVISION HISTORY:
+!  Original author(s): Hans Burchard & Karsten Bolding
+! July 2009: Johan van der Molen (JM): added keep track of fluxes
+!                                      this does not work for UPSTREAM,
+!                                      UPSTREAM_SPLIT or FTC, then zeros
+!                                      are returned
+!
+!  $Log$
+!
+!EOP
+!-----------------------------------------------------------------------
+
+   contains
+
+!-----------------------------------------------------------------------
+!BOP
+!
+! !IROUTINE: init_getm_bio
+!
+! !INTERFACE:
+   subroutine init_getm_bio(namlst,input_file,d3steps_in_d3output)
+
+
+   use bio_var,only: pelvar_type
+   use mem_2DMacroPhyto,ONLY:Init2dMacroPhyto
+   IMPLICIT NONE
+
+!
+! !DESCRIPTION:! !INPUT PARAMETERS:
+  integer,intent(IN)                             :: namlst
+  character(len=*),intent(IN)                    :: input_file
+  integer,intent(IN)                             ::d3steps_in_d3output
+
+#ifdef BFM_GOTM
+!  Reads the namelist and makes calls to the init functions of the
+!  various model components.
+!
+! !REVISION HISTORY:
+!  See the log for the module
+!
+!  !LOCAL VARIABLES
+   integer, parameter                  :: unit_bio=63
+   integer, parameter                  :: unit_bfm=64
+   REALTYPE                            :: h(0:kmax)
+   REALTYPE                            :: s(0:kmax)
+   REALTYPE                            :: t(0:kmax)
+   REALTYPE                            :: rho(0:kmax)
+   REALTYPE                            :: dzero(0:kmax)
+   character(len=80)                   :: brrbrr,msg
+
+   integer               :: rc=0
+   integer               :: i,j,n,iout
+   character(len=80)     :: ben_init_file
+   character(len=80)     :: ben_param_file
+
+   namelist /getm_bio_nml/ hotstart_bio,bio_hor_adv,bio_ver_adv, &
+                           bio_adv_split,bio_AH
+   namelist /getm_bfm_nml/ben_param_file,ben_init_file, &
+                     calc_init_bennut_states,no_hortr_silt, initial_bio_check
+!EOP
+!-------------------------------------------------------------------------
+!BOC
+   LEVEL2 'init_getm_bio()'
+
+!if H < 0.0  there will be no calculation of the benthic nutrient initial values
+! which makes only sesn in a one d model.
+!only  applied from gotm_1D h wil have a positvie value!
+
+   h=30.0D+00
+   s=35.0
+   t=4.0
+   rho=1000
+   dzero=_ZERO_
+   call set_d3_model_flag_for_gotm(.TRUE.)
+   call init_bio(namlst,'bio.nml',unit_bio,kmax)
+
+   if (bio_calc) then
+     if ( bio_setup /=2 ) then
+!new:
+     call set_pointers_from_gotm_to_bfm( &
+                     1,kmax,dt,h,s,t,rho,dzero)
+     call set_env_bio_bfm(kmax,_ZERO_,_ONE_,12.0D+00, &
+             _ZERO_,_ZERO_,_ZERO_,_ZERO_,_ZERO_,julianday)
+!old:
+!    call set_env_bio_bfm(kmax,dt,dzero,dzero,h,t,s,rho,nuh,12.0D+00,&
+!         dzero,dzero,dzero,dzero, dzero,julianday)
+     call init_var_bio(namlst,unit_bfm,d3steps_in_d3output)
+
+     n_cc3d_out=count(var_ave(stPelStateS:stPelStateE) ) + &
+                count( var_ids(stPelDiagS:stPelFluxE)/= 0 )
+     if ( n_cc3d_out > 0 )  then
+       ! pel.biological fields of diagnos.
+       allocate(cc3d_out(n_cc3d_out,I3DFIELD),stat=rc)
+       if (rc /= 0) stop 'init_getm_bio: Error allocating memory (cc3d_out)'
+       cc3d_out=bio_missing
+     endif
+     ! pel.biological fields of diagnos.
+     allocate(counter_ave(I2DFIELD),stat=rc)
+     if (rc /= 0) stop 'init_getm_bio: Error allocating memory (counter_ave)'
+       counter_ave=0
+       if ( numc > 0 ) then
+         ! pel.biological fields of states
+         allocate(cc3d(I3DFIELD,numc),stat=rc)
+         if (rc /= 0) stop 'init_getm_bio: Error allocating memory (cc3d)'
+         ! pel.biological fields of diagnos.
+         allocate(adv3d_courant(I2DFIELD,numc),stat=rc)
+         if (rc /= 0) stop 'init_getm_bio:Error allocating memory (counter_ave)'
+         adv3d_courant=0
+         ! pel.biological fields of diagnos.
+         allocate(adv3d_number(I2DFIELD,numc),stat=rc)
+         if (rc /= 0) stop 'init_getm_bio: Error allocating memory (counter_ave)'
+         adv3d_number=0
+       endif
+     endif
+
+     if ( bio_setup >=2) then
+       if ( numbc > 0 )  then
+         ! bent, biological fields of states
+         allocate(ccb3d(I2DFIELD,0:1,numbc),stat=rc)
+         if (rc /= 0) stop 'init_getm_bio: Error allocating memory (ccb3d)'
+         ccb3d=bio_missing
+       endif
+       n_ccb3d_out=count( var_ave(stBenStateS:stBenStateE)) + &
+              count( var_ids(stBenDiagS:stBenFluxE) /= 0)
+       ! ben. biological fields of flux.
+       if ( n_ccb3d_out > 0 )  then
+         allocate(ccb3d_out(n_ccb3d_out,I2DFIELD,0:1),stat=rc)
+         if (rc /= 0) stop 'init_getm_bio: Error allocating memory (ccb3d_out)'
+         ccb3d_out=bio_missing
+       endif
+       !control to set temporary phytoplankton group on/off
+       allocate(sw_CalcPhyto_2d(I2DFIELD,iiPhytoPlankton),stat=rc)
+       if (rc /= 0)stop 'init_getm_bio:Error allocating memory(sw_CalcPhyto_2d)'
+       sw_CalcPhyto_2d=1
+       !control to set temporary phytoplankton group on/off
+       allocate(d3_pelvar_type(numc),stat=rc)
+       if (rc /= 0) stop 'init_getm_bio:Error allocating memory (d3_pelvar_type)'
+       d3_pelvar_type=pelvar_type
+#ifdef INCLUDE_DIAGNOS_PRF
+       n_ccb3d_prf= count( var_ids(stPRFDiagS:stPRFDiagE) /= 0)
+       ! ben. biological fields of flux.
+       if ( n_ccb3d_prf > 0 )  then
+         allocate(ccb3d_prf(n_ccb3d_prf,I2DFIELD,0:numbc_prf),stat=rc)
+         if (rc /= 0) stop 'init_getm_bio: Error allocating memory (ccb3d_prf)'
+         ccb3d_prf=bio_missing
+       endif
+#endif
+     endif
+
+     ben_init_file=''
+     LEVEL2 "Reading from "//trim(input_file)
+     open(namlst,status='unknown',file=trim(input_file),err=90)
+     brrbrr='getm_bio_nml'
+     read(namlst,NML=getm_bio_nml,end=91,err=92)
+
+     LEVEL2 "Settings related to 3D biological calculations"
+     LEVEL3 'bio_hor_adv=   ',bio_hor_adv
+     LEVEL3 'bio_ver_adv=   ',bio_ver_adv
+     LEVEL3 'bio_adv_split= ',bio_adv_split
+     LEVEL3 'bio_AH=        ',bio_AH
+
+     call fill_diagn_bfm_vars( DIAG_INFO,.true., 0,0, h,1,_ZERO_ );n=0
+     ! This "initialization' is only done
+     ! to check if special arrays have to be allocated.
+     LEVEL2 "Set all elements of cc3d_out which contain river outputs on 0 &
+            & and NOT on 'bio_missing'..."
+     LEVEL2 "In this way all active grid points in which no river ents  &
+             & are set on 0"
+     c1dimz(1:kmax)=_ZERO_
+     do j=jmin,jmax
+       do i=imin,imax
+         if (az(i,j) .ge. 1 ) &
+         call make_river_flux_output(_ZERO_,_ZERO_,_ZERO_,c1dimz,numc,i,j)
+       enddo
+     end do
+     n=diag_end_sections(1,3)
+     call make_uv_flux_output(0,0,stPelFluxS,stPelFluxE,.TRUE.,n,i)
+
+     if ( bio_setup /=2 ) then
+       if (hotstart_bio) then
+         LEVEL2 "Reading biological fields from hotstart file"
+       else
+         LEVEL2 "Initialise biological fields from namelist"
+         do j=jmin,jmax
+           do i=imin,imax
+             if (az(i,j) .ge. 1 ) cc3d(i,j,:,1:numc)=cc(:,1:numc)
+           enddo
+         end do
+       endif
+     end if
+     if ( bio_setup >=2 ) then
+       ben_param_file=''
+       ben_init_file=''
+       brrbrr='getm_bfm_nml'
+       read(namlst,NML=getm_bfm_nml)
+       close(namlst)
+       write(stderr,nml=getm_bfm_nml)
+       ! if output through check_presence is .true. a data file is present!
+       call set_2d_grid_parameters(read_poro,file=ben_param_file, &
+                          bio_missing=bio_missing,test_presence=read_poro)
+       if (hotstart_bio.and.(ben_init_file.ne.'')) then
+         LEVEL2 "Reading benthic biological fields from hotstart file"
+       else
+         LEVEL2 "Initialise benthic biological fields from namelist"
+         do j=jmin,jmax
+           do i=imin,imax
+             if (az(i,j) .eq. 1 ) ccb3d(i,j,:,1:numbc)=ccb(:,1:numbc)
+           enddo
+         end do
+         call init_2d_grid(ben_init_file)
+         do j=jmin,jmax
+           do i=imin,imax
+             n=count(ccb3d(i,j,1,1:numbc)<  _ZERO_)
+             if (az(i,j) .ge. 1.and. n> 0 ) then
+               LEVEL3 'missing intial benthos data  gridpoint i,j=', &
+                                                         i+ioff,j+joff
+              ccb3d(i,j,:,1:numbc)=ccb(:,1:numbc)
+               LEVEL3 'Initial values defined in bio_bfm.inp are used'
+             endif
+           enddo
+         end do
+       endif
+     end if
+
+#ifndef STATIC
+     allocate(delxu(I2DFIELD),stat=rc)
+     if (rc /= 0) stop 'init_getm_bio: Error allocating memory (delxu)'
+
+     allocate(delxv(I2DFIELD),stat=rc)
+     if (rc /= 0) stop 'init_getm_bio: Error allocating memory (delxv)'
+
+     allocate(delyu(I2DFIELD),stat=rc)
+     if (rc /= 0) stop 'init_getm_bio: Error allocating memory (delyu)'
+
+     allocate(delyv(I2DFIELD),stat=rc)
+     if (rc /= 0) stop 'init_getm_bio: Error allocating memory (delyv)'
+
+     allocate(area_inv(I2DFIELD),stat=rc)
+     if (rc /= 0) stop 'init_getm_bio: Error allocating memory (area_inv)'
+
+#endif
+#if defined(SPHERICAL) || defined(CURVILINEAR)
+     delxu=dxu
+     delxv=dxv
+     delyu=dyu
+     delyv=dyv
+     area_inv=arcd1
+#else
+     delxu=dx
+     delxv=dx
+     delyu=dy
+     delyv=dy
+     area_inv=ard1
+#endif
+
+     do n=1,numc
+       call update_3d_halo(cc3d(:,:,:,n),cc3d(:,:,:,n),az, &
+                        imin,jmin,imax,jmax,kmax,D_TAG)
+       call wait_halo(D_TAG)
+     enddo
+
+   end if
+   call Init2dMacroPhyto
+
+   return
+90 msg='can not open ' ;goto 100
+91 msg= 'EOF';          goto 100
+92 msg='error reading'
+100 brrbrr=TRIM(input_file)// ' ('//trim(brrbrr)//' )'
+    call getm_error( 'init_getm_bio',trim(msg)//TRIM(brrbrr))
+
+#endif
+   end subroutine init_getm_bio
+!EOC
+!-----------------------------------------------------------------------
+!BOP
+!
+! !IROUTINE:  do_getm_bio()
+!
+! !INTERFACE:
+   subroutine do_getm_bio(dt,write_3d,llinit)
+!
+! !DESCRIPTION:
+!
+! !USES:
+#ifdef BFM_GOTM
+   use bio,only:getm_stderr_control,warning_level,get_bio_updates
+!               struct_test_3d,struct_test_2d,struct_test_part
+   use bio_bfm,only:do_bio_bfm,copy_from_gotm_to_bfm,output_warning_shiftings
+   use global_mem,only:SILTTRANSPORT
+   use variables_bio_3d,only:counter_reset
+   use controlled_messages,only:controlled_output_point
+!  use bio_var,only: c1dimnumc,ave_count
+   use meteo, only:swr,u10,v10,dl                                     !BFM
+   use domain,only:dry_z,H
+!  use variables_bio_3d,only:counter_ave
+   use mem_2DMacroPhyto,ONLY:Do2dMacroPhyto, Fin2dMacroPhyto
+   use mem,only:Source_D2_vector
+
+#endif
+use getm_timers, only: tic, toc, TIM_GETM_BIO, TIM_ADVECTBIO
+
+   IMPLICIT NONE
+!
+! !INPUT PARAMETERS:
+   REALTYPE, intent(in)                :: dt
+   logical, intent(in)                 :: write_3d
+   logical, intent(in),optional        :: llinit
+! !INPUT/OUTPUT PARAMETERS:
+!
+! !OUTPUT PARAMETERS:
+!
+! !REVISION HISTORY:
+!  See the log for the module
+!
+! !LOCAL VARIABLES:
+#ifdef BFM_GOTM
+   integer         :: n,iout
+   integer         :: i,j,k,shiftcounter
+   REALTYPE        :: h1d(0:kmax) !,T1d(0:kmax),S1d(0:kmax),Rho1d(0:kmax)
+!  REALTYPE        :: nuh1d(0:kmax),light1d(0:kmax)
+   REALTYPE        :: bioshade1d(0:kmax)
+   REALTYPE        :: I_0 !,bath_dep
+   REALTYPE        :: r,c
+   integer,parameter   :: notransport=0
+   CHARACTER(LEN=100) :: sub,outp
+   CHARACTER(LEN=100) :: msg=""
+   LOGICAL         :: error_flag,warning_flag
+!  integer,save    :: follow=0
+!  REALTYPE,dimension(1:1)        :: Y1=_ZERO_,y2=_ZERO_
+!EOP
+!-----------------------------------------------------------------------
+!BOC
+
+   LEVEL2 'getm_bio: do advection '
+!  then we do the advection of the biological variables
+   if ( .not.bio_calc) return
+   if ( bio_setup /= 2 .and.(.not.present(llinit)) )  then
+     j=1
+     ! Check and if needed reinitialize output variables in which uv-fluxes are stored...
+     k=diag_end_sections(1,3)
+     call make_uv_flux_output(0,0,stPelFluxS,stPelFluxE,.TRUE.,k,j)
+     k=diag_end_sections(1,5)
+     j=1;if ( calc_uv_fluxes==2) j=0
+     call tic(TIM_ADVECTBIO)
+     do n=j,numc
+       i=-1
+       if (n==0 ) then
+         i=n;ffp=1.0D+00
+       elseif ( d3_pelvar_type(n)==SILTTRANSPORT) then
+         i=n;ffp(:,:,:) = cc3d(:,:,:,n);if (no_hortr_silt)i=0
+       elseif ( d3_pelvar_type(n)/=notransport) then
+         i=n;ffp(:,:,:) = cc3d(:,:,:,n)
+       endif
+!      if (n==ppR6c) then
+!        c=sum(ffp(12,10,:)*hn(12,10,:));STDERR "Before adv:R6c/m2:",c
+!      endif
+       if ( i>=0) &
+        call do_advection_3d(dt,ffp,uu,vv,ww,hun,hvn,ho,hn, &
+              delxu,delxv,delyu,delyv,area_inv,az,au,av, &
+              bio_hor_adv,bio_ver_adv,bio_adv_split,bio_AH)
+!      if (n==ppR6c) then
+!        r=sum(ffp(12,10,:)*hn(12,10,:));STDERR "After adv:R6c/m2:",r
+!      endif
+       if (i>=1) then
+         cc3d(:,:,:,n) =ffp(:,:,:)
+       endif
+       k=diag_end_sections(1,3)
+       call make_uv_flux_output(1,n,stPelFluxS,stPelFluxE,.TRUE.,k,j)
+     end do
+   endif
+   call toc(TIM_ADVECTBIO)
+   call tic(TIM_GETM_BIO)
+
+!  First we do all the vertical processes
+   LEVEL3 'getm_bio: do column '
+   shiftcounter=0
+   ActualStep_gotm=ActualStep
+   ModelCallNr=0
+   do j=jmin,jmax
+      do i=imin,imax
+         if (az(i,j) .eq. 1 ) then
+           call controlled_output_point(1,i,j)
+           ModelCallNr=ModelCallNr+1
+           I_0=swr(i,j)
+           h1d=hn(i,j,:)
+           getm_stderr_control=i.eq.1.and.j.eq.1
+           if ( bio_setup /= 2 ) then
+!             call link_bfm_to3d_states(i,j)
+             cc(0:kmax,1:numc)=cc3d(i,j,0:kmax,1:numc)
+             if ( warning_level >2 ) then
+               adv1d_courant=adv3d_courant(i,j,:)
+               adv1d_number=adv3d_number(i,j,:)
+             endif
+           endif
+           if ( bio_setup >= 2 ) then
+                call set_2d_grid_parameters(read_poro,igrid=i,jgrid=j)
+                ccb(0:1,1:numbc)=ccb3d(i,j,0:1,1:numbc)
+           endif
+!new:
+          call copy_from_gotm_to_bfm( &
+                 kmax,dt,hn(i,j,:),T(i,j,:),S(i,j,:),rho(i,j,:),nuh(i,j,:))
+
+           call set_env_bio_bfm(kmax,H(i,j),sqrt(taub(i,j)),dl(i,j), &
+             u10(i,j),v10(i,j),uu(i,j,1)/hun(i,j,1),vv(i,j,1)/hvn(i,j,1), &
+             I_0,julianday,dry_z(i,j))
+
+           sw_CalcPhyto(:,1)=sw_CalcPhyto_2d(i,j,:)
+           call Do2dMacroPhyto(julianday,i,j,1)
+           call do_bio(write_3d,counter=shiftcounter, &
+                             d3_reset_count=counter_reset)
+           if ( bio_setup /= 2 ) then
+             cc3d(i,j,0:kmax,1:numc)=cc(0:kmax,1:numc)
+             sw_CalcPhyto_2d(i,j,:)= sw_CalcPhyto(:,1)
+             call get_warning_for_getm(warning_flag )
+             if (write_3d.and.warning_level>2) then
+               k=0;r=counter_ave(i,j)
+               do n=1,numc
+                 if (adv1d_number(n)/r > _ONE_) then
+                   write(outp, &
+                   '(A,'':adv_center:MaxCourantN.='',G12.4,'' iter.='',F5.1)')&
+                   trim(var_names(n)),adv1d_courant(n)/r,adv1d_number(n)/r
+                   LEVEL1 outp(1:len_trim(outp))
+                 endif
+               enddo
+               if(k>0) then
+                 call reset_warning_for_getm;warning_flag=.false.
+#ifdef GETM_PARALLEL
+                 write(outp,'(''i,j,='',I4,''('',I2,'') '',I4,''('',I2,'') &
+                   &Depth='',F10.3)') i+ioff,i,j+joff,j,sum(h1d)
+#else
+                 write(outp,'(''i,j,='',I4,''('',I3,'') '',I4,''('',I3,'') &
+                   &Depth='',F10.3)') i+ioff,i,j+joff,j,sum(h1d)
+#endif
+                  LEVEL3 outp(1:len_trim(outp))
+               endif
+               adv1d_number=_ZERO_
+               adv1d_courant=_ZERO_
+             endif
+             if (warning_level >2) then
+               adv3d_courant(i,j,:)=adv1d_courant
+               adv3d_number(i,j,:)=adv1d_number
+             endif
+           endif
+           if (warning_flag) then
+             call reset_warning_for_getm
+             r=sum(h1d)
+             write(msg,'(''i,j='',I4,''('',I3,'') '',I4,''('',I3,'') &
+              &Depth='',F7.3,'' ActualStep='',I5,'' MdlCallNr='',I4)') &
+                          i+ioff,i,j+joff,j,r,ActualStep,ModelCallNr
+             LEVEL2 msg(1:len_trim(msg))
+           endif
+
+           if ( bio_setup >= 2 ) ccb3d(i,j,0:1,1:numbc)=ccb(:0:1,1:numbc)
+           call fill_diagn_bfm_vars( DIAG_ADD,write_3d, i,j, h1d,kmax,dt)
+           call output_gotm_error( error_flag, sub, msg)
+           if ( error_flag ) then
+#ifdef GETM_PARALLEL
+!            call getm_error( sub, msg(1:k))
+             write(msg,'(''i,j='',I4,''('',I2,'') '',I4,''('',I2,'' &
+                  &) Depth='',F10.3,'' ActualStep='',I8)')&
+                  & i+ioff,i,j+joff,j,sum(h1d),ActualStep
+#else
+               write(msg,'(''i,j,='',I4,'' '',I4,'' Depth='',F10.3), &
+                  &'' ActualStep='',I8)') ,i,j,ActualStep
+#endif
+             call getm_error( sub, msg(1:len_trim(msg)))
+           endif
+           call get_bio_updates(kmax,bioshade1d)
+           light(i,j,:)=bioshade1d
+           call Fin2dMacroPhyto(i,j,1)
+         end if
+      end do
+   end do
+
+   if ( present(llinit)) return
+   call output_warning_shiftings(warning_level,shiftcounter)
+
+   if ( bio_setup /= 2 )  then
+     do n=1,numc
+        call update_3d_halo(cc3d(:,:,:,n),cc3d(:,:,:,n),az, &
+                         imin,jmin,imax,jmax,kmax,D_TAG)
+        call wait_halo(D_TAG)
+     end do
+   endif
+   call toc(TIM_GETM_BIO)
+#endif
+
+   inquire(file='.run_all.direct',exist=error_flag)
+   if ( error_flag) &
+         call getm_error( 'do_getm_bio','run is stopped from outside ' )
+   end subroutine do_getm_bio
+
+!EOC
+!-----------------------------------------------------------------------------
+!BOP
+!
+! !ROUTINE: init_calc_getm_bio
+!
+! !INTERFACE:
+     subroutine init_calc_getm_bio(steps_per_outdelt)
+!
+! DESCRIPTION
+!    Routine which call routines specific valid for biomodels
+!    which calc initial conditions from other initial conditions.
+!
+! !USES:
+   use bio_var,   only: bio_model
+   use bio_var,only: pp,dd,ppb,ddb
+   use bio_bfm, only: reset_diagonal
+   use coupling_getm_bfm ,only:output_2d_grid_parameters
+   use controlled_messages,only: controlled_eval,controlled_output_point
+!
+! !INPUT PARAMETERS:
+     implicit none
+     integer,intent(in)       ::steps_per_outdelt
+!
+!
+!EOP
+!-------------------------------------------------------------------------
+!BOC
+
+      if ( .not.bio_calc) return
+#ifdef BFM_GOTM
+       call output_2d_grid_parameters(0)
+       call controlled_output_point(-1,imax,jmax)
+       call do_bio_bfm(.true.,.true.)
+       call controlled_eval(0,'',1)
+       call reset_diagonal(numc,pp)
+       call reset_diagonal(numc,dd)
+       call reset_diagonal(numbc,ppb)
+       call reset_diagonal(numbc,ddb)
+       call controlled_output_point(0,steps_per_outdelt,0)
+#endif
+
+
+     end subroutine init_calc_getm_bio
+!EOC
+!!-------------------------------------------------------------------------
+
+   end module getm_bio
+
+!-----------------------------------------------------------------------
+! Copyright (C) 2004 - Karsten Bolding and Hans Burchard               !
+!-----------------------------------------------------------------------

@@ -1,0 +1,61 @@
+#!/bin/bash
+
+
+list=$@
+
+cmp=`echo $1 | grep -E '^[-]'` 
+
+
+if [ "$cmp" = "-ns" ] ; then
+  echo "Check in one line where represent n and s constituents"
+elif [ "$cmp" = "-ps" ] ; then
+  echo "Check in one line where represent p and s constituents"
+elif [ "$cmp" = "-pn" ] ; then
+  echo "Check in one line where represent p and n constituents"
+elif [ "$cmp" = "-cn" ] ; then
+  echo "Check in one line where represent c and n constituents"
+elif [ "$cmp" = "-cp" ] ; then
+  echo "Check in one line where represent c and p constituents"
+elif [ "$cmp" = "-pn" ] ; then
+  echo "Check in one line where represent p and n constituents"
+elif [ "$cmp" = "-qpn" ] ; then
+  echo "Check in one line where a  pc-quotum with n fluxes"
+elif [ "$cmp" = "-qnp" ] ; then
+  echo "Check in one line where a  nc-quotum with p fluxes"
+elif [ "$cmp" = "-ppnp" ] ; then
+  echo "Check in one line where a  index pp*n is combined p fluxes"
+elif [ "$cmp" = "-pppn" ] ; then
+  echo "Check in one line where a  index pp*p is combined n fluxes"
+else
+  echo "Check in one line where represent n and p constituents"
+fi
+
+for file in $list ; do 
+  xx=`echo $file | grep -E '^[-]'` 
+  if [ -z "$xx" ] ; then
+    echo "$file:"
+    if [ "$cmp" = "-ns" ] ; then
+      grep -E 'n *[=+*/-]' $file | grep -E 's *[=+*/-]'
+    elif [ "$cmp" = "-ps" ] ; then
+      grep -E 'p *[=+*/-]' $file | grep -E 's *[=+*/-]'
+    elif [ "$cmp" = "-pn" ] ; then
+      grep -E 'p *[=+*/-]' $file | grep -E 'n *[=+*/-]'
+    elif [ "$cmp" = "-cn" ] ; then
+      grep -E 'c *[=+*/-]' $file | grep -E 'n *[=+*/-]'
+    elif [ "$cmp" = "-cp" ] ; then
+      grep -E 'c *[=+*/-]' $file | grep -E 'p *[=+*/-]'
+    elif [ "$cmp" = "-pn" ] ; then
+      grep -E 'p *[=+*/-]' $file | grep -E 'n *([=+*/-]|$)'
+    elif [ "$cmp" = "-qpn" ] ; then
+      grep -E 'qp[A-Za-z]' $file | grep -E 'n *[=+*/-]'
+    elif [ "$cmp" = "-qnp" ] ; then
+      grep -E 'qn[A-Za-z]' $file | grep -E 'p *[=+*/-]'
+    elif [ "$cmp" = "-ppnp" ] ; then
+      grep -E 'pp[A-Za-z]+n *,' $file | grep -E 'p *[=+*/-]'
+    elif [ "$cmp" = "-pppn" ] ; then
+      grep -E 'pp[A-Za-z]+p *,' $file | grep -E 'n *([=+*/-]|$)'
+    else
+      grep -E 'n *[=+*/-]' $file | grep -E 'p *([=+*/-]|$)'
+    fi
+  fi
+done

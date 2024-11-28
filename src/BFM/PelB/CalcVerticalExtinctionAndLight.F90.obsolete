@@ -1,0 +1,191 @@
+#include "DEBUG.h"
+#include "INCLUDE.h"
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50-g
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!BOP
+!
+! !ROUTINE: CalcVerticalExtinction
+!
+! DESCRIPTION
+!   Calculates the vertical extinction.
+!     
+!
+!
+
+!   This file is generated directly from OpenSesame model code, using a code 
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij.
+!   structure of the code based on ideas of M. Vichi.
+!
+! !INTERFACE
+  SUBROUTINE CalcVerticalExtinction(mode,I_0)
+!
+! !USES:
+  ! The following Pelagic-states are used (NOT in fluxes): R6c
+  ! The following box states are used (NOT in fluxes): PhytoPlankton
+  ! The following Pelagic 1-d global boxvars are modified : xEPS
+  ! The following Pelagic 1-d global boxvars  are used: ABIO_eps, ESS
+  ! The following groupmember vars  are used: iiPhytoPlankton
+  ! The following constituent constants  are used: iiC, iiL
+  ! The following 0-d global parameters are used: p_eps0, &
+  ! p_epsR6, p_epsESS, ChlLightFlag, p_epsChla
+  ! The following 1-d global parameter vars are used: p_qchlc
+  ! The following global constants are used: RLEN
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Modules (use of ONLY is strongly encouraged!)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  use global_mem, ONLY:RLEN,LOGUNIT
+#ifdef NOPOINTERS
+  use mem,  ONLY: D3STATE
+#else
+  use mem,  ONLY: R6c, PhytoPlankton
+#endif
+  use mem, ONLY: xEPS, xEPS_0, xEPS_ESS, xEPS_Chl, ABIO_eps, ESS, Xantho,  &
+      iiPhytoPlankton, iiC, iiL, EIR, Depth,OCdepth, NO_BOXES,BoxNumber, &
+      BoxNumberY,NO_BOXES_Y,BoxNumberX,NO_BOXES_X,BoxNumberZ,NO_BOXES_Z
+  use mem_Param, ONLY: p_eps0, p_epsR6, p_epsESS, ChlLightFlag, p_epsChla,p_PAR,p_small
+  use mem_Phyto,ONLY:p_qchlc,p_xantho,P_EIR
+  use constants, ONLY: E2W
+
+
+! !INPUT PARAMETERS:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
+  integer,intent(IN)     :: mode
+  real(RLEN),intent(IN)  :: I_0
+
+
+!  
+!
+! !AUTHORS
+!   ERSEM-team
+!
+!
+! !REVISION_HISTORY
+!   !
+!
+! COPYING
+!   
+!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team 
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!EOP
+!-------------------------------------------------------------------------!
+!BOC
+!
+!
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  integer,external  ::D3toD1
+
+  integer  :: i,j
+  real(RLEN), dimension(:), pointer  ::lcl_PhytoPlankton
+  real(RLEN)                         ::r,s
+
+  select case (mode)
+    case(0,10)
+        xEPS_0(:)= 0.0
+        xEPS_ESS(:)= 0.0
+        xEPS_Chl(:)= p_epsR6* R6c(:)
+    case (1,11)
+      select case ( p_eps0== 0.0D+00)
+        case( .TRUE. )
+          xEPS_ESS(:)  =   ABIO_eps(:)
+          xEPS_Chl(:)  =   p_epsR6* R6c(:)
+        case( .FALSE. )
+          xEPS_0(:)    =   p_eps0 
+          xEPS_ESS(:)  =   p_epsESS* ESS(:)
+          xEPS_Chl(:)  =   p_epsR6* R6c(:)
+      end select
+    case(2,12)
+        xEPS_0(:)= 0.0
+        xEPS_ESS(:)  =   p_epsESS* ESS(:)
+        xEPS_Chl(:)= p_epsR6* R6c(:)
+  end select
+
+!       call findnan( xEPS_Chl,NO_BOXES,iout )
+!       if (iout.gt.0) then
+!         write(LOGUNIT,*) '1 x_eps_chl in Nan in',iout
+!         write(logunit,*) 'R6c=',R6c(iout)
+!       endif
+
+  select case ( ChlLightFlag)
+    case ( 1 )
+      do i = 1 , ( iiPhytoPlankton)
+        lcl_PhytoPlankton =>    PhytoPlankton(i,iiC)
+        xEPS_Chl(:)  =   xEPS_Chl(:)+ p_epsChla * p_qchlc(i)* lcl_PhytoPlankton
+      end do
+
+    case ( 2 )
+      do i = 1 , ( iiPhytoPlankton)
+        lcl_PhytoPlankton =>    PhytoPlankton(i,iiL)
+        xEPS_Chl(:)  =   xEPS_Chl(:)+ p_epsChla * lcl_PhytoPlankton
+!       call findnan( xEPS_Chl,NO_BOXES,iout )
+!       if (iout.gt.0) then
+!         write(LOGUNIT,*) '1 x_eps_chl in Nan in',iout
+!         write(LOGUNIT,*) '1 x_eps_chl in Nan for',i
+!         write(logunit,*) 'phyto=',i,lcl_PhytoPlankton(iout)
+!       endif
+      end do
+  end select
+ 
+  xEPS= xEPS_0 + xEPS_ESS +xEPS_Chl
+
+if ( mode >= 10 ) then
+  !Correct for canals in the shallow areas.........
+  !Phytoplankton get much less energy  at low tide when depths are less than 5 meter..
+  s=max(1.0,5.0/OCDepth(1))
+  DO BoxNumberY=1,NO_BOXES_Y
+    DO BoxNumberX=1,NO_BOXES_X
+      DO BoxNumberZ = NO_BOXES_Z,1,-1
+        BoxNumber=D3toD1(BoxNumberX,BoxNumberY,BoxNumberZ)
+        if ( BoxNumberZ==NO_BOXES_Z ) then
+          EIR(BoxNumber) = max(p_small,I_0)
+        else
+          EIR(BoxNumber) = EIR(j)*exp(-xEPS(j)*Depth(j)*s)
+        endif
+        do i = 1 , ( iiPhytoPlankton)
+           if (p_xantho(i).gt.0) then
+             lcl_PhytoPlankton =>    PhytoPlankton(i,iiL)
+             r=p_xantho(i) * lcl_PhytoPlankton(BoxNumber) * (1.0-exp(-EIR(BoxNumber)/p_EIR(i))) 
+             xEPS(BoxNumber)=xEPS(BoxNumber)+r
+             xEPS_ChL(BoxNumber)=xEPS_Chl(BoxNumber)+r
+             Xantho(BoxNumber)=r
+           endif
+        enddo
+        j=BoxNumber
+      end do
+    end do
+  end do
+endif
+! call findnan( xEPS,NO_BOXES,i )
+! if (i.gt.0) then
+!   write(LOGUNIT,*) '1 x_eps in Nan in',i
+!   write(logunit,*) 'xEPS_CHL=',xEPS_CHL(i)
+!   write(logunit,*) 'xeps=',xeps(i)
+!   write(logunit,*) 'EIR=',EIR(iout)
+!   write(logunit,*) 'R6c=',R6c(iout)
+! endif
+
+  end
+!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model version 2.50
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
