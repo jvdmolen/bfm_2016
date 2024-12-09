@@ -216,18 +216,18 @@
   !  A small concentration is to avoid that one of the state vars. --->0.0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !biomass per square meter
-  bphytoc = D2STATE(ppbpc,:)
-  bphyton = D2STATE(ppbpn,:)
-  bphytop = D2STATE(ppbpp,:)
-  bphytol = D2STATE(ppbpl,:)
+  bphytoc = D2STATE(:,ppbpc)
+  bphyton = D2STATE(:,ppbpn)
+  bphytop = D2STATE(:,ppbpp)
+  bphytol = D2STATE(:,ppbpl)
 
   if ( ppbps > 0 )  then
-     bphytos=D2STATE(ppbps,:)
+     bphytos=D2STATE(:,ppbps)
   !-----------------------------------------------------------------------
      if ( bphytos(1) < ZERO) then
         cx_any=bphytos
         bphytos=p_qsRc(nrphyto)*bphytoc
-        D2STATE(ppbps,:)=bphytos
+        D2STATE(:,ppbps)=bphytos
        write(LOGUNIT,*)'Benphytoc:BP1s is negative, reset to appropiate value'
        write(LOGUNIT,*) 'bphytos=',bphytos,'bphytoc==',bphytoc
         call set_warning_for_getm
@@ -239,7 +239,7 @@
        write(LOGUNIT,*)'BenPhyto: BP1c is negative, small number added'
        write(LOGUNIT,*)'bphytoc==',bphytoc
        bphytoc=bphytoc+NZERO
-       D2STATE(ppbpc,:)=bphytoc
+       D2STATE(:,ppbpc)=bphytoc
 !       call set_warning_for_getm
      endif
   !-----------------------------------------------------------------------

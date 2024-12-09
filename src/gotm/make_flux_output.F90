@@ -83,54 +83,74 @@
           enddo
         elseif ( flx_option(nr)== 10 ) then
           do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
-            hulp(klev:klev)= hulp(klev:klev) + D2STATE(flx_states(i),klev)
+ !JM           hulp(klev:klev)= hulp(klev:klev) + D2STATE(flx_states(i),klev)
+            hulp(klev:klev)= hulp(klev:klev) + D2STATE(klev,flx_states(i))
           enddo
         elseif ( flx_option(nr)== 11 ) then
         elseif ( flx_option(nr)== 12 ) then
           do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
-            hulp(klev:klev)= hulp(klev:klev) + PELBOTTOM(flx_states(i),klev)
+!JM            hulp(klev:klev)= hulp(klev:klev) + PELBOTTOM(flx_states(i),klev)
+            hulp(klev:klev)= hulp(klev:klev) + PELBOTTOM(klev,flx_states(i))
           enddo
         elseif ( flx_option(nr)== 13 ) then
           do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
-            hulp(klev:klev)= hulp(klev:klev) + PELSURFACE(flx_states(i),klev)
+!JM            hulp(klev:klev)= hulp(klev:klev) + PELSURFACE(flx_states(i),klev)
+            hulp(klev:klev)= hulp(klev:klev) + PELSURFACE(klev,flx_states(i))
           enddo
         else
           do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
             if (flx_SS(i) ==1 ) then
+!JM               hulp(1:klev)= hulp(1:klev) &
+!JM                    + flx_t(i) * D2SINK(flx_states(i),flx_ostates(i),:)
                hulp(1:klev)= hulp(1:klev) &
-                    + flx_t(i) * D2SINK(flx_states(i),flx_ostates(i),:)
+                    + flx_t(i) * D2SINK(:,flx_states(i),flx_ostates(i))
             else
+!JM               hulp(1:klev)= hulp(1:klev) &
+!JM                   + flx_t(i) * D2SOURCE(flx_states(i),flx_ostates(i),:)
                hulp(1:klev)= hulp(1:klev) &
-                   + flx_t(i) * D2SOURCE(flx_states(i),flx_ostates(i),:)
+                   + flx_t(i) * D2SOURCE(:,flx_states(i),flx_ostates(i))
             endif
           enddo
         endif
       elseif (flx_option(nr)== 10 ) then
         do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
-            hulp(1:nlev)= hulp(1:nlev) + D3STATE(flx_states(i),1:nlev)
+!JM            hulp(1:nlev)= hulp(1:nlev) + D3STATE(flx_states(i),1:nlev)
+            hulp(1:nlev)= hulp(1:nlev) + D3STATE(1:nlev,flx_states(i))
         enddo
       elseif ( flx_option(nr)< 10 ) then
         do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
           if (flx_SS(i) ==1 ) then
+!JM             hulp(1:klev)= hulp(1:klev) &
+!JM                    + flx_t(i) * D3SINK(flx_states(i),flx_ostates(i),:)
              hulp(1:klev)= hulp(1:klev) &
-                    + flx_t(i) * D3SINK(flx_states(i),flx_ostates(i),:)
+                    + flx_t(i) * D3SINK(:,flx_states(i),flx_ostates(i))
              ! correcting for fluxes  to other subsystems
              if ( flx_states(i) ==flx_ostates(i)) then
+!JM                hulp(1)=hulp(1)+flx_t(i) *min(0.0D+00,&
+!JM                       PELBOTTOM(flx_states(i),1))/Depth(1)/SEC_PER_DAY
+!JM                hulp(klev)=hulp(klev)+flx_t(i) *min(0.0D+00,&
+!JM                    PELSURFACE(flx_states(i),1))/Depth(klev)/SEC_PER_DAY
                 hulp(1)=hulp(1)+flx_t(i) *min(0.0D+00,&
-                       PELBOTTOM(flx_states(i),1))/Depth(1)/SEC_PER_DAY
+                       PELBOTTOM(1,flx_states(i)))/Depth(1)/SEC_PER_DAY
                 hulp(klev)=hulp(klev)+flx_t(i) *min(0.0D+00,&
-                    PELSURFACE(flx_states(i),1))/Depth(klev)/SEC_PER_DAY
+                    PELSURFACE(1,flx_states(i)))/Depth(klev)/SEC_PER_DAY
              endif
 
           else
+!JM             hulp(1:klev)= hulp(1:klev) &
+!JM                  + flx_t(i) * D3SOURCE(flx_states(i),flx_ostates(i),:)
              hulp(1:klev)= hulp(1:klev) &
-                  + flx_t(i) * D3SOURCE(flx_states(i),flx_ostates(i),:)
+                  + flx_t(i) * D3SOURCE(:,flx_states(i),flx_ostates(i))
              ! correcting for fluxes  to other subsystems
              if ( flx_states(i) ==flx_ostates(i)) then
+!JM                hulp(1)=hulp(1)-flx_t(i) *max(0.0D+00,&
+!JM                       PELBOTTOM(flx_states(i),1))/Depth(1)/SEC_PER_DAY
+!JM                hulp(nlev)=hulp(nlev)-flx_t(i) *max(0.0D+00, &
+!JM                    PELSURFACE(flx_states(i),1))/Depth(nlev)/SEC_PER_DAY
                 hulp(1)=hulp(1)-flx_t(i) *max(0.0D+00,&
-                       PELBOTTOM(flx_states(i),1))/Depth(1)/SEC_PER_DAY
+                       PELBOTTOM(1,flx_states(i)))/Depth(1)/SEC_PER_DAY
                 hulp(nlev)=hulp(nlev)-flx_t(i) *max(0.0D+00, &
-                    PELSURFACE(flx_states(i),1))/Depth(nlev)/SEC_PER_DAY
+                    PELSURFACE(1,flx_states(i)))/Depth(nlev)/SEC_PER_DAY
              endif
           endif
         enddo
@@ -149,14 +169,16 @@
              do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
                if ( k.ne. flx_states(i) ) then
                   k=flx_states(i)
-                  out(1:klev)=out(1:klev) + D2STATE(k,:)
+!JM                  out(1:klev)=out(1:klev) + D2STATE(k,:)
+                  out(1:klev)=out(1:klev) + D2STATE(:,k)
                endif
               enddo
           else 
              do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
                if ( k.ne. flx_states(i) ) then
                  k=flx_states(i)
-                 out(1:klev)=out(1:klev) + D3STATE(k,:)
+!JM                 out(1:klev)=out(1:klev) + D3STATE(k,:)
+                 out(1:klev)=out(1:klev) + D3STATE(:,k)
                endif
              enddo
           endif

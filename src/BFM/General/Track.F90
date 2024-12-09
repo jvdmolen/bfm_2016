@@ -233,8 +233,10 @@
         real(RLEN),dimension(NO_D3_BOX_STATES) :: ld3state
         real(RLEN),dimension(NO_D2_BOX_STATES) :: ld2state
 
-        ld3state= D3STATE(:,BoxNumber)
-        ld2state =D2STATE(:,BoxNumberXY)
+!JM        ld3state= D3STATE(:,BoxNumber)
+!JM        ld2state =D2STATE(:,BoxNumberXY)
+        ld3state= D3STATE(BoxNumber,:)
+        ld2state =D2STATE(BoxNumberXY,:)
         call define_track_bot_rate_interface(BoxNumber,BoxNumberXY, &
                      ld3state,NO_D3_BOX_STATES,ld2state,NO_D2_BOX_STATES, &
                      Depth(BoxNumber),iiSys,iiState,jjSys,jjState,rate)
@@ -534,7 +536,8 @@
         integer,intent(IN)           :: n
         integer,intent(IN)           :: nr_track(1:n)
         character(len=*),intent(IN)  :: where
-        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+!JM        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+        real(RLEN),intent(IN)        :: STATE(1:n_boxes,1:n_states)
 
         integer                      ::i
         integer                      ::mt
@@ -547,8 +550,10 @@
         do mt=1,n_rstates
           ml=nr_track(mt); 
           if (ml.gt.0) then
-            t(1:n_boxes)= (STATE(mt,1:n_boxes) - STATE(ml,1:n_boxes)) 
-            st(1:n_boxes)=t(1:n_boxes) /(1.D-80 +STATE(mt,1:n_boxes))
+!JM            t(1:n_boxes)= (STATE(mt,1:n_boxes) - STATE(ml,1:n_boxes)) 
+!JM            st(1:n_boxes)=t(1:n_boxes) /(1.D-80 +STATE(mt,1:n_boxes))
+            t(1:n_boxes)= (STATE(mt,1:n_boxes) - STATE(1:n_boxes,ml)) 
+            st(1:n_boxes)=t(1:n_boxes) /(1.D-80 +STATE(1:n_boxes,ml))
             if (minval(st(1:n_boxes)) .lt. -1.00.and.&
                           minval(t(1:n_boxes)).lt.-2.0D-04) then     
               do i=1,n_boxes
@@ -576,9 +581,12 @@
         integer,intent(IN)           :: n_boxes
         integer,intent(IN)           :: n
         integer,intent(IN)           :: nr_track(1:n_states)
-        real(RLEN),intent(INOUT)     :: SOURCE(1:n_states,1:n_states,1:n_boxes)
-        real(RLEN),intent(INOUT)     :: SINK(1:n_states,1:n_states,1:n_boxes)
-        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+!JM        real(RLEN),intent(INOUT)     :: SOURCE(1:n_states,1:n_states,1:n_boxes)
+!JM        real(RLEN),intent(INOUT)     :: SINK(1:n_states,1:n_states,1:n_boxes)
+!JM        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+        real(RLEN),intent(INOUT)     :: SOURCE(1:n_boxes,1:n_states,1:n_states)
+        real(RLEN),intent(INOUT)     :: SINK(1:n_boxes,1:n_states,1:n_states)
+        real(RLEN),intent(IN)        :: STATE(1:n_boxes,1:n_states)
 
         integer                      ::jt
         integer                      ::jl
@@ -601,11 +609,16 @@
              do jt=1,n_rstates
                 jl= nr_track(jt)
                 if (jl.gt.0.and.ml.ne.jl)  then
-                  p(1:n_boxes)=min(1.0,(p_small+STATE(ml,1:n_boxes))/(p_small+STATE(mt,1:n_boxes)))
-                  t=SOURCE(jt,mt,1:n_boxes); t=t*p; 
-                  SOURCE(jl,ml,1:n_boxes)=t(1:n_boxes) ;
-                  t=  SINK(mt,jt,1:n_boxes) ; t=t*p; 
-                  SINK(ml,jl,1:n_boxes)  = t(1:n_boxes);
+!JM                  p(1:n_boxes)=min(1.0,(p_small+STATE(ml,1:n_boxes))/(p_small+STATE(mt,1:n_boxes)))
+!JM                  t=SOURCE(jt,mt,1:n_boxes); t=t*p; 
+!JM                  SOURCE(jl,ml,1:n_boxes)=t(1:n_boxes) ;
+!JM                  t=  SINK(mt,jt,1:n_boxes) ; t=t*p; 
+!JM                  SINK(ml,jl,1:n_boxes)  = t(1:n_boxes);
+                  p(1:n_boxes)=min(1.0,(p_small+STATE(1:n_boxes,ml))/(p_small+STATE(1:n_boxes,mt)))
+                  t=SOURCE(1:n_boxes,jt,mt); t=t*p; 
+                  SOURCE(1:n_boxes,jl,ml)=t(1:n_boxes) ;
+                  t=  SINK(1:n_boxes,mt,jt) ; t=t*p; 
+                  SINK(1:n_boxes,ml,jl)  = t(1:n_boxes);
                 endif
              enddo
            endif
@@ -622,8 +635,10 @@
         integer,intent(IN)           :: n
         integer,intent(IN)           :: nr_track(1:n_states)
         integer,intent(IN)           :: start
-        real(RLEN),intent(INOUT)     :: DIAGNOS(1:n_diags,1:n_boxes)
-        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+!JM        real(RLEN),intent(INOUT)     :: DIAGNOS(1:n_diags,1:n_boxes)
+!JM        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+        real(RLEN),intent(INOUT)     :: DIAGNOS(1:n_boxes,1:n_diags)
+        real(RLEN),intent(IN)        :: STATE(1:n_boxes,1:n_states)
 
         integer                      ::j
         integer                      ::mt
@@ -635,7 +650,8 @@
         do mt=1,n_rstates
            ml=nr_track(mt); 
            if (ml > 0) then
-              DIAGNOS(j,:)=STATE(ml,:)/(p_small+STATE(mt,:))
+!JM              DIAGNOS(j,:)=STATE(ml,:)/(p_small+STATE(mt,:))
+              DIAGNOS(:,j)=STATE(:,ml)/(p_small+STATE(:,mt))
               j=j+1
            endif
         enddo
@@ -649,8 +665,10 @@
         integer,intent(IN)           :: n_states
         integer,intent(IN)           :: n_diags
         integer,intent(IN)           :: n_boxes
-        real(RLEN),intent(INOUT)     :: DIAGNOS(1:n_diags,1:n_boxes)
-        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+!JM        real(RLEN),intent(INOUT)     :: DIAGNOS(1:n_diags,1:n_boxes)
+!JM        real(RLEN),intent(IN)        :: STATE(1:n_states,1:n_boxes)
+        real(RLEN),intent(INOUT)     :: DIAGNOS(1:n_boxes,1:n_diags)
+        real(RLEN),intent(IN)        :: STATE(1:n_boxes,1:n_states)
         real(RLEN),intent(IN)        :: Depth(1:n_boxes)
         integer,intent(IN)           :: n
         integer,intent(IN)           :: nr_track(1:n_states)
@@ -666,7 +684,8 @@
         do mt=1,n_rstates
            ml=nr_track(mt); 
            if (ml > 0) then
-              DIAGNOS(j,BoxNumberXY)=sum(DEPTH(:)*STATE(ml,:))/(p_small+sum(Depth(:)*STATE(mt,:)))
+!JM              DIAGNOS(j,BoxNumberXY)=sum(DEPTH(:)*STATE(ml,:))/(p_small+sum(Depth(:)*STATE(mt,:)))
+              DIAGNOS(BoxNumberXY,j)=sum(DEPTH(:)*STATE(:,ml))/(p_small+sum(Depth(:)*STATE(:,mt)))
               j=j+1
            endif
         enddo
@@ -676,7 +695,8 @@
       subroutine inittransportstatetypes_track(mode,STATE,STATETYPE, n_states,n_boxes,nr_track,n)
         implicit none
         integer,intent(IN)           :: mode
-        real(RLEN),intent(INOUT)     :: STATE(1:n_states,1:n_boxes)
+!JM        real(RLEN),intent(INOUT)     :: STATE(1:n_states,1:n_boxes)
+        real(RLEN),intent(INOUT)     :: STATE(1:n_boxes,1:n_states)
         integer,intent(INOUT)        :: STATETYPE(1:n_states)
         integer,intent(IN)           :: n_states
         integer,intent(IN)           :: n_boxes
@@ -699,10 +719,12 @@
         do mt=n_rstates,n_states
            ml=nr_track(mt); 
            if (ml.gt.0) then
-                STATE(mt,1:n_boxes)=min(p_small,STATE(ml,1:n_boxes))
+!JM                STATE(mt,1:n_boxes)=min(p_small,STATE(ml,1:n_boxes))
+                STATE(1:n_boxes,mt)=min(p_small,STATE(1:n_boxes,ml))
                 STATETYPE(mt)=STATETYPE(ml)
            elseif ( ml.eq.-1) then
-                STATE(mt,1:n_boxes)=p_small
+!JM                STATE(mt,1:n_boxes)=p_small
+                STATE(1:n_boxes,mt)=p_small
                 STATETYPE(mt)=ALLTRANSPORT
            endif
         enddo
@@ -725,7 +747,8 @@
         integer,intent(IN)          :: nr_boxes
         integer,intent(IN)          :: ig
         integer,intent(IN)          :: jg
-        real(RLEN),intent(INOUT)    :: ccb(1:nr_states,0:nr_boxes)
+!JM        real(RLEN),intent(INOUT)    :: ccb(1:nr_states,0:nr_boxes)
+        real(RLEN),intent(INOUT)    :: ccb(0:nr_boxes,1:nr_states)
 
         integer                      ::i
         integer                      ::mr
@@ -737,19 +760,23 @@
         ! mr points to the normal state variable
         if ( nr.gt.nr_states-ii2dTrack) then
           do i=1,nr_boxes
-           r=ccb(mr,i)
+!JM           r=ccb(mr,i)
+           r=ccb(i,mr)
            if ( r.lt.ZERO ) then   
               write(LOGUNIT,*) 'Warning:',trim(var_names(StBenStateS-1+mr)),' is negative in', ig,jg
               write(LOGUNIT,*) 'Warning: therefor is the is ',trim(var_names(StBenStateS-1+nr)),&
                                 ' set on the same negative value'
-              ccb(nr,i)=r;
-           elseif (r .lt. ccb(nr,i)) then
+!JM              ccb(nr,i)=r;
+              ccb(i,nr)=r;
+!JM           elseif (r .lt. ccb(nr,i)) then
+           elseif (r .lt. ccb(i,nr)) then
               write(message,'(''tracked '',A,'' is larger then'',A ,'' at '',i3,'','',i3)') &
                   trim(var_names(StBenStateS-1+nr)),trim(var_names(StBenStateS-1+mr))
               write(LOGUNIT,*) 'Warning:',trim(message)
               write(LOGUNIT,*) 'Warning: therefor is the is ',trim(var_names(StBenStateS-1+nr)),&
                                 ' set on the samevalue'
-              ccb(nr,i)=ccb(mr,i);
+!JM              ccb(nr,i)=ccb(mr,i);
+              ccb(i,nr)=ccb(i,mr);
            endif
           enddo
         endif

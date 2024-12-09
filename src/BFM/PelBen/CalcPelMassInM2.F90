@@ -10,7 +10,7 @@
      do i=j,NO_BOXES_XY
        k=PelBoxAbove(j)
        n=k+NO_BOXES_Z-1
-       r(i)=sum(D3STATE(ppX,k:n)*Depth(k:n))
+       r(i)=sum(D3STATE(k:n,ppX)*Depth(k:n))
      enddo
      CalcPelMassInM2=r
      return

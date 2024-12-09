@@ -197,7 +197,7 @@
   !  Copy  state var. object in local var
   !  A small concentration is to avoid that one of the state vars. --->0.0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  phytoc = D3STATE(ppphytoc,:)
+  phytoc = D3STATE(:,ppphytoc)
   dry_pel=DONE;if (p_dry_ben) dry_pel=dry_z(1)
 
   avPhyto=sum(phytoc*Depth)/(NZERO+sum(Depth))
@@ -224,10 +224,10 @@
     return
   endif
 
-  phyton = D3STATE(ppphyton,:)
-  phytop = D3STATE(ppphytop,:)
-  phytol = D3STATE(ppphytol,:)
-  if ( ppphytos > 0 )  phytos = D3STATE(ppphytos,:)
+  phyton = D3STATE(:,ppphyton)
+  phytop = D3STATE(:,ppphytop)
+  phytol = D3STATE(:,ppphytol)
+  if ( ppphytos > 0 )  phytos = D3STATE(:,ppphytos)
 
   silica_control=0
   if ( p_qus(phyto) > ZERO )  then

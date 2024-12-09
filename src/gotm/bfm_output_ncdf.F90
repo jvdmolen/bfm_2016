@@ -250,8 +250,10 @@ use global_mem, ONLY:LOGUNIT  !JM
           i=0
           do n=stPelDiagS,stPelDiagE
             i=i+1
+!JM            if ( (var_ids(n) > 0).and. (.not.var_ave(n) ) ) iret =  &
+!JM               store_data(ncid,var_ids(n),XYZT_SHAPE,nlev,array=diag(i,1:nlev))
             if ( (var_ids(n) > 0).and. (.not.var_ave(n) ) ) iret =  &
-               store_data(ncid,var_ids(n),XYZT_SHAPE,nlev,array=diag(i,1:nlev))
+               store_data(ncid,var_ids(n),XYZT_SHAPE,nlev,array=diag(1:nlev,i))
           end do
           i=0
           do n=stPelFluxS,stPelFluxE
@@ -282,8 +284,10 @@ use global_mem, ONLY:LOGUNIT  !JM
             i=0
             do n=stBenDiagS,stBenDiagE
              i=i+1
+!JM             if ( (var_ids(n) > 0)  .and. (.not.var_ave(n))) iret =  &
+!JM               store_data(ncid,var_ids(n),XYT_SHAPE,1,scalar=diagb(i,1))
              if ( (var_ids(n) > 0)  .and. (.not.var_ave(n))) iret =  &
-               store_data(ncid,var_ids(n),XYT_SHAPE,1,scalar=diagb(i,1))
+               store_data(ncid,var_ids(n),XYT_SHAPE,1,scalar=diagb(1,i))
             end do
             i=0
             do n=stBenFluxS,stBenFluxE

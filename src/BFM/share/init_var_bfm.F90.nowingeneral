@@ -325,8 +325,8 @@
       N6r = N6r0
       O2o = O2o0
       if ( ppO3c > 0 ) then
-        D3STATE(:,ppO3c)=O3c0
-        D3STATE(:,ppO3h)=O3h0 -N3n0
+        D3STATE(ppO3c,:)=O3c0
+        D3STATE(ppO3h,:)=O3h0 -N3n0
       endif
       P1c = P1c0
       if (p1l0 /= _ONE_) then
@@ -565,13 +565,13 @@
       Q1c=Q1c+Qun/p_qnUc;Q11c=Q11c+Q1un/p_qnUc;Q21c=Q21c+Q2un/p_qnUc;
 #ifdef INCLUDE_MACROPHYT
        do j = 1,iiMacroStructure
-        k=ppMacroStructure(j,iiC);D2STATE(:,k) = ZERO
+        k=ppMacroStructure(j,iiC);D2STATE(k,:) = ZERO
        end do
        do j = 1,iiMacroContent
-        k=ppMacroContent(j,iiC);D2STATE(:,k) = ZERO
-        k=ppMacroContent(j,iiN);D2STATE(:,k) = ZERO
-        k=ppMacroContent(j,iiP);D2STATE(:,k) = ZERO
-        k=ppMacroContent(j,iiL);D2STATE(:,k) = ZERO
+        k=ppMacroContent(j,iiC);D2STATE(k,:) = ZERO
+        k=ppMacroContent(j,iiN);D2STATE(k,:) = ZERO
+        k=ppMacroContent(j,iiP);D2STATE(k,:) = ZERO
+        k=ppMacroContent(j,iiL);D2STATE(k,:) = ZERO
        end do
 #endif
 
@@ -610,18 +610,18 @@
         LEVEL3 "Benthic model is: benthos + Ruardij & Van Raaphorst"
 ! if element of H < 0.0: a call form getm!
         if ( ppG3c > 0 ) then 
-           D2STATE(:,ppG3c)=G3c0
-           D2STATE(:,ppG13c)=G13c0
-           D2STATE(:,ppG23c)=G23c0
-           D2STATE(:,ppG3h)=G3h0
-           D2STATE(:,ppG13h)=G13h0
-           D2STATE(:,ppG23h)=G23h0
-           if ( G3c0== _ZERO_ ) D2STATE(:,ppG3c)=O3c0* p_poro(1)* D1m0;
-           if ( G13c0== _ZERO_ )D2STATE(:,ppG13c)=O3c0* p_poro(1)*(D2m0-D1m0)
-           if ( G23c0== _ZERO_ )D2STATE(:,ppG23c)=O3c0* p_poro(1)*(p_d_tot_2-D2m0)
-           if ( G3h0== _ZERO_ )D2STATE(:,ppG3h)= O3h0* p_poro(1)* D1m0 
-           if ( G13h0== _ZERO_ )D2STATE(:,ppG13h)=O3h0* p_poro(1)*(D2m0-D1m0)
-           if ( G23h0== _ZERO_ )D2STATE(:,ppG23h)=O3h0* p_poro(1)*(p_d_tot_2-D2m0)
+           D2STATE(ppG3c,:)=G3c0
+           D2STATE(ppG13c,:)=G13c0
+           D2STATE(ppG23c,:)=G23c0
+           D2STATE(ppG3h,:)=G3h0
+           D2STATE(ppG13h,:)=G13h0
+           D2STATE(ppG23h,:)=G23h0
+           if ( G3c0== _ZERO_ ) D2STATE(ppG3c,:)=O3c0* p_poro(1)* D1m0;
+           if ( G13c0== _ZERO_ )D2STATE(ppG13c,:)=O3c0* p_poro(1)*(D2m0-D1m0)
+           if ( G23c0== _ZERO_ )D2STATE(ppG23c,:)=O3c0* p_poro(1)*(p_d_tot_2-D2m0)
+           if ( G3h0== _ZERO_ )D2STATE(ppG3h,:)= O3h0* p_poro(1)* D1m0 
+           if ( G13h0== _ZERO_ )D2STATE(ppG13h,:)=O3h0* p_poro(1)*(D2m0-D1m0)
+           if ( G23h0== _ZERO_ )D2STATE(ppG23h,:)=O3h0* p_poro(1)*(p_d_tot_2-D2m0)
         endif
         STDERR 'Depth(1) calc_init_bennut_states=',Depth(1),calc_init_bennut_states
         if ( Depth(1) > 0.0 .and. calc_init_bennut_states >= 1) then
@@ -637,15 +637,10 @@
    !---------------------------------------------
    ! Initializing  silt
    !---------------------------------------------
-LEVEL3 "init silt"
    InitializeModel=1
    call SiltDynamics
-LEVEL3 "before co2"
-stop
    call CalcCO2SatInField(nlev,numc,ERHO,ETW,ESW,D3STATE)
 
-LEVEL3 "after co2"
-stop
    InitializeModel=0
    !---------------------------------------------
    ! Zeroing of the switched off state variables
@@ -656,7 +651,7 @@ stop
          do i = iiC,iiS
             k=ppPhytoPlankton(j,i) 
             if ( k.gt.0) then
-              D3STATE(:,k) = p_small
+              D3STATE(k,:) = p_small
               D3STATETYPE(k) = NOTRANSPORT
             endif
          end do
@@ -667,7 +662,7 @@ stop
          do i = iiC,iiP
             k=ppMesoZooPlankton(j,i) 
             if ( k>0) then
-              D3STATE(:,k) = p_small
+              D3STATE(k,:) = p_small
               D3STATETYPE(k) = NOTRANSPORT
             endif
          end do
@@ -678,22 +673,22 @@ stop
          do i = iiC,iiP
             k=ppMicroZooPlankton(j,i) 
             if ( k>0) then
-              D3STATE(:,k) = p_small
+              D3STATE(k,:) = p_small
               D3STATETYPE(k) = NOTRANSPORT
             endif
          end do
       end if
    end do
    if ( p_version_Pelbac .ne.4.and.p_version_PelBac.ne.5) then
-      D3STATE(:,ppBac)=p_small
+      D3STATE(ppBac,:)=p_small
    else
-      D3STATE(:,ppBac)=0.05*D3STATE(:,ppB1c)
+      D3STATE(ppBac,:)=0.05*D3STATE(ppB1c,:)
    endif
    do j = 1,iiBenOrganisms
       iiLastElement = iiP
       if (.NOT.CalcBenOrganisms(j)) then
          do i = iiC,iiLastElement
-            D2STATE(:,ppBenOrganisms(j,i)) = p_small
+            D2STATE(ppBenOrganisms(j,i),:) = p_small
          end do
       end if
    end do
@@ -701,7 +696,7 @@ stop
       iiLastElement = iiP
       if (.NOT.CalcBenBacteria(j)) then
          do i = iiC,iiLastElement
-            D2STATE(:,ppBenBacteria(j,i)) = p_small
+            D2STATE(ppBenBacteria(j,i),:) = p_small
          end do
       end if
    end do
@@ -709,7 +704,7 @@ stop
       iiLastElement = iiS
       if (.NOT.CalcBenPhyto(j)) then
          do i = iiC,iiLastElement
-            D2STATE(:,ppBenPhyto(j,i)) = p_small
+            D2STATE(ppBenPhyto(j,i),:) = p_small
          end do
       end if
    end do

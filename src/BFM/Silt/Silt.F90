@@ -162,21 +162,28 @@
 
          ! concentration-dependent settling velocity; assume power law
 
-          ws(ppR9x,1:NO_BOXES)=-a_settle*((R9x(1:NO_BOXES)/kg_to_mg)**b_settle) 
-          where (-ws(ppR9x,:)>ws_max) ws(ppR9x,:)=-ws_max
+!JM          ws(ppR9x,1:NO_BOXES)=-a_settle*((R9x(1:NO_BOXES)/kg_to_mg)**b_settle) 
+          ws(1:NO_BOXES,ppR9x)=-a_settle*((R9x(1:NO_BOXES)/kg_to_mg)**b_settle) 
+!JM          where (-ws(ppR9x,:)>ws_max) ws(ppR9x,:)=-ws_max
+          where (-ws(:,ppR9x)>ws_max) ws(:,ppR9x)=-ws_max
          ! limit settling velocity in shallow situations to prevent instability 
 !        of the model
          lim_resus=1.0
          if ( method.eq.2) then
            ! calculate  limiting of  sedimentation for depths dlim1->dlim2
            if (tdepth<dlim1 ) then
-             av_ws_uncorr=NZERO+sum(ws(ppR9x,1:NO_BOXES)*Depth(:))
+!JM             av_ws_uncorr=NZERO+sum(ws(ppR9x,1:NO_BOXES)*Depth(:))
+             av_ws_uncorr=NZERO+sum(ws(1:NO_BOXES,ppR9x)*Depth(:))
              if (tdepth<dlim1 .and. tdepth>dlim2) &
-               where (ws(ppR9x,1:NO_BOXES)<-ws_max*(1.0D0-((dlim1-tdepth)/(dlim1-dlim2))))  &
-                      ws(ppR9x,1:NO_BOXES)=-ws_max*(1.0D0-((dlim1-tdepth)/(dlim1-dlim2)))
+!JM               where (ws(ppR9x,1:NO_BOXES)<-ws_max*(1.0D0-((dlim1-tdepth)/(dlim1-dlim2))))  &
+!JM                      ws(ppR9x,1:NO_BOXES)=-ws_max*(1.0D0-((dlim1-tdepth)/(dlim1-dlim2)))
+               where (ws(1:NO_BOXES,ppR9x)<-ws_max*(1.0D0-((dlim1-tdepth)/(dlim1-dlim2))))  &
+                      ws(1:NO_BOXES,ppR9x)=-ws_max*(1.0D0-((dlim1-tdepth)/(dlim1-dlim2)))
            !assume that below depth dlim2 sedimentation rate is 0.
-             if (tdepth<=dlim2) ws(ppR9x,:)=0.0D0
-             lim_resus=sum(ws(ppR9x,1:NO_BOXES)*Depth(:))/av_ws_uncorr
+!JM             if (tdepth<=dlim2) ws(ppR9x,:)=0.0D0
+!JM             lim_resus=sum(ws(ppR9x,1:NO_BOXES)*Depth(:))/av_ws_uncorr
+             if (tdepth<=dlim2) ws(:,ppR9x)=0.0D0
+             lim_resus=sum(ws(1:NO_BOXES,ppR9x)*Depth(:))/av_ws_uncorr
            endif
          elseif( method.eq.3) then
            ! dlimi is value between dlim1 and dlim2
@@ -189,13 +196,19 @@
            ! use orginal calculation for limiting sedimentation for depths 
            ! dlim1->dlimi
            if (tdepth<dlim1 ) then
-             av_ws_uncorr=NZERO+sum(ws(ppR9x,1:NO_BOXES)*Depth(:))
-             if (tdepth<dlim1 .and. tdepth>=dlimi) ws(ppR9x,1:NO_BOXES)= &
-               max(ws(ppR9x,:),-ws_max*(1.0D0-(dlim1-tdepth)/(dlim1-dlim2))) 
+!JM             av_ws_uncorr=NZERO+sum(ws(ppR9x,1:NO_BOXES)*Depth(:))
+             av_ws_uncorr=NZERO+sum(ws(1:NO_BOXES,ppR9x)*Depth(:))
+!JM             if (tdepth<dlim1 .and. tdepth>=dlimi) ws(ppR9x,1:NO_BOXES)= &
+!JM               max(ws(ppR9x,:),-ws_max*(1.0D0-(dlim1-tdepth)/(dlim1-dlim2))) 
+             if (tdepth<dlim1 .and. tdepth>=dlimi) ws(1:NO_BOXES,ppR9x)= &
+               max(ws(:,ppR9x),-ws_max*(1.0D0-(dlim1-tdepth)/(dlim1-dlim2))) 
            ! limit sedimentation for depths dlimi->0
-             if (tdepth<dlimi)ws(ppR9x,1:NO_BOXES)=  &
-               max(ws(ppR9x,1:NO_BOXES),-ws_max*(exp(alpha*(dlim1-tdepth)))) 
-             lim_resus=sum(ws(ppR9x,1:NO_BOXES)*Depth(:))/av_ws_uncorr
+!JM             if (tdepth<dlimi)ws(ppR9x,1:NO_BOXES)=  &
+!JM               max(ws(ppR9x,1:NO_BOXES),-ws_max*(exp(alpha*(dlim1-tdepth)))) 
+!JM             lim_resus=sum(ws(ppR9x,1:NO_BOXES)*Depth(:))/av_ws_uncorr
+             if (tdepth<dlimi)ws(1:NO_BOXES,ppR9x)=  &
+               max(ws(1:NO_BOXES,ppR9x),-ws_max*(exp(alpha*(dlim1-tdepth)))) 
+             lim_resus=sum(ws(1:NO_BOXES,ppR9x)*Depth(:))/av_ws_uncorr
            endif
          endif
 !LEVEL1 'Silt: ws(1)',ws(ppR9x,1)
@@ -203,7 +216,8 @@
 
          ! update bottom concentration; use rouse profile
          z=Depth(1)/2
-         b=-ws(ppR9x,1)/(kappa*sqrt(max(tau_bed,1.0D-10)/ERHO(1)))
+!JM         b=-ws(ppR9x,1)/(kappa*sqrt(max(tau_bed,1.0D-10)/ERHO(1)))
+         b=-ws(1,ppR9x)/(kappa*sqrt(max(tau_bed,1.0D-10)/ERHO(1)))
 !LEVEL1 'Silt: b',b
          !limit uptake considering active bottom layer
          cbottmax=lim_resus*psilt(1)*(max(0.5D+00*eta,d_eromin)/tdepth)*rho_s
@@ -224,11 +238,17 @@
            R9x(1)=R9x(1)*1.0D6/(R9x(1)+1.0D6)
          endif
 
-           ws(ppR9x,0)=ws(ppR9x,1)
+!JM           ws(ppR9x,0)=ws(ppR9x,1)
+           ws(0,ppR9x)=ws(1,ppR9x)
 ! interpolate ws to (top) cell boundaries
-           sediR9(1:NO_BOXES)=-ws(ppR9x,1:NO_BOXES)*SEC_PER_DAY
-           ws(ppR9x,1:NO_BOXES-1)=ws(ppR9x,1:NO_BOXES-1) + &
-             (ws(ppR9x,2:NO_BOXES)-ws(ppR9x,1:NO_BOXES-1)) &
+!JM           sediR9(1:NO_BOXES)=-ws(ppR9x,1:NO_BOXES)*SEC_PER_DAY
+!JM           ws(ppR9x,1:NO_BOXES-1)=ws(ppR9x,1:NO_BOXES-1) + &
+!JM             (ws(ppR9x,2:NO_BOXES)-ws(ppR9x,1:NO_BOXES-1)) &
+!JM                *(0.5*Depth(1:NO_BOXES-1)/ &
+!JM                (0.5*Depth(1:NO_BOXES-1)+0.5*Depth(2:NO_BOXES))) 
+           sediR9(1:NO_BOXES)=-ws(1:NO_BOXES,ppR9x)*SEC_PER_DAY
+           ws(1:NO_BOXES-1,ppR9x)=ws(1:NO_BOXES-1,ppR9x) + &
+             (ws(2:NO_BOXES,ppR9x)-ws(1:NO_BOXES-1,ppR9x)) &
                 *(0.5*Depth(1:NO_BOXES-1)/ &
                 (0.5*Depth(1:NO_BOXES-1)+0.5*Depth(2:NO_BOXES))) 
 
@@ -254,7 +274,8 @@
         TauW=tau_w
         TauC=tau_c
         TauBed=tau_bed
-        ws_out=ws(ppR9x,:)
+!JM        ws_out=ws(ppR9x,:)
+        ws_out=ws(:,ppR9x)
         eta_out=eta
  
         select case (InitializeModel)         

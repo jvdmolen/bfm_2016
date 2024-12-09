@@ -182,9 +182,11 @@
              if ( var_ave(i) ) then
                 k=k+1
                 if ( ave_count< 1.5 ) then
-                   cc_ave(:,k)=diag(j,:)
+!JM                   cc_ave(:,k)=diag(j,:)
+                   cc_ave(:,k)=diag(:,j)
                 else
-                   cc_ave(:,k)=cc_ave(:,k)+diag(j,:)
+!JM                   cc_ave(:,k)=cc_ave(:,k)+diag(j,:)
+                   cc_ave(:,k)=cc_ave(:,k)+diag(:,j)
                 endif
               endif
            enddo
@@ -222,9 +224,11 @@
              if ( var_ave(i) ) then
                 k=k+1
                 if ( ave_count< 1.5 ) then
-                   ccb_ave(0:1,k)=diagb(j,0:1)
+!JM                   ccb_ave(0:1,k)=diagb(j,0:1)
+                   ccb_ave(0:1,k)=diagb(0:1,j)
                 else
-                   ccb_ave(0:1,k)=ccb_ave(0:1,k)+diagb(j,0:1)
+!JM                   ccb_ave(0:1,k)=ccb_ave(0:1,k)+diagb(j,0:1)
+                   ccb_ave(0:1,k)=ccb_ave(0:1,k)+diagb(0:1,j)
                 endif
               endif
            enddo
@@ -247,9 +251,11 @@
              if ( var_ave(i) ) then
                 k=k+1
                 if ( ave_count< 1.5 ) then
-                   ccb_ave_prf(k,:)=diagb_prf(:,j)
+!JM                   ccb_ave_prf(k,:)=diagb_prf(:,j)
+                   ccb_ave_prf(:,k)=diagb_prf(:,j)
                 else
-                   ccb_ave_prf(k,:)=ccb_ave_prf(k,:)+diagb_prf(:,j)
+!JM                   ccb_ave_prf(k,:)=ccb_ave_prf(k,:)+diagb_prf(:,j)
+                   ccb_ave_prf(:,k)=ccb_ave_prf(:,k)+diagb_prf(:,j)
                 endif
               endif
            enddo

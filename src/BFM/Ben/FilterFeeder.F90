@@ -269,9 +269,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  yc = D2STATE(ppyc,:)
-  yn = D2STATE(ppyn,:)
-  yp = D2STATE(ppyp,:)
+  yc = D2STATE(:,ppyc)
+  yn = D2STATE(:,ppyn)
+  yp = D2STATE(:,ppyp)
 
    !puP6Y3 stands for the correction for Phaeo Colonies: too largen ones are not eaten.
    limit_PIc =DONE; limit_PIc(iiP6,:)=puP6Y3(y,:)

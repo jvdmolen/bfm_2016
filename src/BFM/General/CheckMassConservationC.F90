@@ -73,7 +73,7 @@
                     +sum(D3SOURCE(j,nr,f:t)*d)*SEC_PER_DAY 
             if (ppO3c.gt.0)  &
               jminPELc(BoxNumberXY)=jminPELc(BoxNumberXY) &
-                    +sum(D3SINK(j,nr,f:t)*d)*SEC_PER_DAY
+                    +sum(D3SINK(f:t,j,nr)*d)*SEC_PER_DAY
             sc=> PhytoPlankton(i,iiC); 
             totPELc(BoxNumberXY)=totPELc(BoxNumberXY) +sum(sc(f:t)*d)
             jtotbenpelc(BoxNumberXY)=jtotbenpelc(BoxNumberXY) &
@@ -83,7 +83,7 @@
             j=ppMesoZooPlankton(i,iiC)
             if (ppO3c.eq.0) nr=j
             jminPELc(BoxNumberXY)=jminPELc(BoxNumberXY) &
-                    +sum(D3SINK(j,nr,f:t)*d) *SEC_PER_DAY
+                    +sum(D3SINK(f:t,j,nr)*d) *SEC_PER_DAY
             sc=> MesoZooplankton(i,iiC)
             totPELc(BoxNumberXY)=totPELc(BoxNumberXY) +sum(sc(f:t)*d)
             jtotbenpelc(BoxNumberXY)=jtotbenpelc(BoxNumberXY)&
@@ -93,7 +93,7 @@
             j=ppMicroZooPlankton(i,iiC)
             if (ppO3c.eq.0) nr=j
             jminPELc(BoxNumberXY)=jminPELc(BoxNumberXY) &
-                    +sum(D3SINK(j,nr,f:t)*d) *SEC_PER_DAY
+                    +sum(D3SINK(f:t,j,nr)*d) *SEC_PER_DAY
             sc=> MicroZooplankton(i,iiC)
             totPELc(BoxNumberXY)=totPELc(BoxNumberXY) +sum(sc(f:t)*d)
             jtotbenpelc(BoxNumberXY)=jtotbenpelc(BoxNumberXY)&
@@ -111,11 +111,11 @@
          !jtotbenpelc and B1c : no flux to sediment of B1
          if ( ppO3c.eq.0) nr=ppB1c
          jminPELc(BoxNumberXY)=jminPELc(BoxNumberXY) &
-                    +sum(D3SINK(ppB1c,nr,f:t)*d)*SEC_PER_DAY
+                    +sum(D3SINK(f:t,ppB1c,nr)*d)*SEC_PER_DAY
 
          if ( ppO3c.gt.0) & 
-         totPELInc(BoxNumberXY)=sum(D3STATE(ppO3c,f:t)*d)
-         if (ppO3h.gt.0) totPELh(BoxNumberXY)=sum((D3STATE(ppO3h,f:t) &
+         totPELInc(BoxNumberXY)=sum(D3STATE(f:t,ppO3c)*d)
+         if (ppO3h.gt.0) totPELh(BoxNumberXY)=sum((D3STATE(f:t,ppO3h) &
                          +N3n(f:t)*p_qhK4K3n-N6r(f:t)*p_qhAto/p_qro)*d) 
          
          !respiration of FIlterFeeders(Y3), which take partly place in pelagic
@@ -132,7 +132,7 @@
               j=ppBenOrganisms(i,iiC)
               if ( ppG3c.eq.0) nr=j
               jminBENc(BoxNumberXY)=jminBENc(BoxNumberXY) &
-                    +D2SINK(j,nr,BoxNumberXY) *SEC_PER_DAY
+                    +D2SINK(BoxNumberXY,j,nr) *SEC_PER_DAY
               sc => BenOrganisms(i,iiC)
               totBENc(BoxNumberXY)=totBENc(BoxNumberXY)+sc(BoxNumberXY)
             enddo
@@ -140,7 +140,7 @@
               j=ppSusPensionFeeders(i,iiC)
               if ( ppG3c.eq.0) nr=j
               jminBENc(BoxNumberXY)=jminBENc(BoxNumberXY) &
-                    +D2SINK(j,nr,BoxNumberXY) *SEC_PER_DAY
+                    +D2SINK(BoxNumberXY,j,nr) *SEC_PER_DAY
               sc => SusPensionFeeders(i,iiC)
               totBENc(BoxNumberXY)=totBENc(BoxNumberXY)+sc(BoxNumberXY)
             enddo
@@ -163,20 +163,20 @@
                             +D2SOURCE(nr,j,BoxNumberXY) *SEC_PER_DAY
                 !Aerobic bacteria+ nitrifiers
                 jminBENc(BoxNumberXY)=jminBENc(BoxNumberXY) &
-                    +D2SINK(j,nr,BoxNumberXY) *SEC_PER_DAY
+                    +D2SINK(BoxNumberXY,j,nr) *SEC_PER_DAY
               elseif (combine_anabac.and.i==iiH2) then
                 !Anaerobic bacteria
                 nr=ppG13c;if (ppG13c.eq.0) nr=j
                 jminBENc(BoxNumberXY)=jminBENc(BoxNumberXY) &
-                    +D2SINK(j,nr,BoxNumberXY) *SEC_PER_DAY
+                    +D2SINK(BoxNumberXY,j,nr) *SEC_PER_DAY
                 nr=ppG23c;if (ppG23c.gt.0) & 
                    jminBENc(BoxNumberXY)=jminBENc(BoxNumberXY) &
-                      +D2SINK(j,nr,BoxNumberXY) *SEC_PER_DAY
+                      +D2SINK(BoxNumberXY,j,nr) *SEC_PER_DAY
               else
                 !Anaerobic bacteria
                 nr=ppBenthicCO2(i,iiC);if (nr.eq.0) nr=j
                 jminBENc(BoxNumberXY)=jminBENc(BoxNumberXY) &
-                      +D2SINK(j,nr,BoxNumberXY) *SEC_PER_DAY
+                      +D2SINK(BoxNumberXY,j,nr) *SEC_PER_DAY
               endif
               sc => BenBacteria(i,iiC)
               totBENc(BoxNumberXY)=totBENc(BoxNumberXY)+sc(BoxNumberXY)
@@ -184,14 +184,14 @@
             ! Mass conservation variables
             totBENc(BoxNumberXY) = totBENc(BoxNumberXY)+Q6c(BoxNumberXY)
             if ( ppG3c.gt.0) & 
-               totBENInc(BoxNumberXY)=D2STATE(ppG3c,BoxNumberXY) &
-               +D2STATE(ppG13c,BoxNumberXY)+D2STATE(ppG23c,BoxNumberXY)
+               totBENInc(BoxNumberXY)=D2STATE(BoxNumberXY,ppG3c) &
+               +D2STATE(BoxNumberXY,ppG13c)+D2STATE(BoxNumberXY,ppG23c)
             if ( ppG3h.gt.0)  totBENh(BoxNumberXY)= &
-                D2STATE(ppG3h,BoxNumberXY) &
-               +D2STATE(ppG13h,BoxNumberXY)+D2STATE(ppG23h,BoxNumberXY) &
-               -p_qhAto/p_qro *(D2STATE(ppK6r,BoxNumberXY) &
-               +D2STATE(ppK16r,BoxNumberXY)+D2STATE(ppK26r,BoxNumberXY)) &
-               +D2STATE(ppK3n,BoxNumberXY)*p_qhK4K3n
+                D2STATE(BoxNumberXY,ppG3h) &
+               +D2STATE(BoxNumberXY,ppG13h)+D2STATE(BoxNumberXY,ppG23h) &
+               -p_qhAto/p_qro *(D2STATE(BoxNumberXY,ppK6r) &
+               +D2STATE(BoxNumberXY,ppK16r)+D2STATE(BoxNumberXY,ppK26r)) &
+               +D2STATE(BoxNumberXY,ppK3n)*p_qhK4K3n
          end select
         enddo
       enddo

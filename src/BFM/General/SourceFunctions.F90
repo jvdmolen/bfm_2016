@@ -88,9 +88,9 @@
           do i=1,lgroup
             j=ppgroup(i,type)
             if (mode.eq.iiConsumption.or.mode.eq.iiToTal) &
-               fill=fill + l* D3SINK(iistate,j,:)
+               fill=fill + l* D3SINK(:,iistate,j)
             if (mode.eq.iiProduction.or.mode.eq.iiToTal) &
-               fill=fill + D3SOURCE(iistate,j,:)
+               fill=fill + D3SOURCE(:,iistate,j)
           enddo
           Source_D3_withgroup=fill*SEC_PER_DAY
         end function Source_D3_withgroup
@@ -108,9 +108,9 @@
           fill=ZERO;l=DONE;if ( mode ==iiTotal ) l=-l
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           if (mode.eq.iiConsumption.or.mode.eq.iiToTal) &
-               fill=fill + l*D3SINK(iistate,jjstate,:)
+               fill=fill + l*D3SINK(:,iistate,jjstate)
           if (mode.eq.iiProduction.or.mode.eq.iiToTal) &
-               fill=fill + D3SOURCE(iistate,jjstate,:)
+               fill=fill + D3SOURCE(:,iistate,jjstate)
           Source_D3_withstate=fill*SEC_PER_DAY
         end function Source_D3_withstate
 
@@ -137,9 +137,9 @@
           do i=1,lgroup
             j=ppgroup(i,type)
             if (mode.eq.iiConsumption.or.mode.eq.iiToTal) &
-               fill=fill + l* D2SINK(iistate,j,:)
+               fill=fill + l* D2SINK(:,iistate,j)
             if (mode.eq.iiProduction.or.mode.eq.iiToTal) &
-               fill=fill + D2SOURCE(iistate,j,:)
+               fill=fill + D2SOURCE(:,iistate,j)
           enddo
           Source_D2_withgroup=fill*SEC_PER_DAY
         end function Source_D2_withgroup
@@ -157,9 +157,9 @@
           fill=ZERO;l=DONE;if ( mode ==iiTotal ) l=-l
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           if (mode.eq.iiConsumption.or.mode.eq.iiToTal) &
-               fill=fill + l*D2SINK(iistate,jjstate,:)
+               fill=fill + l*D2SINK(:,iistate,jjstate)
           if (mode.eq.iiProduction.or.mode.eq.iiToTal) &
-               fill=fill + D2SOURCE(iistate,jjstate,:)
+               fill=fill + D2SOURCE(:,iistate,jjstate)
           Source_D2_withstate=fill*SEC_PER_DAY
         end function Source_D2_withstate
 

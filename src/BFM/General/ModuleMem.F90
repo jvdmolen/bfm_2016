@@ -78,171 +78,10 @@
 ! State variables Info
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-!    3d name                                                  description            unit
-! ---------- ------------------------------------------------------------ ---------------
-!        R9x                                           Suspended sediment           mg/m3
-!        O2o                                                       Oxygen      mmol O2/m3
-!        N1p                                                    Phosphate       mmol P/m3
-!        N3n                                                      Nitrate       mmol N/m3
-!        N4n                                                     Ammonium       mmol N/m3
-!        N5s                                                     Silicate      mmol Si/m3
-!        N6r                                        Reduction Equivalents     mmol S--/m3
-!        B1c                                             Pelagic Bacteria         mg C/m3
-!        B1n                                             Pelagic Bacteria       mmol N/m3
-!        B1p                                             Pelagic Bacteria       mmol P/m3
-!        Bac                                           Pelagic Nitrifiers         mg C/m3
-!        P1c                                                      Diatoms         mg C/m3
-!        P1n                                                      Diatoms       mmol N/m3
-!        P1p                                                      Diatoms       mmol P/m3
-!        P1l                                                      Diatoms       mg Chl/m3
-!        P1s                                                      Diatoms      mmol Si/m3
-!        P2c                                                  Flagellates         mg C/m3
-!        P2n                                                  Flagellates       mmol N/m3
-!        P2p                                                  Flagellates       mmol P/m3
-!        P2l                                                  Flagellates       mg Chl/m3
-!        P3c                                            PicoPhytoPlankton         mg C/m3
-!        P3n                                            PicoPhytoPlankton       mmol N/m3
-!        P3p                                            PicoPhytoPlankton       mmol P/m3
-!        P3l                                            PicoPhytoPlankton       mg Chl/m3
-!        P4c                                              Dinoflagellates         mg C/m3
-!        P4n                                              Dinoflagellates       mmol N/m3
-!        P4p                                              Dinoflagellates       mmol P/m3
-!        P4l                                              Dinoflagellates       mg Chl/m3
-!        P5c                                  Resuspended Benthic Diatoms         mg C/m3
-!        P5n                                  Resuspended Benthic Diatoms       mmol N/m3
-!        P5p                                  Resuspended Benthic Diatoms       mmol P/m3
-!        P5l                                  Resuspended Benthic Diatoms       mg Chl/m3
-!        P5s                                  Resuspended Benthic Diatoms      mmol Si/m3
-!        P6c                                         Phaeocystis colonies         mg C/m3
-!        P6n                                         Phaeocystis colonies       mmol N/m3
-!        P6p                                         Phaeocystis colonies       mmol P/m3
-!        P6l                                         Phaeocystis colonies       mg Chl/m3
-!        Pcc                               Phaeo mass initiating colonies         mg C/m3
-!        R1c                                  Labile Organic Carbon (LOC)         mg C/m3
-!        R1n                                  Labile Organic Carbon (LOC)       mmol N/m3
-!        R1p                                  Labile Organic Carbon (LOC)       mmol P/m3
-!        R2c                                            TEP (long sugars)         mg C/m3
-!        R2n                                            TEP (long sugars)       mmol N/m3
-!        R3c                                           TEP in Phaeocystis         mg C/m3
-!        R6c                                                     Detritus         mg C/m3
-!        R6n                                                     Detritus       mmol N/m3
-!        R6p                                                     Detritus       mmol P/m3
-!        R6s                                                     Detritus      mmol Si/m3
-!        RZc                                        FaecelPellet Detritus         mg C/m3
-!        O3c                                   Dissolved Inorganic Carbon         mg C/m3
-!        O3h                                                   Alkalinity       mmol H/m3
-!        Z3c                                  Carnivorous mesozooplankton         mg C/m3
-!        Z4c                                   Omnivorous mesozooplankton         mg C/m3
-!        Z2c                                           Filterfeederlarvae         mg C/m3
-!        Z5c                                             Microzooplankton         mg C/m3
-!        Z6c                         Heterotrophic nanoflagellates (HNAN)         mg C/m3
 
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-!    2d name                                                  description            unit
-! ---------- ------------------------------------------------------------ ---------------
-!       BP1c                                              Benthic Diatoms         mg C/m2
-!       BP1n                                              Benthic Diatoms       mmol N/m2
-!       BP1p                                              Benthic Diatoms       mmol P/m2
-!       BP1l                                              Benthic Diatoms       mg Chl/m3
-!       BP1s                                              Benthic Diatoms      mmol Si/m2
-!        Y1c                                                   Epibenthos         mg C/m2
-!        Y1n                                                   Epibenthos       mmol N/m2
-!        Y1p                                                   Epibenthos       mmol P/m2
-!        Y2c                                              Deposit feeders         mg C/m2
-!        Y2n                                              Deposit feeders       mmol N/m2
-!        Y2p                                              Deposit feeders       mmol P/m2
-!        Y4c                                                  Meiobenthos         mg C/m2
-!        Y4n                                                  Meiobenthos       mmol N/m2
-!        Y4p                                                  Meiobenthos       mmol P/m2
-!        Y5c                                            Benthic predators         mg C/m2
-!        Y5n                                            Benthic predators       mmol N/m2
-!        Y5p                                            Benthic predators       mmol P/m2
-!       Yy3c                                     Young Suspension feeders         mg C/m2
-!       Yy3n                                     Young Suspension feeders       mmol N/m2
-!       Yy3p                                     Young Suspension feeders       mmol P/m2
-!        Y3c                                   (Adult) Suspension feeders         mg C/m2
-!        Y3n                                   (Adult) Suspension feeders       mmol N/m2
-!        Y3p                                   (Adult) Suspension feeders       mmol P/m2
-!       Ys3c                          Spawned mass of filterfeeder larvae         mg C/m2
-!        Q6c                                   Particulate organic carbon         mg C/m2
-!        Q6n                                   Particulate organic carbon       mmol N/m2
-!        Q6p                                   Particulate organic carbon       mmol P/m2
-!        Q6s                                   Particulate organic carbon      mmol Si/m2
-!        Q9x                mass of silt in water column at previous step           mg/m2
-!       Qp9x                     mass of silt in water column 2 steps ago           mg/m2
-!        QSx                mass of silt in first 30 cm of benthic system           mg/m2
-!        Qun                                                         Urea       mmol N/m3
-!       Q1un                                                         Urea       mmol N/m3
-!       Q2un                                                         Urea       mmol N/m3
-!        Q2c                                                Carbohydrates         mg C/m2
-!        Q2n                                                Carbohydrates                
-!       Q12c                                                Carbohydrates         mg C/m2
-!       Q12n                                                Carbohydrates                
-!        Q1c                                        Labile organic carbon         mg C/m2
-!        Q1n                                        Labile organic carbon       mmol N/m2
-!        Q1p                                        Labile organic carbon       mmol P/m2
-!       Q11c                                        Labile organic carbon         mg C/m2
-!       Q11n                                        Labile organic carbon       mmol N/m2
-!       Q11p                                        Labile organic carbon       mmol P/m2
-!       Q21c                                        Labile organic carbon         mg C/m2
-!       Q21n                                        Labile organic carbon       mmol N/m2
-!       Q21p                                        Labile organic carbon       mmol P/m2
-!        H1c                                     Aerobic benthic bacteria         mg C/m2
-!        H1n                                     Aerobic benthic bacteria       mmol N/m2
-!        H1p                                     Aerobic benthic bacteria       mmol P/m2
-!        H2c                                   Anaerobic benthic bacteria         mg C/m2
-!        H2n                                   Anaerobic benthic bacteria       mmol N/m2
-!        H2p                                   Anaerobic benthic bacteria       mmol P/m2
-!        H3c                   Anaerobic benthic bacteria in anoxic layer         mg C/m2
-!        H3n                   Anaerobic benthic bacteria in anoxic layer       mmol N/m2
-!        H3p                   Anaerobic benthic bacteria in anoxic layer       mmol P/m2
-!        HNc                   Aerobic benthic nitrifying bacteria+archea         mg C/m2
-!        HNn                   Aerobic benthic nitrifying bacteria+archea       mmol N/m2
-!        HNp                   Aerobic benthic nitrifying bacteria+archea       mmol P/m2
-!        Hac                                            nitrifying archea         mg C/m2
-!       Kp1p                                 Phosphate in prim.prod.layer       mmol P/m2
-!       Kp3n                             Nitrate in prim.prod.layer layer       mmol N/m2
-!       Kp4n                                  Ammonium in prim.prod.layer       mmol N/m2
-!       Kn4n                          Ammonium in dark part of oxic layer       mmol N/m2
-!       Kp5s                                  Silicate in prim.prod.layer      mmol Si/m2
-!       Qpun                                      Urea in prim.prod.layer       mmol N/m2
-!        K1p                                      Phosphate in oxic layer       mmol P/m2
-!       K11p                           Phosphate in denitrification layer       mmol P/m2
-!       K21p                                    Phosphate in anoxic layer       mmol P/m2
-!        K4n                                       Ammonium in oxic layer       mmol N/m2
-!       K14n                            Ammonium in denitrification layer       mmol N/m2
-!       K24n                                     Ammonium in anoxic layer       mmol N/m2
-!        K5s                       Silicate in oxic+denitrification layer      mmol Si/m2
-!       K15s                                     Silicate in anoxic layer      mmol Si/m2
-!        K6r                          Reduction equivalents in oxic layer     mmol S--/m2
-!       K16r               Reduction equivalents in denitrification layer     mmol S--/m2
-!       K26r                        Reduction equivalents in anoxic layer     mmol S--/m2
-!        K3n                        Nitrate in oxic+denitrification layer       mmol N/m2
-!       K13n                             Nitrate in denitrification layer       mmol N/m2
-!       K23n                                      Nitrate in anoxic layer       mmol N/m2
-!        G2o                                                   Benthic O2      mmol O2/m2
-!        G4n                                  N2 sink for benthic system.       mmol N/m2
-!        Dfm                             Penetration Depth Benthic Diatom               m
-!        Dcm                        Penetration Depth Benthic chlorophyll               m
-!        Dlm                            Compensation Depth Benthic Diatom               m
-!        D1m                                     Oxygen penetration depth               m
-!        D2m                                  Denitrification layer depth               m
-!        D6m                                  Penetration Depth organic C               m
-!        D7m                                  Penetration Depth organic N               m
-!        D8m                                  Penetration Depth organic P               m
-!        D9m                                 Penetration Depth organic Si               m
-!        DSm                                       Penetration Depth Silt               m
-!       DH2m                  Penetration Depth Bacteria in denitr. layer               m
-!       DH3m                   Penetration Depth Bacteria in anoxic layer               m
-!   irri_bio                      Enhancement factor due to bioirrigation               -
-!        G3c                                         CO2 in aerobic layer         mg C/m2
-!        G3h                                  alkalinity in aerobic layer          mol/kg
-!       G13c                                 CO2 in denitrification layer         mg C/m2
-!       G13h                          alkalinity in denitrification layer          mol/kg
-!       G23c                                       CO2 in anaerobic layer         mg C/m2
-!       G23h                                alkalinity in anaerobic layer          mol/kg
 
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1508,7 +1347,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        PhytoPlankton => D3STATE(ppPhytoPlankton(n,constituent),:)
+        PhytoPlankton => D3STATE(:,ppPhytoPlankton(n,constituent))
 
        END function
 
@@ -1523,7 +1362,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        PelDetritus => D3STATE(ppPelDetritus(n,constituent),:)
+        PelDetritus => D3STATE(:,ppPelDetritus(n,constituent))
 
        END function
 
@@ -1538,7 +1377,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        Inorganic => D3STATE(ppInorganic(n,constituent),:)
+        Inorganic => D3STATE(:,ppInorganic(n,constituent))
 
        END function
 
@@ -1553,7 +1392,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        MesoZooPlankton => D3STATE(ppMesoZooPlankton(n,constituent),:)
+        MesoZooPlankton => D3STATE(:,ppMesoZooPlankton(n,constituent))
 
        END function
 
@@ -1568,7 +1407,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        MicroZooPlankton => D3STATE(ppMicroZooPlankton(n,constituent),:)
+        MicroZooPlankton => D3STATE(:,ppMicroZooPlankton(n,constituent))
 
        END function
 
@@ -1887,7 +1726,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenPhyto => D2STATE(ppBenPhyto(n,constituent),:)
+        BenPhyto => D2STATE(:,ppBenPhyto(n,constituent))
 
        END function
 
@@ -1902,7 +1741,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenOrganisms => D2STATE(ppBenOrganisms(n,constituent),:)
+        BenOrganisms => D2STATE(:,ppBenOrganisms(n,constituent))
 
        END function
 
@@ -1918,7 +1757,7 @@
         integer, intent(IN) ::constituent
 
         SuspensionFeeders =>&
-         & D2STATE(ppSuspensionFeeders(n,constituent),:)
+         & D2STATE(:,ppSuspensionFeeders(n,constituent))
 
        END function
 
@@ -1933,7 +1772,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenUrea => D2STATE(ppBenUrea(n,constituent),:)
+        BenUrea => D2STATE(:,ppBenUrea(n,constituent))
 
        END function
 
@@ -1948,7 +1787,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenCarboHydrates => D2STATE(ppBenCarboHydrates(n,constituent),:)
+        BenCarboHydrates => D2STATE(:,ppBenCarboHydrates(n,constituent))
 
        END function
 
@@ -1964,7 +1803,7 @@
         integer, intent(IN) ::constituent
 
         BenLabileDetritus =>&
-         & D2STATE(ppBenLabileDetritus(n,constituent),:)
+         & D2STATE(:,ppBenLabileDetritus(n,constituent))
 
        END function
 
@@ -1979,7 +1818,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenBacteria => D2STATE(ppBenBacteria(n,constituent),:)
+        BenBacteria => D2STATE(:,ppBenBacteria(n,constituent))
 
        END function
 
@@ -1994,7 +1833,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenthicPhosphate => D2STATE(ppBenthicPhosphate(n,constituent),:)
+        BenthicPhosphate => D2STATE(:,ppBenthicPhosphate(n,constituent))
 
        END function
 
@@ -2009,7 +1848,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenthicAmmonium => D2STATE(ppBenthicAmmonium(n,constituent),:)
+        BenthicAmmonium => D2STATE(:,ppBenthicAmmonium(n,constituent))
 
        END function
 
@@ -2024,7 +1863,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenthicSilicate => D2STATE(ppBenthicSilicate(n,constituent),:)
+        BenthicSilicate => D2STATE(:,ppBenthicSilicate(n,constituent))
 
        END function
 
@@ -2039,7 +1878,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenthicRedEq => D2STATE(ppBenthicRedEq(n,constituent),:)
+        BenthicRedEq => D2STATE(:,ppBenthicRedEq(n,constituent))
 
        END function
 
@@ -2054,7 +1893,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenthicNitrate => D2STATE(ppBenthicNitrate(n,constituent),:)
+        BenthicNitrate => D2STATE(:,ppBenthicNitrate(n,constituent))
 
        END function
 
@@ -2069,7 +1908,7 @@
         integer, intent(IN) ::n
         integer, intent(IN) ::constituent
 
-        BenthicCO2 => D2STATE(ppBenthicCO2(n,constituent),:)
+        BenthicCO2 => D2STATE(:,ppBenthicCO2(n,constituent))
 
        END function
 
@@ -2147,28 +1986,28 @@
               endif ! minval<0
               select case ( iiSub )
                 case (iiPel)
-                  D3SINK(origin,destination,:)  =  flux/SEC_PER_DAY
-                  D3SOURCE(destination,origin,:)=  flux/SEC_PER_DAY
+                  D3SINK(:,origin,destination)  =  flux/SEC_PER_DAY
+                  D3SOURCE(:,destination,origin)=  flux/SEC_PER_DAY
                 case (iiBen)
-                  D2SINK(origin,destination,:) =  flux/SEC_PER_DAY
-                  D2SOURCE(destination,origin,:)   = flux/SEC_PER_DAY
+                  D2SINK(:,origin,destination) =  flux/SEC_PER_DAY
+                  D2SOURCE(:,destination,origin)   = flux/SEC_PER_DAY
               end select
             else
               select case ( iiSub )
                 case (iiPel)
                   where (flux > 0.0D+00 )
-                    D3SOURCE(origin,destination,:) =D3SOURCE(origin,destination,:) &
+                    D3SOURCE(:,origin,destination) =D3SOURCE(:,origin,destination) &
                       + flux/SEC_PER_DAY
                   elsewhere
-                    D3SINK(destination,origin,:) =D3SINK(destination,origin,:) - &
+                    D3SINK(:,destination,origin) =D3SINK(:,destination,origin) - &
                       flux/SEC_PER_DAY
                   end where
                 case (iiBen)
                   where (flux > 0.0D+00 )
-                    D2SOURCE(destination,origin,:) =D2SOURCE(destination,origin,:) &
+                    D2SOURCE(:,destination,origin) =D2SOURCE(:,destination,origin) &
                       + flux/SEC_PER_DAY
                   elsewhere
-                    D2SINK(origin,destination,:) =D2SINK(origin,destination,:) - &
+                    D2SINK(:,origin,destination) =D2SINK(:,origin,destination) - &
                       flux/SEC_PER_DAY
                   end where
               end select
@@ -2196,11 +2035,11 @@
                 write(LOGUNIT,'(''origin='',i4,'' destination='',i4)') &
                   origin,destination
                 if ( iiSub== iiBen) then
-                    write(LOGUNIT,*) "state value origin:",D2STATE(origin,i)
-                    write(LOGUNIT,*) "state value destination:",D2STATE(destination,i)
+                    write(LOGUNIT,*) "state value origin:",D2STATE(i,origin)
+                    write(LOGUNIT,*) "state value destination:",D2STATE(i,destination)
                 else
-                    write(LOGUNIT,*) "state value origin:",D3STATE(origin,i)
-                    write(LOGUNIT,*) "state value destination:",D3STATE(destination,i)
+                    write(LOGUNIT,*) "state value origin:",D3STATE(i,origin)
+                    write(LOGUNIT,*) "state value destination:",D3STATE(i,destination)
                 endif
                 STDERR 'Nan value in flux'
                 stop 1002
@@ -2220,11 +2059,11 @@
             if (isnan(scalar).eqv. .true. ) then
             write(LOGUNIT,'(''origin='',i4,'' destination='',i4)') origin,destination
             if ( iiSub == iiBen)  then
-                 write(LOGUNIT,*) "state value origin:",D2STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D2STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D2STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D2STATE(grid_nr,destination)
               else 
-                 write(LOGUNIT,*) "state value origin:",D3STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D3STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D3STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D3STATE(grid_nr,destination)
             endif
             write(LOGUNIT,*) 'Nan value in scalar flux'
             stop 1003
@@ -2266,11 +2105,11 @@
               write(LOGUNIT,*) "origin,destination:", origin,destination
               write(LOGUNIT,*) flow
               if ( iiSub == iiBen)  then
-                 write(LOGUNIT,*) "state value origin:",D2STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D2STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D2STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D2STATE(grid_nr,destination)
               else 
-                 write(LOGUNIT,*) "state value origin:",D3STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D3STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D3STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D3STATE(grid_nr,destination)
               endif
               STDERR "Error in (scalar)flux function:negative flux !"
               call BFM_ERROR("flux","negative flux")
@@ -2278,28 +2117,28 @@
             endif ! flow<0
             select case ( iiSub )
               case (iiPel)
-                D3SINK(origin,destination,grid_nr)=  flow/SEC_PER_DAY
-                D3SOURCE(destination,origin,grid_nr)= flow/SEC_PER_DAY
+                D3SINK(grid_nr,origin,destination)=  flow/SEC_PER_DAY
+                D3SOURCE(grid_nr,destination,origin)= flow/SEC_PER_DAY
               case (iiBen)
-                D2SINK(origin,destination,grid_nr)=  flow/SEC_PER_DAY
-                D2SOURCE(destination,origin,grid_nr)= flow/SEC_PER_DAY
+                D2SINK(grid_nr,origin,destination)=  flow/SEC_PER_DAY
+                D2SOURCE(grid_nr,destination,origin)= flow/SEC_PER_DAY
             end select
           else
             select case ( iiSub )
               case (iiPel)
                 if (flow > 0.0 ) then
-                  D3SOURCE(destination,origin,grid_nr)= D3SOURCE(destination,origin,grid_nr) &
+                  D3SOURCE(grid_nr,destination,origin)= D3SOURCE(grid_nr,destination,origin) &
                     +flow/SEC_PER_DAY
                 else
-                  D3SINK(origin,destination,grid_nr)= D3SINK(origin,destination,grid_nr) &
+                  D3SINK(grid_nr,origin,destination)= D3SINK(grid_nr,origin,destination) &
                     -flow/SEC_PER_DAY
                 endif
               case (iiBen)
                 if (flow > 0.0 ) then
-                  D2SOURCE(destination,origin,grid_nr)= D2SOURCE(destination,origin,grid_nr) &
+                  D2SOURCE(grid_nr,destination,origin)= D2SOURCE(grid_nr,destination,origin) &
                     +flow/SEC_PER_DAY
                 else
-                  D2SINK(origin,destination,grid_nr)= D2SINK(origin,destination,grid_nr) &
+                  D2SINK(grid_nr,origin,destination)= D2SINK(grid_nr,origin,destination) &
                     -flow/SEC_PER_DAY
                 endif
             end select
@@ -2327,12 +2166,12 @@
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           select case (mode)
             case(iiConsumption)
-              Source_D3_vector=sum(D3SINK(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D3_vector=sum(D3SINK(:,iistate,:),DIM=1)*SEC_PER_DAY
             case(iiTotal)
-              Source_D3_vector=(sum(D3SOURCE(iistate,:,:),DIM=1)-&
-                          sum(D3SINK(iistate,:,:),DIM=1))*SEC_PER_DAY
+              Source_D3_vector=(sum(D3SOURCE(:,iistate,:),DIM=1)-&
+                          sum(D3SINK(:,iistate,:),DIM=1))*SEC_PER_DAY
             case(iiProduction)
-              Source_D3_vector=sum(D3SOURCE(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D3_vector=sum(D3SOURCE(:,iistate,:),DIM=1)*SEC_PER_DAY
           end select
         end function Source_D3_vector
 
@@ -2353,12 +2192,12 @@
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           select case (mode)
             case(iiConsumption)
-              Source_D2_vector=sum(D2SINK(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D2_vector=sum(D2SINK(:,iistate,:),DIM=1)*SEC_PER_DAY
             case(iiTotal)
-              Source_D2_vector=(sum(D2SOURCE(iistate,:,:),DIM=1)-&
-                          sum(D2SINK(iistate,:,:),DIM=1))*SEC_PER_DAY
+              Source_D2_vector=(sum(D2SOURCE(:,iistate,:),DIM=1)-&
+                          sum(D2SINK(:,iistate,:),DIM=1))*SEC_PER_DAY
             case(iiProduction)
-              Source_D2_vector=sum(D2SOURCE(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D2_vector=sum(D2SOURCE(:,iistate,:),DIM=1)*SEC_PER_DAY
           end select
         end function Source_D2_vector
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -2378,11 +2217,11 @@
           integer, intent(IN)  ::iibox
           integer, intent(IN)  ::iistate
           if ( iiSub == iiPel )  then
-            Source = (sum(D3SOURCE(iistate,:,iibox))- &
-              sum(D3SINK(iistate,:,iibox)))*SEC_PER_DAY
+            Source = (sum(D3SOURCE(iibox,iistate,:))- &
+              sum(D3SINK(iibox,iistate,:)))*SEC_PER_DAY
           elseif ( iiSub == iiBen )  then
-            Source = (sum(D2SOURCE(iistate,:,iibox))- &
-              sum(D2SINK(iistate,:,iibox)))*SEC_PER_DAY
+            Source = (sum(D2SOURCE(iibox,iistate,:))- &
+              sum(D2SINK(iibox,iistate,:)))*SEC_PER_DAY
           endif
         end function source
 
@@ -2396,8 +2235,8 @@
           implicit none
 
           integer, intent(IN) ::iistate
-          D3SOURCE(iistate,:,:)=ZERO
-          D3SINK(iistate,:,:)=ZERO
+          D3SOURCE(:,iistate,:)=ZERO
+          D3SINK(:,iistate,:)=ZERO
         end subroutine ResetSource_D3_vector
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -2410,8 +2249,8 @@
           implicit none
 
           integer, intent(IN) ::iistate
-          D2SOURCE(iistate,:,:)=ZERO
-          D2SINK(iistate,:,:)=ZERO
+          D2SOURCE(:,iistate,:)=ZERO
+          D2SINK(:,iistate,:)=ZERO
         end subroutine ResetSource_D2_vector
 
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -2430,11 +2269,11 @@
           integer, intent(IN)  ::iibox
           integer, intent(IN)  ::iistate
           if ( iiSub == iiPel )  then
-            D3SOURCE(iistate,:,iibox)=ZERO
-            D3SINK(iistate,:,iibox)=ZERO
+            D3SOURCE(iibox,iistate,:)=ZERO
+            D3SINK(iibox,iistate,:)=ZERO
           elseif ( iiSub == iiBen )  then
-            D2SOURCE(iistate,:,iibox)=ZERO
-            D2SINK(iistate,:,iibox)=ZERO
+            D2SOURCE(iibox,iistate,:)=ZERO
+            D2SINK(iibox,iistate,:)=ZERO
           endif
         end subroutine ResetSource
 
@@ -2467,16 +2306,16 @@
             case (iiPel)
               type="D3"
               if ( grid_nr <=0  ) then
-                tot=sum(D3SINK(origin,destination,:))
+                tot=sum(D3SINK(:,origin,destination))
               else
-                tot=D3SINK(origin,destination,grid_nr)
+                tot=D3SINK(grid_nr,origin,destination)
               endif
             case (iiBen)
               type="D2"
               if ( grid_nr <=0  ) then
-                tot=sum(D2SINK(origin,destination,:))
+                tot=sum(D2SINK(:,origin,destination))
               else
-                tot=D2SINK(origin,destination,grid_nr)
+                tot=D2SINK(grid_nr,origin,destination)
               endif
             case (iiReset)
               D3SINK(:,:,:)=0.0D+00

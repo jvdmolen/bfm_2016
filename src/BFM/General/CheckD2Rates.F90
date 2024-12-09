@@ -23,8 +23,8 @@
         llsource = 0
         llsink = 0
         do i=1,NO_D2_BOX_STATES
-          if (D2SINK(nr,i,1) > ZERO.and.i.ne.nr) llsink(i)=1
-          if (D2SOURCE(nr,i,1) > ZERO.and.i.ne.nr) llsource(i)=1
+          if (D2SINK(1,nr,i) > ZERO.and.i.ne.nr) llsink(i)=1
+          if (D2SOURCE(1,nr,i) > ZERO.and.i.ne.nr) llsource(i)=1
         enddo
         out=sum(llsink)+sum(llsource)
       elseif (init.eq.0) then
@@ -32,16 +32,16 @@
       elseif ( mode.eq.1) then
         llout=0
         do i=1,NO_D2_BOX_STATES
-          if (D2SINK(nr,i,1) > ZERO.and.llsink(i)==0.and.i.ne.nr ) llout=llout+1
-          if (D2SINK(nr,i,1) == ZERO.and.llsink(i)>0.and.i.ne.nr ) llout=llout+1
-          if (D2SOURCE(nr,i,1) > ZERO.and.llsource(i)==0.and.i.ne.nr) llout=llout+1
-          if (D2SOURCE(nr,i,1) == ZERO.and.llsource(i)>0.and.i.ne.nr) llout=llout+1
+          if (D2SINK(1,nr,i) > ZERO.and.llsink(i)==0.and.i.ne.nr ) llout=llout+1
+          if (D2SINK(1,nr,i) == ZERO.and.llsink(i)>0.and.i.ne.nr ) llout=llout+1
+          if (D2SOURCE(1,nr,i) > ZERO.and.llsource(i)==0.and.i.ne.nr) llout=llout+1
+          if (D2SOURCE(1,nr,i) == ZERO.and.llsource(i)>0.and.i.ne.nr) llout=llout+1
         enddo
         out=llout
       elseif ( mode.eq.2) then
         j=0
         do i=1,NO_D2_BOX_STATES
-          if (D2SINK(nr,i,1) > ZERO.and.llsink(i)==0 ) then
+          if (D2SINK(1,nr,i) > ZERO.and.llsink(i)==0 ) then
              if (j==0) write(LOGUNIT,&
                '(''CheckD2Rate:flux-> only defined in actual step'',$)')
              write(LOGUNIT,'(I4,$)'),i
@@ -51,7 +51,7 @@
         if (j==1)write(LOGUNIT,*) ''
        j=0
         do i=1,NO_D2_BOX_STATES
-          if (D2SINK(nr,i,1) == ZERO.and.llsink(i)>0.and.i.ne.nr ) then 
+          if (D2SINK(1,nr,i) == ZERO.and.llsink(i)>0.and.i.ne.nr ) then 
              if (j==0) write(LOGUNIT,&
              '(''CheckD2Rate:flux-> only defined in previous step'',$)')
              write(LOGUNIT,'(I4,$)'),i
@@ -61,7 +61,7 @@
         if (j==1) write(LOGUNIT,*) ''
         j=0
         do i=1,NO_D2_BOX_STATES
-          if (D2SOURCE(nr,i,1) > ZERO.and.llsource(i)==0)  then
+          if (D2SOURCE(1,nr,i) > ZERO.and.llsource(i)==0)  then
             if (j==0)write(LOGUNIT,&
             '(''CheckD2Rate:flux<- only defined in actual step'',$)') 
             write(LOGUNIT,'(I4,$)'),i
@@ -71,7 +71,7 @@
         if (j==1)write(LOGUNIT,*) ''
         j=0
         do i=1,NO_D2_BOX_STATES
-          if (D2SOURCE(nr,i,1) == ZERO.and.llsource(i)>0.and.i.ne.nr) then
+          if (D2SOURCE(1,nr,i) == ZERO.and.llsource(i)>0.and.i.ne.nr) then
              if (j==0)write(LOGUNIT,&
              '(''CheckD2Rate:flux<- only defined in previous step'',$)')
              write(LOGUNIT,'(I4,$)'),i

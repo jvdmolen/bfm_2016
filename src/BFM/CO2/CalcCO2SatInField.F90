@@ -67,7 +67,8 @@
   real(RLEN),intent(IN)      :: ERHO(1:k)
   real(RLEN),intent(IN)      :: ETW(1:k)
   real(RLEN),intent(IN)      :: ESW(1:k)
-  real(RLEN),intent(INOUT)   :: cc(1:n,1:k)
+!JM  real(RLEN),intent(INOUT)   :: cc(1:n,1:k)
+  real(RLEN),intent(INOUT)   :: cc(1:k,1:n)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! external functions
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -88,22 +89,31 @@
   j=ppO3h
   if ( k > 0 ) then
     do i=1,k
-          Ac   =   cc(j,i)
+!JM          Ac   =   cc(j,i)
+          Ac   =   cc(i,j)
           Ac_max=   (Ac+HplusBASIS)*0.5
           Ac=min(Ac_max,Ac)
+!JM          error= CalcCO2System(MethodCalcCO2,ESW(i),ETW(i),ERHO(i),&
+!JM                   cc(ppN1p,i),cc(ppN5s,i),Ac,&
+!JM                   dumCO2,dumHCO3,dumCO3,dumCac,&
+!JM                   pCO2_in=pCO2_Air,DIC_out=DIC,pH_out=dumpH)
           error= CalcCO2System(MethodCalcCO2,ESW(i),ETW(i),ERHO(i),&
-                   cc(ppN1p,i),cc(ppN5s,i),Ac,&
+                   cc(i,ppN1p),cc(i,ppN5s),Ac,&
                    dumCO2,dumHCO3,dumCO3,dumCac,&
                    pCO2_in=pCO2_Air,DIC_out=DIC,pH_out=dumpH)
           if ( error.eq.0) then
-            cc(m,i)=DIC* MW_C
-            cc(j,i)=Ac
+!JM            cc(m,i)=DIC* MW_C
+!JM            cc(j,i)=Ac
+            cc(i,m)=DIC* MW_C
+            cc(i,j)=Ac
           else
             write(LOGUNIT,*) 'error,DIC',error,DIC
             write(LOGUNIT,*) 'i=',i
             write(LOGUNIT,*) 'AC=',Ac
-            write(LOGUNIT,*) 'N1p=',cc(ppN1p,i)
-            write(LOGUNIT,*) 'N5s=',cc(ppN5s,i)
+!JM            write(LOGUNIT,*) 'N1p=',cc(ppN1p,i)
+!JM            write(LOGUNIT,*) 'N5s=',cc(ppN5s,i)
+            write(LOGUNIT,*) 'N1p=',cc(i,ppN1p)
+            write(LOGUNIT,*) 'N5s=',cc(i,ppN5s)
             write(LOGUNIT,*) 'ESW=',ESW(i)
             write(LOGUNIT,*) 'ETW=',ETW(i)
             write(LOGUNIT,*) 'ERHO=',ERHO(i)

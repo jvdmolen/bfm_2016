@@ -802,7 +802,7 @@ if { ![regexp field $mode ] && [regexp {^[23]+[_0-9]*d} $dim ] } {
 set type [ lindex $tmp 1 ]
 switch -- $mode {
   diagnos-desc -
-  state-desc {
+  sate-desc {
     if { [ info exists VARS($dim,$type,name) ] } {
       set tmp [ format "! %10s %60s %15s" "$dim name" "description" "unit" ]
       PrintLine -block $tmp;PrintLine -print ""
@@ -1017,7 +1017,8 @@ switch -- $mode {
       regexp {[0-9]+} $dim i
       set TYPE [ string toupper $type ]
       foreach name $VARS($dim,$type,name) {
-	PrintLine -print "$name => D$i${TYPE}${k}(pp$name,:); $name=ZERO"
+#JM	PrintLine -print "$name => D$i${TYPE}${k}(pp$name,:); $name=ZERO"
+	PrintLine -print "$name => D$i${TYPE}${k}(:,pp$name); $name=ZERO"
       }
     }
   }
@@ -1291,18 +1292,21 @@ switch -- $mode {
           { set j $VARS(new_diagnos,$dim,layers)  ;set k _$VARS(new_diagnos,$dim,name) }
       regexp {[0-9]+} $dim i
       PrintLine -print ""
-      PrintLine -print "allocate(D$i${TYPE}${k}(1:NO_D${i}_BOX_${TYPE}S$k,1:$j),stat=status)"
+#JM      PrintLine -print "allocate(D$i${TYPE}${k}(1:NO_D${i}_BOX_${TYPE}S$k,1:$j),stat=status)"
+      PrintLine -print "allocate(D$i${TYPE}${k}(1:$j,1:NO_D${i}_BOX_${TYPE}S$k),stat=status)"
       set j D$i${TYPE}${k}
       PrintLine -print "if (status /=0)call error_msg_prn(ALLOC,\"AllocateMem\",\"$j\" )"
 
       PrintLine -print "$j= ZERO"
       if { $type == "state" } {
 	set tmp SOURCE
-	PrintLine -print "allocate(D$i${tmp}(1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES,1:NO_BOXES$j),stat=status)"
+#JM	PrintLine -print "allocate(D$i${tmp}(1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES,1:NO_BOXES$j),stat=status)"
+	PrintLine -print "allocate(D$i${tmp}(1:NO_BOXES$j,1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES),stat=status)"
 	PrintLine -print "if (status /= 0) call error_msg_prn(ALLOC,\"AllocateMem\", \"D$i$tmp\")"
 	PrintLine -print "D$i$tmp = ZERO"
 	set tmp SINK
-	PrintLine -print "allocate(D$i${tmp}(1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES,1:NO_BOXES$j) ,stat=status)"
+#JM	PrintLine -print "allocate(D$i${tmp}(1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES,1:NO_BOXES$j) ,stat=status)"
+	PrintLine -print "allocate(D$i${tmp}(1:NO_BOXES$j,1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES) ,stat=status)"
 	PrintLine -print "if (status /= 0) call error_msg_prn(ALLOC,\"AllocateMem\", \"D$i$tmp\")"
 	PrintLine -print "D$i$tmp = ZERO"
 	set tmp STATETYPE
@@ -1651,7 +1655,8 @@ foreach groupname $VARS($dim,group) members $VARS($dim,member) constituents $VAR
     PrintLine -print "endif"
   } else {
     regsub d $dim "" dim2
-    PrintLine -print "$pre$groupname => D${dim2}STATE(pp${groupname}(n,constituent),:)"
+#JM    PrintLine -print "$pre$groupname => D${dim2}STATE(pp${groupname}(n,constituent),:)"
+    PrintLine -print "$pre$groupname => D${dim2}STATE(:,pp${groupname}(n,constituent))"
   }
   PrintLine -print "";Section -decr body
   PrintLine -print "END function"

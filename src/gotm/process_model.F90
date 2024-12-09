@@ -42,11 +42,14 @@
 ! !INPUT PARAMETERS:
    logical, intent(in)                 :: first
    integer, intent(in)                 :: numc,nlev
-   REALTYPE, intent(in)                :: cc(1:numc,0:nlev)
+!JM   REALTYPE, intent(in)                :: cc(1:numc,0:nlev)
+   REALTYPE, intent(in)                :: cc(0:nlev,1:numc)
 !
 ! !INPUT/OUTPUT PARAMETERS:
-   REALTYPE, intent(inout)             :: pp(1:numc,1:numc,0:nlev)
-   REALTYPE, intent(inout)             :: dd(1:numc,1:numc,0:nlev)
+!JM   REALTYPE, intent(inout)             :: pp(1:numc,1:numc,0:nlev)
+!JM   REALTYPE, intent(inout)             :: dd(1:numc,1:numc,0:nlev)
+   REALTYPE, intent(inout)             :: pp(0:nlev,1:numc,1:numc)
+   REALTYPE, intent(inout)             :: dd(0:nlev,1:numc,1:numc)
 !
 ! !REVISION HISTORY:
 !  Original author(s): Hans Burchard & Karsten Bolding

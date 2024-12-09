@@ -492,7 +492,7 @@
 #ifdef BFM_GOTM
       case (6)  ! The BFM (ERSEM) model
          call init_var_bfm(namlst,'bio_bfm.nml',unit,bio_setup)
-       case (7)  ! The trace model
+      case (7)  ! The trace model
          call init_var_trace(bio_model)
 #endif
       case default
@@ -677,10 +677,13 @@
                   adv_courant=adv1d_courant(j);
                   adv_number=adv1d_number(j);
                 endif
-                c1dimz=cc(j,:)
+!JM                c1dimz=cc(j,:)
+                c1dimz=cc(:,j)
                 if (llsumh ) then
                   if ( llws(j)) then
-                    call adv_center_bfm(j,nlev,dt,h_l,h_l,ws(j,:),flux,flux, &
+!JM                    call adv_center_bfm(j,nlev,dt,h_l,h_l,ws(j,:),flux,flux, &
+!JM                    _ZERO_,_ZERO_,w_adv_discr,mass_conservation_adv,c1dimz)
+                    call adv_center_bfm(j,nlev,dt,h_l,h_l,ws(:,j),flux,flux, &
                     _ZERO_,_ZERO_,w_adv_discr,mass_conservation_adv,c1dimz)
 !-----------------JM added
                     msg='bio+advection'
@@ -694,9 +697,13 @@
                  ! do diffusion step
 !JM added for ppR9x: SILTTRANSPORT: Dirichlet bottom boundary condition
                   if (pelvar_type(j)>=SILTTRANSPORT.and.llws(j)) then
-                    c1dimz(1)=cc(j,1)
+!JM                    c1dimz(1)=cc(j,1)
+                    c1dimz(1)=cc(1,j)
+!JM                    call diff_center_bfm(nlev,dt,cnpar,posconc(j),h_l, &
+!JM                      Neumann,Dirichlet,sfl(j),cc(j,1),nuh_l,Lsour,Qsour,RelaxTau, &
+!JM                      c1dimz,mass_conservation_diff,c1dimz)
                     call diff_center_bfm(nlev,dt,cnpar,posconc(j),h_l, &
-                      Neumann,Dirichlet,sfl(j),cc(j,1),nuh_l,Lsour,Qsour,RelaxTau, &
+                      Neumann,Dirichlet,sfl(j),cc(1,j),nuh_l,Lsour,Qsour,RelaxTau, &
                       c1dimz,mass_conservation_diff,c1dimz)
                   else
                     call diff_center_bfm(nlev,dt,cnpar,posconc(j),h_l, &
@@ -724,7 +731,8 @@
                 elseif (present(counter))then
                   counter=counter+1
                 endif
-                cc(j,:)=c1dimz
+!JM                cc(j,:)=c1dimz
+                cc(:,j)=c1dimz
                 if (pelvar_type(j)>=ALLTRANSPORT.and.warning_level>2) then
                   adv1d_courant(j)=adv_courant;
                   adv1d_number(j)=adv_number;
@@ -740,24 +748,30 @@
         elseif (bio_model==7) then
           do j=1,numcc
 !           do diffusion step
-            c1dimz=cc(j,:)
+!JM            c1dimz=cc(j,:)
+            c1dimz=cc(:,j)
             call diff_center(nlev,dt,cnpar,posconc(j),h_l,Neumann,Neumann,&
                 sfl(j),bfl(j),nuh_l,Lsour,Qsour,RelaxTau,c1dimz,c1dimz)
             call test_on_negative_states ( j,llsumh2,h_l,nlev,  &
                                       "bio+vert.diff" ,c1dimz,kt,msg )
             if (kt.gt.0) STDERR msg(1:len_trim(msg))
-            cc(j,:)=c1dimz
+!JM            cc(j,:)=c1dimz
+            cc(:,j)=c1dimz
           end do
         else ! other bio_model
 #endif
           do j=1,numcc
 !           do advection step
+!JM            if ( bio_model /= 7 ) call adv_center(nlev,dt,h_l,h_l,ws(j,:),flux, &
+!JM                 flux,_ZERO_,_ZERO_,w_adv_discr,cc(j,:))
             if ( bio_model /= 7 ) call adv_center(nlev,dt,h_l,h_l,ws(j,:),flux, &
-                 flux,_ZERO_,_ZERO_,w_adv_discr,cc(j,:))
+                 flux,_ZERO_,_ZERO_,w_adv_discr,cc(:,j))
 
 !           do diffusion step
+!JM            call diff_center(nlev,dt,cnpar,posconc(j),h_l,Neumann,Neumann,&
+!JM                sfl(j),bfl(j),nuh_l,Lsour,Qsour,RelaxTau,cc(j,:),cc(j,:))
             call diff_center(nlev,dt,cnpar,posconc(j),h_l,Neumann,Neumann,&
-                sfl(j),bfl(j),nuh_l,Lsour,Qsour,RelaxTau,cc(j,:),cc(j,:))
+                sfl(j),bfl(j),nuh_l,Lsour,Qsour,RelaxTau,cc(:,j),cc(:,j))
           end do
 #ifdef BFM_GOTM
          end if !bio_model
@@ -772,27 +786,35 @@
          end do
          do j=1,numc
 #ifdef LAGRANGE
-            call lagrange(nlev,dt,zlev,nuh_l,ws(j,1),bio_npar, &
-                          particle_active(j,:), &
-                          particle_indx(j,:),   &
-                          particle_pos(j,:))
+!JM            call lagrange(nlev,dt,zlev,nuh_l,ws(j,1),bio_npar, &
+!JM                          particle_active(j,:), &
+!JM                          particle_indx(j,:),   &
+!JM                          particle_pos(j,:))
+            call lagrange(nlev,dt,zlev,nuh_l,ws(1,j),bio_npar, &
+                          particle_active(:,j), &
+                          particle_indx(:,j),   &
+                          particle_pos(:,j))
             if (mussels_calc) then
                filter_depth=-depth+total_mussel_flux*dt
                do i=1,bio_npar
-                  if (particle_pos(j,i) .lt. filter_depth) &
-                      particle_active(j,i)=.false.
+!JM                  if (particle_pos(j,i) .lt. filter_depth) &
+!JM                      particle_active(j,i)=.false.
+                  if (particle_pos(i,j) .lt. filter_depth) &
+                      particle_active(i,j)=.false.
                end do
             end if
 !           convert particle counts  into concentrations
             if( write_results .or. bio_lagrange_mean ) then
                if (set_C_zero) then
-                  cc(j,:)=_ZERO_
+!JM                  cc(j,:)=_ZERO_
+                  cc(:,j)=_ZERO_
                   set_C_zero=.false.
                end if
                do np=1,bio_npar
                   if (particle_active(j,np)) then
                     n=particle_indx(j,np)
-                    cc(j,n)=cc(j,n)+_ONE_
+!JM                    cc(j,n)=cc(j,n)+_ONE_
+                    cc(n,j)=cc(n,j)+_ONE_
                   end if
                end do
                if (bio_lagrange_mean) then
@@ -802,7 +824,8 @@
                end if
                if (write_results) then
                   do n=1,nlev
-                     cc(j,n) = cc(j,n)/bio_npar*depth/h(n)/count
+!JM                     cc(j,n) = cc(j,n)/bio_npar*depth/h(n)/count
+                     cc(n,j) = cc(n,j)/bio_npar*depth/h(n)/count
                   end do
                   count=0
                   set_C_zero=.true.
@@ -883,7 +906,8 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
-   allocate(cc(1:numc,0:nlev),stat=rc)
+!JM   allocate(cc(1:numc,0:nlev),stat=rc)
+   allocate(cc(0:nlev,1:numc),stat=rc)
    if (rc /= 0) STOP 'init_bio: Error allocating (cc)'
    cc=_ZERO_
  
@@ -949,11 +973,13 @@
    if (rc /= 0) STOP 'init_bio: Error allocating (adv1d_number)'
    adv1d_number=_ZERO_
 
-   allocate(pp(1:numc,1:numc,0:nlev),stat=rc)
+!JM   allocate(pp(1:numc,1:numc,0:nlev),stat=rc)
+   allocate(pp(0:nlev,1:numc,1:numc),stat=rc)
    if (rc /= 0) STOP 'init_bio: Error allocating (pp)'
    pp=_ZERO_
 
-   allocate(dd(1:numc,1:numc,0:nlev),stat=rc)
+!JM   allocate(dd(1:numc,1:numc,0:nlev),stat=rc)
+   allocate(dd(0:nlev,1:numc,1:numc),stat=rc)
    if (rc /= 0) STOP 'init_bio: Error allocating (dd)'
    dd=_ZERO_
 

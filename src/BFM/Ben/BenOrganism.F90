@@ -177,9 +177,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  yc = D2STATE(ppyc,:)
-  yn = D2STATE(ppyn,:)
-  yp = D2STATE(ppyp,:)
+  yc = D2STATE(:,ppyc)
+  yn = D2STATE(:,ppyn)
+  yp = D2STATE(:,ppyp)
 
   edry=DONE
   ! p_xdry==0 : edry=1

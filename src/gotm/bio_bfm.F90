@@ -175,9 +175,12 @@
    !---------------------------------------------
    ! Pelagic pointers
    !---------------------------------------------
-   D3STATE  => cc(:,1:NO_BOXES)
-   D3SOURCE => pp(:,:,1:NO_BOXES)
-   D3SINK   => dd(:,:,1:NO_BOXES)
+!JM   D3STATE  => cc(:,1:NO_BOXES)
+!JM   D3SOURCE => pp(:,:,1:NO_BOXES)
+!JM   D3SINK   => dd(:,:,1:NO_BOXES)
+   D3STATE  => cc(1:NO_BOXES,:)
+   D3SOURCE => pp(1:NO_BOXES,:,:)
+   D3SINK   => dd(1:NO_BOXES,:,:)
    D3STATETYPE => pelvar_type
    if (numc_diag > 0) D3DIAGNOS => diag(:,1:NO_BOXES)
 
@@ -185,9 +188,12 @@
    ! Benthic pointers
    !---------------------------------------------
    if (bio_setup >=2 ) then
-      D2STATE  => ccb(:,1:NO_BOXES_XY)
-      D2SOURCE => ppb(:,:,1:NO_BOXES_XY)
-      D2SINK   => ddb(:,:,1:NO_BOXES_XY)
+!JM      D2STATE  => ccb(:,1:NO_BOXES_XY)
+!JM      D2SOURCE => ppb(:,:,1:NO_BOXES_XY)
+!JM      D2SINK   => ddb(:,:,1:NO_BOXES_XY)
+      D2STATE  => ccb(1:NO_BOXES_XY,:)
+      D2SOURCE => ppb(1:NO_BOXES_XY,:,:)
+      D2SINK   => ddb(1:NO_BOXES_XY,:,:)
       D2STATETYPE => benvar_type
       if (numbc_diag>0) D2DIAGNOS => diagb(:,1:NO_BOXES_XY)
 #ifdef INCLUDE_DIAGNOS_PRF
@@ -195,9 +201,13 @@
 #endif
    else
       ! allocate memory anyhow to avoid problems with BFM allocation
-      allocate(D2STATE(1:NO_D2_BOX_STATES,1:NO_BOXES_XY))
-      allocate(D2SOURCE(1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES,1:NO_BOXES_XY))
-      allocate(D2SINK(1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES,1:NO_BOXES_XY))
+!JM      allocate(D2STATE(1:NO_D2_BOX_STATES,1:NO_BOXES_XY))
+!JM      allocate(D2SOURCE(1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES,1:NO_BOXES_XY))
+!JM      allocate(D2SINK(1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES,1:NO_BOXES_XY))
+!JM      allocate(D2STATETYPE(1:NO_D2_BOX_STATES ))
+      allocate(D2STATE(1:NO_BOXES_XY,1:NO_D2_BOX_STATES))
+      allocate(D2SOURCE(1:NO_BOXES_XY,1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES))
+      allocate(D2SINK(1:NO_BOXES_XY,1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES))
       allocate(D2STATETYPE(1:NO_D2_BOX_STATES ))
       if (numbc_diag>0)  &
          allocate(D2DIAGNOS(1:NO_D2_BOX_DIAGNOSS,1:NO_BOXES_XY))
@@ -625,19 +635,23 @@ IMPLICIT NONE
              abs(c1dimz(1:NO_BOXES_Z)))/ (1.0D-80+abs(c1dimz(1:NO_BOXES_Z)))
            corr=corr*OCDepth(ldep)/(5.0+OCdepth(ldep))
         endif
-           ws(j,1:NO_BOXES_Z) = -c1dimz(1:NO_BOXES_Z)/SEC_PER_DAY *corr
+!JM           ws(j,1:NO_BOXES_Z) = -c1dimz(1:NO_BOXES_Z)/SEC_PER_DAY *corr
+           ws(1:NO_BOXES_Z,j) = -c1dimz(1:NO_BOXES_Z)/SEC_PER_DAY *corr
        else
-          ws(j,1:NO_BOXES_Z) = 0.0;
+!JM          ws(j,1:NO_BOXES_Z) = 0.0;
+          ws(1:NO_BOXES_Z,j) = 0.0;
        endif
        llws(j)=ll_larger
-       ws(j,0)= ws(j,1)
+!JM       ws(j,0)= ws(j,1)
+       ws(0,j)= ws(1,j)
      elseif (i< -NO_D3_BOX_STATES) then
        llws(j)=.false.
      elseif (-i==j) then
        ! only when iiPelSinkRef is equal to the negative value of its
        ! is possible to define straight a ws .
        llws(j)=.false.
-       ws(j,0)= ws(j,1)
+!JM       ws(j,0)= ws(j,1)
+       ws(0,j)= ws(1,j)
 !      if ( OCDEPTH(1)>1.5)llws(j)=.true.
        llws(j)=.true.
      elseif (i<0) then
@@ -646,7 +660,8 @@ IMPLICIT NONE
          stop 'error:assign_adv_rates'
        endif
        i=-i
-       ws(j,0:NO_BOXES_Z) =ws(i,0:NO_BOXES_Z)
+!JM       ws(j,0:NO_BOXES_Z) =ws(i,0:NO_BOXES_Z)
+       ws(0:NO_BOXES_Z,j) =ws(0:NO_BOXES_Z,i)
        llws(j)=llws(i)
      else
        llws(j)=.false.
@@ -710,7 +725,8 @@ IMPLICIT NONE
 !-----------------------------------------------------------------------
 !BOC
      do i=1,n
-       pp(i,i,:) = _ZERO_
+!JM       pp(i,i,:) = _ZERO_
+       pp(:,i,i) = _ZERO_
      end do
 
    return
@@ -761,7 +777,7 @@ IMPLICIT NONE
 
    if ( numc_diag > 0 ) then
      allocate(diag(1:numc_diag,0:nlev),stat=rc)
-     if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (cc)'
+    if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (cc)'
      diag=_ZERO_                                                     !BFM
    endif
 
@@ -775,11 +791,14 @@ IMPLICIT NONE
 
    if (bio_setup >= 2) then                                         !BFM
      ! allocate benthic state variables                             !BFM
-     allocate(ccb(1:numbc,0:1),stat=rc)                             !BFM
+!JM     allocate(ccb(1:numbc,0:1),stat=rc)                             !BFM
+     allocate(ccb(0:1,1:numbc),stat=rc)                             !BFM
      if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (ccb)'!BFM
-     allocate(ppb(1:numbc,1:numbc,0:1),stat=rc)                     !BFM
+!JM     allocate(ppb(1:numbc,1:numbc,0:1),stat=rc)                     !BFM
+     allocate(ppb(0:1,1:numbc,1:numbc),stat=rc)                     !BFM
      if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (ppb)'!BFM
-     allocate(ddb(1:numbc,1:numbc,0:1),stat=rc)                     !BFM
+!JHM     allocate(ddb(1:numbc,1:numbc,0:1),stat=rc)                     !BFM
+     allocate(ddb(0:1,1:numbc,1:numbc),stat=rc)                     !BFM
      if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (ppb)'!BFM
 
      ccb=_ZERO_                                                     !BFM
@@ -995,7 +1014,8 @@ IMPLICIT NONE
 !
 ! !OUTPUT PARAMETERS:
 !          Array ccx is modified if ncecessry
-       REALTYPE,intent(inout)                  :: ccx(1:nstates,0:nlev)
+!JM       REALTYPE,intent(inout)                  :: ccx(1:nstates,0:nlev)
+       REALTYPE,intent(inout)                  :: ccx(0:nlev,1:nstates)
        integer,intent(OUT)                     :: enderror
 ! !LOCAL VARIABLES:
         integer              ::j,i
@@ -1007,7 +1027,8 @@ IMPLICIT NONE
               do j=1,nstates
                if (b_setup /= 2 ) then
                  if (pelvar_type(j)>=ALLTRANSPORT) then
-                   c1dimz=ccx(j,:)
+!JM                   c1dimz=ccx(j,:)
+                   c1dimz=ccx(:,j)
                    counter=0
                    call test_on_negative_states ( j,lldeep,h,nlev, messafter, &
                    c1dimz, error,msg,counter )
@@ -1020,7 +1041,8 @@ IMPLICIT NONE
                    if (error.lt.0) then
                        enderror=error;return
                    endif
-                   if (error.gt.0) ccx(j,:)=c1dimz
+!JM                   if (error.gt.0) ccx(j,:)=c1dimz
+                   if (error.gt.0) ccx(:,j)=c1dimz
                  endif
                endif
              enddo
@@ -1228,8 +1250,10 @@ IMPLICIT NONE
    do i=1,n
      if ( nr>0) then
      select case (mode)
-       case(2); l=(abs(D2SOURCE(nra,i,layer))>1.0D-80)
-       case(3); l=(abs(D3SOURCE(nra,i,layer))>1.0D-80)
+!JM       case(2); l=(abs(D2SOURCE(nra,i,layer))>1.0D-80)
+!JM       case(3); l=(abs(D3SOURCE(nra,i,layer))>1.0D-80)
+       case(2); l=(abs(D2SOURCE(layer,nra,i))>1.0D-80)
+       case(3); l=(abs(D3SOURCE(layer,nra,i))>1.0D-80)
      end select
      if (l) then
        ikeep=ikeep+1;keep(ikeep)=i
@@ -1237,8 +1261,10 @@ IMPLICIT NONE
      endif
      if ( nr<0) then
      select case (mode)
-       case(2); l=(abs(D2SINK(nra,i,layer))>1.0D-80)
-       case(3); l=(abs(D3SINK(nra,i,layer))>1.0D-80)
+!JM       case(2); l=(abs(D2SINK(nra,i,layer))>1.0D-80)
+!JM       case(3); l=(abs(D3SINK(nra,i,layer))>1.0D-80)
+       case(2); l=(abs(D2SINK(layer,nra,i))>1.0D-80)
+       case(3); l=(abs(D3SINK(layer,nra,i))>1.0D-80)
      end select
      if (l) then
        ikeep=ikeep+1;keep(ikeep)=-i
@@ -1292,8 +1318,10 @@ IMPLICIT NONE
            n=int(m*rk);m=int((m-1)*rk)+1
            rk=real(NO_D3_BOX_STATES )/real(k)
         else ;k=-k;m=k;n=k; endif
-        if( j3d.eq.1.or.j3d.eq.3) D3SOURCE(m:n,:,:)=_ZERO_
-        if (j3d.ge.2) D3SINK(m:n,:,:)=_ZERO_
+!JM        if( j3d.eq.1.or.j3d.eq.3) D3SOURCE(m:n,:,:)=_ZERO_
+!JM        if (j3d.ge.2) D3SINK(m:n,:,:)=_ZERO_
+        if( j3d.eq.1.or.j3d.eq.3) D3SOURCE(:,m:n,:)=_ZERO_
+        if (j3d.ge.2) D3SINK(:,m:n,:)=_ZERO_
         if (l.eq.0) STDERR "test_structure Reset D3SOURCE D3SINK",rk,m,n
       else
         if( j3d.eq.1.or.j3d.eq.3) D3SOURCE(:,:,:)=_ZERO_
@@ -1307,8 +1335,10 @@ IMPLICIT NONE
             n=int(m*rk);m=int((m-1)*rk)+1
             rk=real(NO_D2_BOX_STATES )/real(k)
         else ;k=-k;m=k;n=k; endif
-        if( j2d.eq.1.or.j2d.eq.3) D2SOURCE(m:n,:,:)=_ZERO_
-        if (j2d.ge.2) D2SINK(m:n,:,:)=_ZERO_
+!JM        if( j2d.eq.1.or.j2d.eq.3) D2SOURCE(m:n,:,:)=_ZERO_
+!JM        if (j2d.ge.2) D2SINK(m:n,:,:)=_ZERO_
+        if( j2d.eq.1.or.j2d.eq.3) D2SOURCE(:,m:n,:)=_ZERO_
+        if (j2d.ge.2) D2SINK(:,m:n,:)=_ZERO_
         if (l.eq.0) STDERR "test_structure Reset D2SOURCE D2SINK",rk,m,n
       else
         if( j2d.eq.1.or.j2d.eq.3) D2SOURCE(:,:,:)=_ZERO_
@@ -1378,9 +1408,11 @@ IMPLICIT NONE
    endif
    do i=from,ito
      if ( kmax.gt.1) then
-        r=sum(cc(i,1:kmax)*h(1:kmax))
-     else
-        r=cc(i,1)
+ !JM       r=sum(cc(i,1:kmax)*h(1:kmax))
+        r=sum(cc(1:kmax,i)*h(1:kmax))
+    else
+!JM        r=cc(i,1)
+        r=cc(1,i)
      endif
      n_fr=n_fr+ fraction(r)
      n_exp=n_exp +exponent(r)
@@ -1416,9 +1448,11 @@ IMPLICIT NONE
    endif
    do i=from,ito
      if ( kmax.gt.1) then
-        r=sum(sum(pp(i,:,1:kmax)-dd(i,:,1:kmax),2)*h(1:kmax))
+!JM        r=sum(sum(pp(i,:,1:kmax)-dd(i,:,1:kmax),2)*h(1:kmax))
+        r=sum(sum(pp(1:kmax,i,:)-dd(1:kmax,i,:),2)*h(1:kmax))
      else
-        r=sum(ppb(i,:,1)-ddb(i,:,1))
+!JM        r=sum(ppb(i,:,1)-ddb(i,:,1))
+        r=sum(ppb(1,i,:)-ddb(1,i,:))
      endif
      n_fr=n_fr+ fraction(r)
      n_exp=n_exp +exponent(r)

@@ -133,7 +133,7 @@ add_library(global_mod
            )
 
 #set_target_properties(global_mod PROPERTIES LINKER_LANGUAGE Fortran)
-target_link_libraries(global_mod  prebasis turbulence )
+target_link_libraries(global_mod  prebasis turbulence)
 set(bfm_all ${bfm_all} global_mod)
 
 FUNCTION( dodir arg0 arg1 arg2 arg3  arg4)

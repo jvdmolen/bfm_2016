@@ -504,7 +504,7 @@
   ! total of losses ( here only due to grazing)
   rmHnc=ZERO
   do i=1,iiBenOrganisms
-    rmHNc=rmHNc+ D2SINK( ppHNc,ppBenOrganisms(i,iiC),:)*SEC_PER_DAY
+    rmHNc=rmHNc+ D2SINK(:,ppHNc,ppBenOrganisms(i,iiC))*SEC_PER_DAY
   enddo
   !Calculate part of Hac in Hnc and limit Hac to a minimum value
   p=min(DONE,Hac/(NZERO+HNc))

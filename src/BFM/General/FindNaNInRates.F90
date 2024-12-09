@@ -74,7 +74,7 @@
   select case (iiSys)
     case (iiPel)
       r3=Source_D3_vector(ppState,0)
-      if (mode==3) s3=D3STATE(ppSTATE,:)+GetDelta()*r3
+      if (mode==3) s3=D3STATE(:,ppSTATE)+GetDelta()*r3
       select case  (mode)
         case(1) ;call findnan(r3,NO_BOXES,jout)
         case(2) ;call findlarge(r3,NO_BOXES,1.0D+05,jout)
@@ -87,12 +87,12 @@
          if (mode.eq.2)write(logunit,'(''Rate of '',A,''('',I2,'')='',G13.6)') &
               trim(var_names(stPelStateS+ppState-1)),jout,r3(jout)
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
-              trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(ppSTATE,jout)
+              trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(jout,ppSTATE)
          call set_warning_for_getm
       endif
     case (iiBen)
       r2=Source_D2_vector(ppState,0)
-      if (mode==3) s2=D2STATE(ppSTATE,:)+GetDelta()*r2
+      if (mode==3) s2=D2STATE(:,ppSTATE)+GetDelta()*r2
       select case  (mode)
         case(1) ;call findnan(r2,NO_BOXES_XY,jout)
         case(2) ;call findlarge(r2,NO_BOXES_XY,1.0D+04,jout)
@@ -105,7 +105,7 @@
          if (mode.eq.2)write(logunit,'(''Rate of '',A,''('',I2,'')='',G13.6)') &
               trim(var_names(stBenStateS+ppState-1)),jout,r2(jout)
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
-              trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(ppSTATE,jout)
+              trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(jout,ppSTATE)
          call set_warning_for_getm
       endif
    end select
@@ -317,7 +317,7 @@ subroutine findsmall( vector,n,small,iout)
          write(logunit,'(A,A,A,I2)') &
                 'Inf in rate ',trim(var_names(stPelStateS+ppState-1)),' layer:',jout
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
-              trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(ppSTATE,jout)
+              trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(jout,ppSTATE)
          call set_warning_for_getm
       endif
     case (iiBen)
@@ -328,7 +328,7 @@ subroutine findsmall( vector,n,small,iout)
          write(logunit,'(A,A,A,I2)') &
                'Inf in rate ',trim(var_names(stBenStateS+ppState-1)),' layer:',jout
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
-              trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(ppSTATE,jout)
+              trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(jout,ppSTATE)
          call set_warning_for_getm
       endif
    end select

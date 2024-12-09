@@ -171,9 +171,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  hxc = D2STATE(pphxc,:)
-  hxn = D2STATE(pphxn,:)
-  hxp = D2STATE(pphxp,:)
+  hxc = D2STATE(:,pphxc)
+  hxn = D2STATE(:,pphxn)
+  hxp = D2STATE(:,pphxp)
 
   qnHc=max(ZERO,hxn/(NZERO+hxc))
   qpHc=max(ZERO,hxp/(NZERO+hxc))

@@ -119,11 +119,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  phytoc = D3STATE(ppphytoc,:)
-  phyton = D3STATE(ppphyton,:)
-  phytop = D3STATE(ppphytop,:)
-  phytos = D3STATE(ppphytos,:)
-  phytol = D3STATE(ppphytol,:)
+  phytoc = D3STATE(:,ppphytoc)
+  phyton = D3STATE(:,ppphyton)
+  phytop = D3STATE(:,ppphytop)
+  phytos = D3STATE(:,ppphytos)
+  phytol = D3STATE(:,ppphytol)
 
 
   ! EPLi[%phyto] has been already calculated in Irradiance_PI.p

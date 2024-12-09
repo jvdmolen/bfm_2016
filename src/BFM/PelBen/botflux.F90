@@ -52,7 +52,8 @@
             PelBoxAbove(BoxNumberXY)=k
           enddo
         enddo
-        BENBOUND=>D3STATE(:,1:NO_BOXES:NO_BOXES_Z)
+!JM        BENBOUND=>D3STATE(:,1:NO_BOXES:NO_BOXES_Z)
+        BENBOUND=>D3STATE(1:NO_BOXES_Z,:)
         write(logunit,*) 'PelBoxAbove;',PelBoxAbove
       end subroutine initbotflux
 
@@ -92,10 +93,10 @@
         if (k.le.n) then
           do i=1,NO_D3_BOX_STATES
             select case (n) 
-              case(1) ;r=D3STATE(i,k)*Depth3D(k)
+              case(1) ;r=D3STATE(k,i)*Depth3D(k)
               case(2) 
                 l=k+NO_BOXES_Z-1 
-                r=NZERO+sum(D3STATE(i,k:l)*Depth3D(k:l))
+                r=NZERO+sum(D3STATE(k:l,i)*Depth3D(k:l))
             end select
             r=abs(PELBOTTOM(i,j)/r)
             if ( r>s ) then     

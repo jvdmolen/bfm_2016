@@ -317,28 +317,28 @@
               endif ! minval<0
               select case ( iiSub )
                 case (iiPel)
-                  D3SINK(origin,destination,:)  =  flux/SEC_PER_DAY
-                  D3SOURCE(destination,origin,:)=  flux/SEC_PER_DAY
+                  D3SINK(:,origin,destination)  =  flux/SEC_PER_DAY
+                  D3SOURCE(:,destination,origin)=  flux/SEC_PER_DAY
                 case (iiBen)
-                  D2SINK(origin,destination,:) =  flux/SEC_PER_DAY
-                  D2SOURCE(destination,origin,:)   = flux/SEC_PER_DAY
+                  D2SINK(:,origin,destination) =  flux/SEC_PER_DAY
+                  D2SOURCE(:,destination,origin)   = flux/SEC_PER_DAY
               end select
             else
               select case ( iiSub )
                 case (iiPel)
                   where (flux > 0.0D+00 )
-                    D3SOURCE(origin,destination,:) =D3SOURCE(origin,destination,:) &
+                    D3SOURCE(:,origin,destination) =D3SOURCE(:,origin,destination) &
                       + flux/SEC_PER_DAY
                   elsewhere
-                    D3SINK(destination,origin,:) =D3SINK(destination,origin,:) - &
+                    D3SINK(:,destination,origin) =D3SINK(:,destination,origin) - &
                       flux/SEC_PER_DAY
                   end where
                 case (iiBen)
                   where (flux > 0.0D+00 )
-                    D2SOURCE(destination,origin,:) =D2SOURCE(destination,origin,:) &
+                    D2SOURCE(:,destination,origin) =D2SOURCE(:,destination,origin) &
                       + flux/SEC_PER_DAY
                   elsewhere
-                    D2SINK(origin,destination,:) =D2SINK(origin,destination,:) - &
+                    D2SINK(:,origin,destination) =D2SINK(:,origin,destination) - &
                       flux/SEC_PER_DAY
                   end where
               end select
@@ -366,11 +366,11 @@
                 write(LOGUNIT,'(''origin='',i4,'' destination='',i4)') &
                   origin,destination
                 if ( iiSub== iiBen) then
-                    write(LOGUNIT,*) "state value origin:",D2STATE(origin,i)
-                    write(LOGUNIT,*) "state value destination:",D2STATE(destination,i)
+                    write(LOGUNIT,*) "state value origin:",D2STATE(i,origin)
+                    write(LOGUNIT,*) "state value destination:",D2STATE(i,destination)
                 else
-                    write(LOGUNIT,*) "state value origin:",D3STATE(origin,i)
-                    write(LOGUNIT,*) "state value destination:",D3STATE(destination,i)
+                    write(LOGUNIT,*) "state value origin:",D3STATE(i,origin)
+                    write(LOGUNIT,*) "state value destination:",D3STATE(i,destination)
                 endif
                 STDERR 'Nan value in flux'
                 stop 1002
@@ -390,11 +390,11 @@
             if (isnan(scalar).eqv. .true. ) then
             write(LOGUNIT,'(''origin='',i4,'' destination='',i4)') origin,destination
             if ( iiSub == iiBen)  then
-                 write(LOGUNIT,*) "state value origin:",D2STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D2STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D2STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D2STATE(grid_nr,destination)
               else 
-                 write(LOGUNIT,*) "state value origin:",D3STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D3STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D3STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D3STATE(grid_nr,destination)
             endif
             write(LOGUNIT,*) 'Nan value in scalar flux'
             stop 1003
@@ -436,11 +436,11 @@
               write(LOGUNIT,*) "origin,destination:", origin,destination
               write(LOGUNIT,*) flow
               if ( iiSub == iiBen)  then
-                 write(LOGUNIT,*) "state value origin:",D2STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D2STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D2STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D2STATE(grid_nr,destination)
               else 
-                 write(LOGUNIT,*) "state value origin:",D3STATE(origin,grid_nr)
-                 write(LOGUNIT,*) "state value destination:",D3STATE(destination,grid_nr)
+                 write(LOGUNIT,*) "state value origin:",D3STATE(grid_nr,origin)
+                 write(LOGUNIT,*) "state value destination:",D3STATE(grid_nr,destination)
               endif
               STDERR "Error in (scalar)flux function:negative flux !"
               call BFM_ERROR("flux","negative flux")
@@ -448,28 +448,28 @@
             endif ! flow<0
             select case ( iiSub )
               case (iiPel)
-                D3SINK(origin,destination,grid_nr)=  flow/SEC_PER_DAY
-                D3SOURCE(destination,origin,grid_nr)= flow/SEC_PER_DAY
+                D3SINK(grid_nr,origin,destination)=  flow/SEC_PER_DAY
+                D3SOURCE(grid_nr,destination,origin)= flow/SEC_PER_DAY
               case (iiBen)
-                D2SINK(origin,destination,grid_nr)=  flow/SEC_PER_DAY
-                D2SOURCE(destination,origin,grid_nr)= flow/SEC_PER_DAY
+                D2SINK(grid_nr,origin,destination)=  flow/SEC_PER_DAY
+                D2SOURCE(grid_nr,destination,origin)= flow/SEC_PER_DAY
             end select
           else
             select case ( iiSub )
               case (iiPel)
                 if (flow > 0.0 ) then
-                  D3SOURCE(destination,origin,grid_nr)= D3SOURCE(destination,origin,grid_nr) &
+                  D3SOURCE(grid_nr,destination,origin)= D3SOURCE(grid_nr,destination,origin) &
                     +flow/SEC_PER_DAY
                 else
-                  D3SINK(origin,destination,grid_nr)= D3SINK(origin,destination,grid_nr) &
+                  D3SINK(grid_nr,origin,destination)= D3SINK(grid_nr,origin,destination) &
                     -flow/SEC_PER_DAY
                 endif
               case (iiBen)
                 if (flow > 0.0 ) then
-                  D2SOURCE(destination,origin,grid_nr)= D2SOURCE(destination,origin,grid_nr) &
+                  D2SOURCE(grid_nr,destination,origin)= D2SOURCE(grid_nr,destination,origin) &
                     +flow/SEC_PER_DAY
                 else
-                  D2SINK(origin,destination,grid_nr)= D2SINK(origin,destination,grid_nr) &
+                  D2SINK(grid_nr,origin,destination)= D2SINK(grid_nr,origin,destination) &
                     -flow/SEC_PER_DAY
                 endif
             end select
@@ -497,12 +497,12 @@
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           select case (mode)
             case(iiConsumption)
-              Source_D3_vector=sum(D3SINK(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D3_vector=sum(D3SINK(:,iistate,:),DIM=1)*SEC_PER_DAY
             case(iiTotal)
-              Source_D3_vector=(sum(D3SOURCE(iistate,:,:),DIM=1)-&
-                          sum(D3SINK(iistate,:,:),DIM=1))*SEC_PER_DAY
+              Source_D3_vector=(sum(D3SOURCE(:,iistate,:),DIM=1)-&
+                          sum(D3SINK(:,iistate,:),DIM=1))*SEC_PER_DAY
             case(iiProduction)
-              Source_D3_vector=sum(D3SOURCE(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D3_vector=sum(D3SOURCE(:,iistate,:),DIM=1)*SEC_PER_DAY
           end select
         end function Source_D3_vector
 
@@ -523,12 +523,12 @@
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           select case (mode)
             case(iiConsumption)
-              Source_D2_vector=sum(D2SINK(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D2_vector=sum(D2SINK(:,iistate,:),DIM=1)*SEC_PER_DAY
             case(iiTotal)
-              Source_D2_vector=(sum(D2SOURCE(iistate,:,:),DIM=1)-&
-                          sum(D2SINK(iistate,:,:),DIM=1))*SEC_PER_DAY
+              Source_D2_vector=(sum(D2SOURCE(:,iistate,:),DIM=1)-&
+                          sum(D2SINK(:,iistate,:),DIM=1))*SEC_PER_DAY
             case(iiProduction)
-              Source_D2_vector=sum(D2SOURCE(iistate,:,:),DIM=1)*SEC_PER_DAY
+              Source_D2_vector=sum(D2SOURCE(:,iistate,:),DIM=1)*SEC_PER_DAY
           end select
         end function Source_D2_vector
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -548,11 +548,11 @@
           integer, intent(IN)  ::iibox
           integer, intent(IN)  ::iistate
           if ( iiSub == iiPel )  then
-            Source = (sum(D3SOURCE(iistate,:,iibox))- &
-              sum(D3SINK(iistate,:,iibox)))*SEC_PER_DAY
+            Source = (sum(D3SOURCE(iibox,iistate,:))- &
+              sum(D3SINK(iibox,iistate,:)))*SEC_PER_DAY
           elseif ( iiSub == iiBen )  then
-            Source = (sum(D2SOURCE(iistate,:,iibox))- &
-              sum(D2SINK(iistate,:,iibox)))*SEC_PER_DAY
+            Source = (sum(D2SOURCE(iibox,iistate,:))- &
+              sum(D2SINK(iibox,iistate,:)))*SEC_PER_DAY
           endif
         end function source
 
@@ -566,8 +566,8 @@
           implicit none
 
           integer, intent(IN) ::iistate
-          D3SOURCE(iistate,:,:)=ZERO
-          D3SINK(iistate,:,:)=ZERO
+          D3SOURCE(:,iistate,:)=ZERO
+          D3SINK(:,iistate,:)=ZERO
         end subroutine ResetSource_D3_vector
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -580,8 +580,8 @@
           implicit none
 
           integer, intent(IN) ::iistate
-          D2SOURCE(iistate,:,:)=ZERO
-          D2SINK(iistate,:,:)=ZERO
+          D2SOURCE(:,iistate,:)=ZERO
+          D2SINK(:,iistate,:)=ZERO
         end subroutine ResetSource_D2_vector
 
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -600,11 +600,11 @@
           integer, intent(IN)  ::iibox
           integer, intent(IN)  ::iistate
           if ( iiSub == iiPel )  then
-            D3SOURCE(iistate,:,iibox)=ZERO
-            D3SINK(iistate,:,iibox)=ZERO
+            D3SOURCE(iibox,iistate,:)=ZERO
+            D3SINK(iibox,iistate,:)=ZERO
           elseif ( iiSub == iiBen )  then
-            D2SOURCE(iistate,:,iibox)=ZERO
-            D2SINK(iistate,:,iibox)=ZERO
+            D2SOURCE(iibox,iistate,:)=ZERO
+            D2SINK(iibox,iistate,:)=ZERO
           endif
         end subroutine ResetSource
 
@@ -637,16 +637,16 @@
             case (iiPel)
               type="D3"
               if ( grid_nr <=0  ) then
-                tot=sum(D3SINK(origin,destination,:))
+                tot=sum(D3SINK(:,origin,destination))
               else
-                tot=D3SINK(origin,destination,grid_nr)
+                tot=D3SINK(grid_nr,origin,destination)
               endif
             case (iiBen)
               type="D2"
               if ( grid_nr <=0  ) then
-                tot=sum(D2SINK(origin,destination,:))
+                tot=sum(D2SINK(:,origin,destination))
               else
-                tot=D2SINK(origin,destination,grid_nr)
+                tot=D2SINK(grid_nr,origin,destination)
               endif
             case (iiReset)
               D3SINK(:,:,:)=0.0D+00
