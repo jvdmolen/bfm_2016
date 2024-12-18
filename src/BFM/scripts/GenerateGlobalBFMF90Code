@@ -1294,19 +1294,23 @@ switch -- $mode {
       PrintLine -print ""
 #JM      PrintLine -print "allocate(D$i${TYPE}${k}(1:NO_D${i}_BOX_${TYPE}S$k,1:$j),stat=status)"
       PrintLine -print "allocate(D$i${TYPE}${k}(1:$j,1:NO_D${i}_BOX_${TYPE}S$k),stat=status)"
-      set j D$i${TYPE}${k}
-      PrintLine -print "if (status /=0)call error_msg_prn(ALLOC,\"AllocateMem\",\"$j\" )"
+#JM bug      set j D$i${TYPE}${k}
+#JM bug      PrintLine -print "if (status /=0)call error_msg_prn(ALLOC,\"AllocateMem\",\"$j\" )"
+      set jj D$i${TYPE}${k}
+      PrintLine -print "if (status /=0)call error_msg_prn(ALLOC,\"AllocateMem\",\"$jj\" )"
 
-      PrintLine -print "$j= ZERO"
+#JM bug      PrintLine -print "$j= ZERO"
+      PrintLine -print "$jj= ZERO"
       if { $type == "state" } {
 	set tmp SOURCE
 #JM	PrintLine -print "allocate(D$i${tmp}(1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES,1:NO_BOXES$j),stat=status)"
-	PrintLine -print "allocate(D$i${tmp}(1:NO_BOXES$j,1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES),stat=status)"
+	PrintLine -print "allocate(D$i${tmp}(1:$j,1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES),stat=status)"
 	PrintLine -print "if (status /= 0) call error_msg_prn(ALLOC,\"AllocateMem\", \"D$i$tmp\")"
 	PrintLine -print "D$i$tmp = ZERO"
 	set tmp SINK
 #JM	PrintLine -print "allocate(D$i${tmp}(1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES,1:NO_BOXES$j) ,stat=status)"
-	PrintLine -print "allocate(D$i${tmp}(1:NO_BOXES$j,1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES) ,stat=status)"
+	PrintLine -print "allocate(D$i${tmp}(1:$j,1:NO_D${i}_BOX_STATES,1:NO_D${i}_BOX_STATES) ,stat=status)"
+
 	PrintLine -print "if (status /= 0) call error_msg_prn(ALLOC,\"AllocateMem\", \"D$i$tmp\")"
 	PrintLine -print "D$i$tmp = ZERO"
 	set tmp STATETYPE

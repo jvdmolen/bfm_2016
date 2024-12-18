@@ -95,6 +95,8 @@
   ! mode ==1 : Bioturbation Dynamics is already called  in the 
   ! call BenthicNutrient3Dynamics(1) where some global variables calculated in 
   ! BenthicNutrient3Dynamics get already an value (pH, M5s,....)
+!write(LOGUNIT,*) 'subroutine benthicsystemdynamics'
+!stop
 
 
   call findLarge(Dfm,No_BOXES_XY,1.0D+08,iout)
@@ -123,28 +125,41 @@
     if (r1(1)>DONE) write(LOGUNIT,*) 'After CalcB>enOrganism:Rate Dfm>1',r1(1)
 
 
-
   if ( CalcBenOrganisms(iiY2)) &
     call BenOrganismDynamics( iiY2, ppY2c, ppY2n, ppY2p)
 
 
 ! call FindNaNInRates(iiBen,ppK14n,'BenthicSystem:after iiY2')
+!write(LOGUNIT,*) 'here 0'
+!stop
 
   if ( CalcSuspensionFeeders(iiY3) .and. CalcSuspensionFeeders(iiYy3)) &
     call FilterFeederDynamics(iiYy3,ppYy3c,ppYy3n,ppYy3p)
+!write(LOGUNIT,*) 'here'
+!stop
   if ( CalcSuspensionFeeders(iiY3)) &
     call FilterFeederDynamics(iiY3,ppY3c,ppY3n,ppY3p)
 
 ! call FindNaNInRates(iiBen,ppK14n,'BenthicSystem:after FilterFeeder')
 
+!write(LOGUNIT,*) 'here1'
+!stop
 
   call BioturbationDynamics
+
+!write(LOGUNIT,*) 'after Bioturbation'
+!stop
 
   !mode =1 : preprocessing
   call BenLimitNutrientDynamics
 
+!write(LOGUNIT,*) 'after BenLimitNutrients'
+!stop
+
   if ( CalcBenBacteria(iiHN)) call BenNBacDynamics
 
+!write(LOGUNIT,*) 'after BenNBac'
+!stop
 
 ! call FindNaNInRates(iiBen,ppK14n,'BenthicSystem:after iiHN')
 
@@ -155,10 +170,15 @@
     if (r1(1)>DONE) write(LOGUNIT,*) 'After BenPhyto:Rate Dfm>1',r1(1)
 ! OUtput2d_2=jPIQ6s(1,:)
 
+!write(LOGUNIT,*) 'after BenPhyto'
+!stop
+
 ! call FindNaNInRates(iiBen,ppK14n,'BenthicSystem:after iiBP1')
   if ( CalcBenBacteria(iiH1)) &
     call BenBacDynamics( iiH1, ppH1c, ppH1n, ppH1p)
 
+!write(LOGUNIT,*) 'after BenBacteria'
+!stop
 ! D2SINK(ppH2c,:,:)=ZERO
 
   if ( CalcBenBacteria(iiH2))  &
@@ -172,6 +192,9 @@
 
   !mode =2 : postprocessing
   call BenGlobalDynamics(2)
+
+!write(LOGUNIT,*) 'end BenthicSystem'
+!stop
 
   end
 !BOP

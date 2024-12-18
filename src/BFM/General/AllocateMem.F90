@@ -64,10 +64,10 @@
      allocate(D3STATE(1:NO_BOXES,1:NO_D3_BOX_STATES),stat=status)
      if (status /=0)call error_msg_prn(ALLOC,"AllocateMem","D3STATE" )
      D3STATE= ZERO
-     allocate(D3SOURCE(1:NO_BOXESD3STATE,1:NO_D3_BOX_STATES,1:NO_D3_BOX_STATES),stat=status)
+     allocate(D3SOURCE(1:NO_BOXES,1:NO_D3_BOX_STATES,1:NO_D3_BOX_STATES),stat=status)
      if (status /= 0) call error_msg_prn(ALLOC,"AllocateMem", "D3SOURCE")
      D3SOURCE = ZERO
-     allocate(D3SINK(1:NO_BOXESD3STATE,1:NO_D3_BOX_STATES,1:NO_D3_BOX_STATES)&
+     allocate(D3SINK(1:NO_BOXES,1:NO_D3_BOX_STATES,1:NO_D3_BOX_STATES)&
       & ,stat=status)
      if (status /= 0) call error_msg_prn(ALLOC,"AllocateMem", "D3SINK")
      D3SINK = ZERO
@@ -79,10 +79,10 @@
      allocate(D2STATE(1:NO_BOXES_XY,1:NO_D2_BOX_STATES),stat=status)
      if (status /=0)call error_msg_prn(ALLOC,"AllocateMem","D2STATE" )
      D2STATE= ZERO
-     allocate(D2SOURCE(1:NO_BOXESD2STATE,1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES),stat=status)
+     allocate(D2SOURCE(1:NO_BOXES_XY,1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES),stat=status)
      if (status /= 0) call error_msg_prn(ALLOC,"AllocateMem", "D2SOURCE")
      D2SOURCE = ZERO
-     allocate(D2SINK(1:NO_BOXESD2STATE,1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES)&
+     allocate(D2SINK(1:NO_BOXES_XY,1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES)&
       & ,stat=status)
      if (status /= 0) call error_msg_prn(ALLOC,"AllocateMem", "D2SINK")
      D2SINK = ZERO

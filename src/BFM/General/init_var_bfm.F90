@@ -640,12 +640,8 @@
 LEVEL3 "init silt"
    InitializeModel=1
    call SiltDynamics
-LEVEL3 "before co2"
-stop
    call CalcCO2SatInField(nlev,numc,ERHO,ETW,ESW,D3STATE)
 
-LEVEL3 "after co2"
-stop
    InitializeModel=0
    !---------------------------------------------
    ! Zeroing of the switched off state variables

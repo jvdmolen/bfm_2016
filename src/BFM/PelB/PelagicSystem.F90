@@ -122,12 +122,16 @@ use mem,only:ppR2c
 !write(LOGUNIT,*)'call testmacrophytostatus 2'
      if (CalcMacroPhyto) call test_MacroPhyto_status
 #endif
+!write(LOGUNIT,*)'call pelglobaldynamics'
     call PelGlobalDynamics(1)
-
+!write(LOGUNIT,*)'pelglobaldynamics'
+!stop
    endif
  
 
   case(2) !-------------------------------------------------------------------
+!write(LOGUNIT,*)'pelagicsystem case2'
+!stop
 
     !predictor-corrector
     call LimitNutrientUptake
@@ -151,7 +155,10 @@ use mem,only:ppR2c
    endif
 #endif
 !write(LOGUNIT,*)'findnaninrates'
+!stop
    call FindNaNInRates(iiPel,ppN1p,'Before PelagicSystems:MicroZoo')
+!write(LOGUNIT,*)'microzooloop'
+!stop
     do i=1,iiMicroZooPlankton
       if ( CalcMicroZooPlankton(i)) then
         ic=ppMicroZooPlankton(i,iiC)
@@ -159,11 +166,19 @@ use mem,only:ppR2c
         ip=ppMicroZooPlankton(i,iiP)
         call MicroZooDynamics( i, ic, in, ip)
        write(msg,'(I4)') i
+!write(LOGUNIT,*)'inside microzooloop'
+!stop
    call FindNaNInRates(iiPel,ppN1p,'After PelagicSystems:MicroZoo'//msg)
+!write(LOGUNIT,*)'betweenfindnans'
+!stop
    call FindNaNInRates(iiPel,ppR2c,'After PelagicSystems:MicroZoo'//msg)
+!write(LOGUNIT,*)'afterbetweenfindnans'
+!stop
       end if
     enddo
 
+!write(LOGUNIT,*)'mesozooloop'
+!stop
 
     do i=1,iiMesoZooPlankton
       if ( CalcMesoZooPlankton(i)) then
@@ -173,11 +188,19 @@ use mem,only:ppR2c
         call MesoZooDynamics( i, ic, in, ip)
       end if
     enddo
+!write(LOGUNIT,*)'after mesozooloop'
+!stop
     call FindNaNInRates(iiPel,ppN1p,'After PelagicSystems:MesoZoo')
+!write(LOGUNIT,*)'after findnan'
+!stop
 
     if ( CalcBacteria) call PelBacDynamics
 !   call FindNaNInRates(iiPel,ppN1p,'After PelagicSystems:Bact')
+!write(LOGUNIT,*)'after calcbacteria'
+!stop
    call FindNaNInRates(iiPel,ppR2c,'After PelagicSystems:MicroZoo')
+!write(LOGUNIT,*)'after findnan'
+!stop
 
   case(3) !-----------------------------------------------------------------
 

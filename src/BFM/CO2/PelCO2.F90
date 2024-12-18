@@ -119,7 +119,8 @@
              write(LOGUNIT,*) 'N5s',N5s(BoxNumber)
              write(LOGUNIT,*) 'N3n',N3n(BoxNumber)
              write(LOGUNIT,*) 'N4n',N4n(BoxNumber)
-             k=1
+             write(LOGUNIT,*) 'rho',ERHO(BoxNumber)
+!             k=1
            endif
            error= CalcCO2System(MethodCalcCO2, &
              ESW(BoxNumber),ETW(BoxNumber),ERHO(BoxNumber),&
@@ -127,8 +128,11 @@
              CO2(BoxNumber),HCO3(BoxNumber),CO3(BoxNumber),CAc(BoxNumber),&
              pH_in=9.D+00,DIC_in=DIC(BoxNumber), &
              pCO2_out=pCO2(BoxNumber))
-             O3h(Boxnumber)=Ac(BoxNumber)
-             write(LOGUNIT,*) 'O3h=AC reset to',O3h(BoxNumber)
+write(LOGUNIT,*)'BoxNumber',BoxNumber
+write(LOGUNIT,*)'Ac',Ac(BoxNumber)
+write(LOGUNIT,*)'O3h',O3h(BoxNumber)
+           O3h(BoxNumber)=Ac(BoxNumber)
+           write(LOGUNIT,*) 'O3h=AC reset to',O3h(BoxNumber)
         endif
 
         if ( BoxNumber==NO_BOXES_Z ) then
@@ -141,6 +145,7 @@
   ENDDO
  if (j>0) then
    write(LOGUNIT,*) 'For this column ',j,' times pH was outside bounds (4-11)'
+stop
    call set_warning_for_getm()
  endif
 

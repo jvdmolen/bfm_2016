@@ -13,6 +13,13 @@
 !
 ! !USES:
 !  default: all is private.
+     use bio_var, only: stPelStateS,stPelDiagS,stPelFluxS,stBenStateS,stBenDiagS, &
+                        stBenFluxS,stPelStateE,stPelDiagE,stPelFluxE,stBenStateE, &
+                        stBenDiagE,stBenFluxE,stSYSE
+#ifdef INCLUDE_DIAGNOS_PRF
+     use bio_var, only: stPRFDiagS,stPRFFluxS,stPRFDiagE,stPRFFluxE
+#endif
+
 !
 ! !PUBLIC MEMBER FUNCTIONS
 ! store arrays for average computations (pelagic and benthic)
@@ -33,25 +40,25 @@
 
      logical      :: write_results
      ! Start and End markers for variable and diagnostics storage
-     integer      :: stPelStateS
-     integer      :: stPelDiagS
-     integer      :: stPelFluxS
-     integer      :: stBenStateS
-     integer      :: stBenDiagS
-     integer      :: stBenFluxS
-     integer      :: stPelStateE
-     integer      :: stPelDiagE
-     integer      :: stPelFluxE
-     integer      :: stBenStateE
-     integer      :: stBenDiagE
-     integer      :: stBenFluxE
-     integer      :: stSYSE
-#ifdef INCLUDE_DIAGNOS_PRF
-     integer      :: stPRFDiagS
-     integer      :: stPRFFluxS
-     integer      :: stPRFDiagE
-     integer      :: stPRFFluxE
-#endif
+!JM     integer      :: stPelStateS
+!JM     integer      :: stPelDiagS
+!JM     integer      :: stPelFluxS
+!JM     integer      :: stBenStateS
+!JM     integer      :: stBenDiagS
+!JM     integer      :: stBenFluxS
+!JM     integer      :: stPelStateE
+!JM     integer      :: stPelDiagE
+!JM     integer      :: stPelFluxE
+!JM     integer      :: stBenStateE
+!JM     integer      :: stBenDiagE
+!JM     integer      :: stBenFluxE
+!JM     integer      :: stSYSE
+!JM#ifdef INCLUDE_DIAGNOS_PRF
+!JM     integer      :: stPRFDiagS
+!JM     integer      :: stPRFFluxS
+!JM     integer      :: stPRFDiagE
+!JM     integer      :: stPRFFluxE
+!JM#endif
 
 
 
@@ -100,7 +107,10 @@
      if (rc /= 0) stop 'setup_bio_output(): Error allocating var_long)'
 
      end subroutine setup_bio_output
+
+
      subroutine prepare_bio_output(mode)
+     use global_mem,only:LOGUNIT
      use bio_var,only: nlev,dt, &
               cc,ccb,diag,diagb,c1dimz,bio_setup, &
               adv1d_courant,adv1d_number,numc
@@ -135,7 +145,7 @@
 #ifdef INCLUDE_DIAGNOS_PRF
           i=count(var_ave(stPRFDiagS:stPRFDiagE))
           if ( (i> 0) .and. bio_setup>1) then
-            allocate(ccb_ave_prf(1:i,0:numbc_prf),stat=rc)
+            allocate(ccb_ave_prf(0:numbc_prf,1:i),stat=rc)
             if (rc/= 0) stop 'init_bio(): Error allocating ccb_ave_prf)'
             ccb_ave_prf=0
           endif

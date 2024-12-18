@@ -45,7 +45,7 @@
     K1p, K11p, K4n, K14n, &
     K3n, K5s, K15s, D3STATE
 #endif
-  use mem,ONLY: ppB1p,ppN1p, ppB1n, ppN3n, ppN4n, ppN5s, D2STATE,Depth
+  use mem,ONLY: ppB1p,ppN1p, ppB1n, ppN3n, ppN4n, ppN5s, Depth
   use mem, ONLY: ppQ6p, ppQ6n, ppQ6s, ppK1p, ppK11p, ppK4n, ppK14n, &
     ppK3n, ppK5s,ppK15s, totBENp, totBENn, totBENs, &
     totPELp,totPELn,totPELs, totSYSp,totSYSn,totSYSs, NO_BOXES_XY, &

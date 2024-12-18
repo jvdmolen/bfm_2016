@@ -119,6 +119,7 @@
   real(RLEN),dimension(NO_BOXES)  :: ex_any !any  dimensionless number (0->inf)
   real(RLEN),dimension(NO_BOXES)  :: px_any !any  dimensionless number (0->1)
   real(RLEN),dimension(NO_BOXES)  :: xpure_R3c,x_buoancy
+  real(RLEN),dimension(NO_BOXES)  :: exp_arg
 
   real(RLEN)                      :: rn_1,rn_2,actual_depth
   real(RLEN),parameter            :: low_phaeo=1.0D-10
@@ -133,23 +134,33 @@
     !          Colonies sinks due to size or include more C than the maximum
     !CALC_MORTALITY: Mortality of degradation of colonies and mortality in cells
     case (CALC_SEDIMENTATION,CALC_MORTALITY)
+!write(LOGUNIT,*)'calc_sedimentation',mode,CALC_SEDIMENTATION,CALC_MORTALITY
+!if (.false.) then
       output=ZERO
       ColSize=DONE
-      if (phyto.ne.iiP6.or.param.le.NZERO)return
+      if ((phyto.ne.iiP6).or.(param.le.NZERO))return
       where (phytoc>low_phaeo)  &
          ColSize=max(DONE,phytoc/(NZERO+Pcc))
       call CalcPhaeoColonyParameters(NO_BOXES,p_xsize_m(phyto),ColSize, &
                                                          Radius,Volume)
       Content=p_wP6c
       nrCols=Pcc/p_wP6c
+!write(LOGUNIT,*)'phaeocalc 1,MW_C,nrCols,NZERO',MW_C,nrCols,NZERO
+
       where (phytoc>low_phaeo.and.Colsize> low_colsize) Content= &
           ColSize*PI_dw(phyto,:)+(R3c+R3c/MW_C*(2.0*MW_H+MW_O))/(NZERO+nrCols)
+!write(LOGUNIT,*)'phaeocalc 2'
       call CalcSinking(NO_BOXES,Radius,Content,ETW,ESW,rx_any)
+!write(LOGUNIT,*)'phaeocalc 3'
 
       ex_any=min((qpPc(phyto,:)- p_qplc(phyto))/(p_qpRc(phyto)-p_qplc(phyto)), &
          (qnPc(phyto,:)- p_lqnlc(phyto))/(p_qnRc(phyto)- p_lqnlc(phyto)))
+!write(LOGUNIT,*)'phaeocalc 4'
+
       ex_any=2.0* p_thdo(phyto)* (DONE/( ex_any+ p_thdo(phyto)))
-      px_any= exp_limit(- qlPc(phyto,:)/ p_qchlc(phyto)/ p_Ke(phyto)* EIR)
+!JM      px_any= exp_limit(- qlPc(phyto,:)/ p_qchlc(phyto)/ p_Ke(phyto)* EIR)
+      exp_arg=- qlPc(phyto,:)/ p_qchlc(phyto)/ p_Ke(phyto)* EIR
+      px_any=exp_limit(exp_arg)
       ! More light  more buancy less sedimentation
       ! More nutrient limitation less buoancy more sedimentation
       x_buoancy=max(ZERO,ex_any,px_any)*insw_vector(ColSize-DONE)
@@ -176,12 +187,15 @@
         cx_any=DONE;sx_any=ZERO
         where (phytoc>low_phaeo)
            sx_any=ex_any* phytoc/(phytoc+low_phaeo)*param
-        endwhere
+        end where
         call LimitChange_vector(POSITIVE,sx_any,cx_any,max_change_per_step)
         output=sx_any
       else
         output=rx_any !m/d (sinking rate
       endif
+!endif
+!write(LOGUNIT,*)'phaeocalc 5',output
+!stop
     case (CALC_MORTALITY_CELLS_IN_COLONY)  !20  mortality of cells in colony
       ! after a direct return the value in output keep its value!
       output=ZERO
@@ -386,6 +400,9 @@
       end select
   end select
 
+!endif !skip option
+!write(LOGUNIT,*)'phaeocalc end'
+!stop
 
   end subroutine PhaeocystisCalc
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

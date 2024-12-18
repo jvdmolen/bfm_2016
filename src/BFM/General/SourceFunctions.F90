@@ -78,8 +78,10 @@
             integer,intent(IN)   ::n,iiC    ! Specification
             end function                    ! Specification
           end  interface   
-          real(RLEN) :: Source_D3_withgroup(size(D3SOURCE,DIM=3))
-          real(RLEN) :: fill(size(D3SOURCE,DIM=3))
+!JM          real(RLEN) :: Source_D3_withgroup(size(D3SOURCE,DIM=3))
+!JM          real(RLEN) :: fill(size(D3SOURCE,DIM=3))
+          real(RLEN) :: Source_D3_withgroup(size(D3SOURCE,DIM=1))
+          real(RLEN) :: fill(size(D3SOURCE,DIM=1))
           integer    :: i,j
           real(RLEN) :: l
 
@@ -101,8 +103,10 @@
           integer, intent(IN)             ::iistate
           integer, intent(IN)             ::jjstate
           integer, intent(IN)             ::mode
-          real(RLEN) :: Source_D3_withstate(size(D3SOURCE,DIM=3))
-          real(RLEN) :: fill(size(D3SOURCE,DIM=3))
+!JM          real(RLEN) :: Source_D3_withstate(size(D3SOURCE,DIM=3))
+!JM          real(RLEN) :: fill(size(D3SOURCE,DIM=3))
+          real(RLEN) :: Source_D3_withstate(size(D3SOURCE,DIM=1))
+          real(RLEN) :: fill(size(D3SOURCE,DIM=1))
           real(RLEN) :: l
 
           fill=ZERO;l=DONE;if ( mode ==iiTotal ) l=-l
@@ -127,8 +131,10 @@
             integer,intent(IN)   ::n,iiC    ! Specification
             end function                    ! Specification
           end  interface   
-          real(RLEN) :: Source_D2_withgroup(size(D2SOURCE,DIM=3))
-          real(RLEN) :: fill(size(D2SOURCE,DIM=3))
+!JM          real(RLEN) :: Source_D2_withgroup(size(D2SOURCE,DIM=3))
+!JM          real(RLEN) :: fill(size(D2SOURCE,DIM=3))
+          real(RLEN) :: Source_D2_withgroup(size(D2SOURCE,DIM=1))
+          real(RLEN) :: fill(size(D2SOURCE,DIM=1))
           integer    :: i,j
           real(RLEN) :: l
 
@@ -150,8 +156,10 @@
           integer, intent(IN)             ::iistate
           integer, intent(IN)             ::jjstate
           integer, intent(IN)             ::mode
-          real(RLEN) :: Source_D2_withstate(size(D2SOURCE,DIM=3))
-          real(RLEN) :: fill(size(D2SOURCE,DIM=3))
+!JM          real(RLEN) :: Source_D2_withstate(size(D2SOURCE,DIM=3))
+!JM          real(RLEN) :: fill(size(D2SOURCE,DIM=3))
+          real(RLEN) :: Source_D2_withstate(size(D2SOURCE,DIM=1))
+          real(RLEN) :: fill(size(D2SOURCE,DIM=1))
           real(RLEN) :: l
 
           fill=ZERO;l=DONE;if ( mode ==iiTotal ) l=-l

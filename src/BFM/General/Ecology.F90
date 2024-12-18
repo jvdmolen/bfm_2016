@@ -109,6 +109,9 @@
   integer,save                     ::follow=0
   integer                          :: iout,i,j,k,l,mm
 
+write(LOGUNIT,*) 'subroutine ecologydynamics'
+!stop
+
   call ResetSource_D2_vector(ppQ6s)
   Output2d_1(1)=sum((P1s+P5s+R6s+N5s)*Depth)
   Output2d_2(1)=sum(R6s*Depth)
@@ -139,7 +142,6 @@
          call set_warning_for_getm
   endif
 
-  
 #ifdef DEBUG
   call  flux(1,iiReset,1,1,0.00D+00)
 #endif
@@ -191,6 +193,7 @@
   endif
 
 !write(LOGUNIT,*)'ecology before reset flux interface'
+!stop
 
   ! Reset plagic-benthic fluxes-interface..............
   if (CalcBenthicFlag==BENTHIC_BIO .or. CalcBenthicFlag==BENTHIC_FULL)  &
@@ -210,6 +213,8 @@
       call CalculateThermoVarsBFM
 !write(LOGUNIT,*)'call pelagicsystemdynamics'
       call PelagicSystemDynamics(1)
+!write(LOGUNIT,*)'after pelagicsystemdynamics'
+!stop
       ! -pH in water column and in sediment
     case (.false.)
 !write(logunit,*)'ecology, pelagic flag false'
@@ -217,8 +222,12 @@
       !dynamic boundary condition,
       call PelagicSystemDynamics(0)
   end select
-!write(LOGUNIT,*)'findlarge'
+!write(LOGUNIT,*)'findlarge',iiPel,ppN1p
+!stop
+!JM a pointer error occurs in this call. Don't understand what's going wrong. Skip for now!!!!!!!!!
   call FindLargeInRates(iiPel,ppN1p,'Ecology:after Pelagic_1')
+!write(LOGUNIT,*)'CO2dynamics'
+!stop
   call CO2Dynamics(1)
   call findnan(R6c,NO_BOXES,iout)
   if ( iout>0) then
@@ -227,18 +236,29 @@
   endif
 
 !write(LOGUNIT,*)'ecology: before benthicdiatomtest'
+!stop
 
   !test if benthic diatoms are present on this grid point
+!write(LOGUNIT,*) 'next call pelagic system dynamics'
+!stop
 
   if ( CalcPelagicFlag) then
+!write(LOGUNIT,*) 'calcpelagicflag'
+!stop
     !test which phyton groups are presenta on this grid point
     call test_Phyto_status
+!write(LOGUNIT,*) 'aftertest'
+!stop
     ! Calculate Pelagic processes inclusive change in DIC
     call PelagicSystemDynamics(2)
+!write(LOGUNIT,*) 'after pelagicsystem'
+!stop
     call FindNaNInRates(iiPel,ppR3c,'Ecology:after Pelagic_2')
     call FindNaNInRates(iiPel,ppR2c,'Ecology:after Pelagic_2')
     call FindLargeInRates(iiPel,ppN1p,'Ecology:after Pelagic_2')
   endif
+!write(LOGUNIT,*) 'past it'
+!stop
 
   if (CalcBenthicFlag==BENTHIC_BIO .or. CalcBenthicFlag==BENTHIC_FULL) then
     !Calculate for for benthic model: use concentration form the lowest layer
@@ -247,6 +267,8 @@
     ! values
     call BenPhosphateDynamics(0)
   endif
+!write(LOGUNIT,*) 'after benphosphatedynamics',CalcBenthicFlag
+!stop
   if (CalcBenthicFlag > 0 ) then
 
     select case ( CalcBenthicFlag)
@@ -259,37 +281,55 @@
         call BenthicNutrient2Dynamics
 
       case ( BENTHIC_FULL )  ! Full benthic nutrients
+!write(LOGUNIT,*) 'benthic_full'
+!stop
         call PelForcingForBenDynamics(2)
+!write(LOGUNIT,*) 'after pelforcingforbendynamics'
+!stop
         !Calculate Cand coupled nutrient fluxes of functional groups in benthic system
         call BenthicSystemDynamics
+!write(LOGUNIT,*) 'after benthicsystemdynamics'
+!stop
         call FindNanInRates(iiPel,ppK3n,'Ecology:full benthic system')
 
         !Diagenetic model
                 call BenthicNutrient3Dynamics
                 call FindNanInRates(iiPel,ppK3n,'Ecology:full benthic nutrients')
 
+!write(LOGUNIT,*) 'after benthicsnutrient3Ddynamics'
+!stop
         
         !For good funtioning of benthic nutrient model it is necessary
         ! that are no empty buffere of the esstial nutrients.
         ! if not ,correct and give an message.
         ! Calculate Benthic DIC and Alkalinity fluxes.
         call CO2Dynamics(3)
+!write(LOGUNIT,*) 'after CO2Ddynamics'
+!stop
         if ( CalcPelagicFlag) then
           !Resuspension and settling of bnethic filterfeeder larvae
           ! (fluxes between Yy3 and Z2)
           call Y3Z2CoupDynamics
+!write(LOGUNIT,*) 'after Y3Z2'
+!stop
 
           call FindNanInRates(iiPel,ppR3c,'Ecology:after Y3Y2Dyn')
           call FindNanInRates(iiPel,ppR2c,'Ecology:after Y3Y2Dyn')
 
           ! Resuspension and of detritus   (fluxes beteween R6 and Q6)
           call ResuspensionPartDetritus
+!write(LOGUNIT,*) 'after resuspensionPart'
+!stop
           ! Resuspension of diatoms  (fluxes between P5 and BP1)
           call ResuspensionBenPhyto
+!write(LOGUNIT,*) 'after resuspensionBenPhyto'
+!stop
           ! Settling of phytoplankton,detritus
         endif
     end select
   endif
+!write(LOGUNIT,*) 'after allbenthiccalls'
+!stop
   call FindLargeInRates(iiPel,ppN1p,'Ecology:before PSF(3)')
   if ( CalcPelagicFlag) then
     call PelagicSystemDynamics(3)
@@ -299,6 +339,8 @@
 
   endif
 
+!write(LOGUNIT,*) 'after calcpelagicflag'
+!stop
    !Fill variables to test if no masis lows or created.
    ! ( can only test in a 1D-setup)
 
@@ -309,18 +351,24 @@
    
 ! call checkbotflux(1,NO_BOXES,0.1D+00,Depth)
   if (CalcBenthicFlag > 0 ) call setbotflux(ADD,NO_BOXES,Depth)
+!write(LOGUNIT,*) 'after setbotflux'
+!stop
 
   call FindNanInRates(iiPel,ppR3c,'Ecology:after setbotflux')
+!write(LOGUNIT,*) 'after first check'
+!stop
   call FindNanInRates(iiBen,ppK14n,'Ecology:after setbotflux')
   call FindLargeInRates(iiPel,ppN1p,'Ecology:after setbotflux')
-          Output2d_4=Source_D2_vector(ppQ6s,0)
+!          Output2d_4=Source_D2_vector(ppQ6s,0)
 
+!write(LOGUNIT,*) 'after calcbenthicflag'
+!stop
 
   if ( mass_conservation_check ) then
     call CheckMassConservationNPSDynamics
 #ifdef INCLUDE_MACROPHYT
-     if (CalcMacroPhyto.and.CalcPelagicFlag )  &
-                                 call AddMacroPhytAddToMassConservationNP
+!skip     if (CalcMacroPhyto.and.CalcPelagicFlag )  &
+!skip                                 call AddMacroPhytAddToMassConservationNP
 #endif
      call CheckMassConservationCDynamics
   endif
@@ -334,6 +382,7 @@
   call FindNanInRates(iiPel,ppK3n,'Ecology: at end')
 
 !write(LOGUNIT,*)'end ecology'
+!stop
   end
 !BOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

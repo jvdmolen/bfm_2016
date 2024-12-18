@@ -96,7 +96,17 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: d,h,r
   real(RLEN),dimension(NO_BOXES_XY)  :: alpha
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! JM more Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN),dimension(NO_BOXES_XY)  :: jnetY1,jnetY2,jnetY4,jnetY5
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+  !JM assign local variables to avoid pointer errors in insw_vector calls
+  jnetY1=jnetYIc(iiY1,:)
+  jnetY2=jnetYIc(iiY2,:)
+  jnetY4=jnetYIc(iiY4,:)
+  jnetY5=jnetYIc(iiY5,:)
 
   d=p_cturm
 
@@ -111,10 +121,14 @@
   ! Calculation of bioturbation. ''turenh'' is a global box variable!
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  r=   Y1c(:)*insw_vector(jnetYIc(iiY1,:))+ &
-       Y4c(:)*insw_vector(jnetYIc(iiY4,:))
-  Ytur=r+   Y2c(:)*insw_vector(jnetYIc(iiY2,:)) &
-     + Y5c(:)*insw_vector(jnetYIc(iiY5,:)) 
+!JM  r=   Y1c(:)*insw_vector(jnetYIc(iiY1,:))+ &
+!JM       Y4c(:)*insw_vector(jnetYIc(iiY4,:))
+  r=   Y1c(:)*insw_vector(jnetY1)+ &
+       Y4c(:)*insw_vector(jnetY4)
+!JM  Ytur=r+   Y2c(:)*insw_vector(jnetYIc(iiY2,:)) &
+!JM     + Y5c(:)*insw_vector(jnetYIc(iiY5,:)) 
+  Ytur=r+   Y2c(:)*insw_vector(jnetY2) &
+     + Y5c(:)*insw_vector(jnetY5) 
 
   turenh(:)  =DONE+   p_cmtur* MM_vector(  Ytur-r,  p_chtur)
   h  =DONE+   p_cmtur* MM_vector(  r,  p_chtur)
@@ -148,9 +162,12 @@
   if (sw_irr==1.or.sw_irr==3 ) then
     ! bacckground bioirrigation is caused by the wholes which are
     ! by the different types of benthic organisms.
-    Yirr=    Y2c(:)*insw_vector(jnetYIc(iiY2,:)) &
-    +        Y5c(:)*insw_vector(jnetYIc(iiY5,:)) &
-    +p_irrY4*Y4c(:)*insw_vector(jnetYIc(iiY4,:)) &
+!JM    Yirr=    Y2c(:)*insw_vector(jnetYIc(iiY2,:)) &
+!JM    +        Y5c(:)*insw_vector(jnetYIc(iiY5,:)) &
+!JM    +p_irrY4*Y4c(:)*insw_vector(jnetYIc(iiY4,:)) &
+    Yirr=    Y2c(:)*insw_vector(jnetY2) &
+    +        Y5c(:)*insw_vector(jnetY5) &
+    +p_irrY4*Y4c(:)*insw_vector(jnetY4) &
     +p_irrY3*Y3c(:)*insw_vector(jnetY3c)
   
     irrenh(:)  =   DONE+ p_cmirr *MM_vector(  Yirr,  p_chirr)

@@ -219,10 +219,13 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     do i = 1 , (iiMicroZooPlankton)
       cx_any=MicroZooPlankton(i,iiC)
+!write(LOGUNIT,*)'pelglobal microzoo'
       if (ppMicroZooPlankton(i,iiN) > 0 )  then
         qn_mz(i,:)= MicroZooPlankton(i,iiN)/(NZERO+cx_any )
       else
+!write(LOGUNIT,*)'pelglobal microzoo 2'
         qn_mz(i,:)= p_qnMic(i)
+!write(LOGUNIT,*)'pelglobal microzoo 3'
       endif
       if (ppMicroZooPlankton(i,iiP) > 0 ) then
         qp_mz(i,:)= MicroZooPlankton(i,iiP)/(NZERO+cx_any )
@@ -233,7 +236,7 @@
       PON=PON+cx_any*qn_mz(i,:)
       POP=POP+cx_any*qp_mz(i,:)
     end do
-
+!write(LOGUNIT,*)'pelglobal mesozoo'
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Compute nutrient quota in omnivorous and herbivorous mesozooplankton
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -261,6 +264,7 @@
     ! Max quotum is limited to p_xqn*p_nrc because Phaeocystis may contain more
     ! than the maximum. This N is found in the colony but ouside the cells.
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!write(LOGUNIT,*)'pelglobal phyto'
 
     do i = 1 , iiPhytoPlankton
       cx_any= PhytoPlankton(i,iiC)
@@ -294,6 +298,8 @@
       flPIR6s(i,:) = ZERO
     end do
 
+!write(LOGUNIT,*)'pelglobal bac'
+
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Compute nutrient quota in Pelagic Bacteria
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -322,6 +328,7 @@
     sedi_macragg=ZERO
 
     !limitation of sedimentation rate at very low concentration (1.0E-6)
+!write(LOGUNIT,*)'pelglobal macroagg'
 
   ! concentration TEP determines sinking rate!
     if (p_raPIm> ZERO)  then
@@ -431,7 +438,9 @@
          do i=1,iiPhytoPlankton
            if (p_iRI(i).ne.iiR2.and.CoupledtoBDc(i).eq.0 &
                                       .and.CalcPhytoPlankton(i)) then
+!write(LOGUNIT,*)'pelglobal pheocystis step5, i',i
              call PhaeocystisCalc(CALC_REL_RADIUS,iiP6,px_any,dummy,p_xsize_m(i))
+!write(LOGUNIT,*)'pelglobal pheocystis step5 after call'
              mx_any=px_any*p_xsize_m(i)
              sxMACatchControl=RelAttachRateToTEP(1,NO_BOXES,mx_any,E, &
                 radius_macro=xSizeMA_m,number_macros=x_macro_n)
@@ -459,8 +468,15 @@
      sediPI(iiP5,:)=86400.0*0.002
     ! Calculate sinking rate (dummy is here a dummy variable) on basis of size and wight of colonies.
     ! Compare sinking with siinkin due to sticking to macroaggregates produced by diatoms.
-    call PhaeocystisCalc(CALC_SEDIMENTATION,iiP6,rx_any,dummy,p_xsize_m(iiP6))
+!write(LOGUNIT,*)'pelglobal pheocystis calc_sedimentation',rx_any
+!stop
+!JM return leads to segmentation fault. Skip for now, solve later
+   call PhaeocystisCalc(CALC_SEDIMENTATION,iiP6,rx_any,dummy,p_xsize_m(iiP6))
+!write(LOGUNIT,*)'pelglobal sediPI'
+!stop
     sediPI(iiP6,:)=max(sediPI(iiP6,:),rx_any)
+!write(LOGUNIT,*)'pelglobal sediPI 2'
+!stop
 
      do i = 1 , iiPhytoPlankton
       if (CalcPhytoPlankton(i)) &
@@ -474,6 +490,8 @@
       sediR2(:)=(sediR2(:)+max(ZERO,R2c-R2x_macr_c(iiP1,:))*p_raR2m)/(NZERO+R2c)
       sediR2(2:NO_BOXES)=(sediR2(2:NO_BOXES)+sediR2(1:NO_BOXES-1))*0.5
     endwhere
+!write(LOGUNIT,*)'pelglobal findnan'
+!stop
     call findnan(sediR2,NO_BOXES,iout)
     if (iout>0) then
         write(logunit,*) 'PelGLobal II in sediR2c layer',iout
@@ -495,6 +513,8 @@
       sediMiZ(i,NO_BOXES_Z)=ZERO
     end do
 
+!write(LOGUNIT,*)'pelglobal sediR6'
+!stop
     !Sedmentation of R6 "uncoupled" to silt.
     !we assume that filterfeeders only take up the uncoupled detritus
     sediRZ(:)=p_raRZm*OCDepth(1)/(5.0+OCDepth(1))
@@ -503,13 +523,21 @@
     !During period of stratification there is above the startified layers no
     ! coupled transport of detritus.
     !Sedimentation of detritus depend on the origin of the  detritus recently
+!write(LOGUNIT,*)'pelglobal sourced3 0'
+!stop
     r=Source_D3_withstate(ppR6c,ppB1c,iiProduction) &
      +Source_D3_withgroup(ppR6c,ppMicroZooPlankton,iiMicroZooPlankton, &
               iiC,iiProduction)
+!write(LOGUNIT,*)'pelglobal sourced3 1'
+!stop
     h=r+Source_D3_withgroup(ppR6c,ppPhytoPlankton,iiPhytoPlankton, &
               iiC,iiProduction)
+!write(LOGUNIT,*)'pelglobal sourced3 2'
+!stop
     r=r +Source_D3_withstate(ppR6c,ppP3c,iiProduction) &
         +Source_D3_withstate(ppR6c,ppZ6c,iiProduction)
+!write(LOGUNIT,*)'pelglobal sourced3'
+!stop
 
     do j=1,NO_BOXES_XY
       from=PelBoxAbove(j)
@@ -537,6 +565,8 @@
        sediPI(i,:)=ZERO
      endif
     enddo
+!write(LOGUNIT,*)'pelglobal limit'
+!stop
 
     !limit sedimentation at very small values of R2 (avoid problems in GOTM)
     rscalar=max(ZERO,sum(R2c*Depth))

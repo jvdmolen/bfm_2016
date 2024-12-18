@@ -20,7 +20,8 @@
 !   structure of the code based on ideas of M. Vichi.
 !
 ! !INTERFACE
-  subroutine FilterFeederDynamics(y,ppyc,ppyn,ppyp)
+!JM  subroutine FilterFeederDynamics(y,ppyc,ppyn,ppyp)
+  subroutine FilterFeederDynamics(y_arg,ppyc_arg,ppyn_arg,ppyp_arg)
 !
 ! !USES:
 
@@ -40,9 +41,9 @@
 
   use global_mem, ONLY:RLEN,ZERO,DONE,NZERO,LOGUNIT
   use constants,  ONLY:p_qnUc,MW_C
-#ifdef NOPOINTERS
-  use mem,  ONLY: D2STATE
-#endif
+!JM double #ifdef NOPOINTERS
+!  use mem,  ONLY: D2STATE
+!#endif
   use mem,  ONLY: D2STATE,Y3c,Yy3c
   use mem, ONLY: ppY3c,ppY3n,ppY3p, ppYy3c, ppQ6c, ppQ6n, ppQ6p, ppG2o, &
     ppYs3c,Ys3c,ppQ1c,ppQ1p,ppQ1n,ppK1p, iiPel,iiBen, ppG3c,iiY3,iiYy3, &
@@ -128,10 +129,14 @@
   IMPLICIT NONE
 ! !INPUT:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  integer,intent(IN)  :: y
-  integer,intent(IN) :: ppyc
-  integer,intent(IN) :: ppyn
-  integer,intent(IN) :: ppyp
+!JM  integer,intent(IN)  :: y
+!JM  integer,intent(IN) :: ppyc
+!JM  integer,intent(IN) :: ppyn
+!JM  integer,intent(IN) :: ppyp
+  integer,intent(IN)  :: y_arg
+  integer,intent(IN) :: ppyc_arg
+  integer,intent(IN) :: ppyn_arg
+  integer,intent(IN) :: ppyp_arg
 !
 
 !
@@ -176,6 +181,12 @@
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer  :: i,j,k
+
+  integer  :: y
+  integer :: ppyc
+  integer :: ppyn
+  integer :: ppyp
+
   real(RLEN) :: clu
   real(RLEN) :: corr_max,corr_not
   real(RLEN),dimension(NO_BOXES_XY)  :: R6_corr !correction for power distitustion of R6 ln layer near sediment
@@ -265,7 +276,16 @@
   real(RLEN),dimension(NO_BOXES_XY) :: actual_depth! p6/food
   !resp . any rate,limitation(<1),specific rate,concentration
   real(RLEN),dimension(NO_BOXES_XY) :: rx_any,px_any,sx_any,cx_any,px_limit 
+  real(RLEN),dimension(NO_BOXES_XY) :: in_arg !JM added
 
+!write(LOGUNIT,*) 'FilterFeederDynamics',y_arg
+!stop
+
+  !JM variables made local
+  y=y_arg
+  ppyc=ppyc_arg
+  ppyn=ppyn_arg
+  ppyp=ppyp_arg
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -314,7 +334,7 @@
      cx_any =  limit_PIc(i,:) * PI_Benc(i,:) *p_puPI(y,i)
      px_any= MM_vector(  cx_any,  clu)
      cx_any =  cx_any  *px_any
-     call CorrectConcNearBed_vector(actual_depth,sediPI_Ben(i,:),p_height(y),&
+     call CorrectConcNearBed_vector(actual_depth(:),sediPI_Ben(i,:),p_height(y),&
                                         corr_not,NO_BOXES_XY,  puPIY3(i,:))
      food_PIc(i,:)=cx_any*puPIY3(i,:)
      food_PT(:)  = food_PT(:)+ food_PIc(i,:)
@@ -467,6 +487,8 @@
   ! calculation of quotum N/C P/C in exretion product slow degrading detritus
   ! (R6)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!write(LOGUNIT,*) 'somewhere halfway'
+!stop
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Pelagic Phytoplankton:
@@ -656,6 +678,8 @@
   ! new food originating for mesozooplankton for Y3 is added here to Y3
   ! losses to mesozooplankton are set in BenPelCoup using the total
   ! total mesozooplankton uptake jZEY3c
+!write(LOGUNIT,*) 'quite a bit further'
+!stop
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Pelagic Detritus
@@ -665,6 +689,10 @@
   ruR2c= R2x_food_c *suf *Depth_Ben*px_limit
   call addbotflux_vector(POSITIVE,iiPel,ppR2c,iiBen,ppyc,ruR2c)
   reR2c= R2x_food_c *se_uR2 *Depth_Ben*px_limit
+
+!write(LOGUNIT,*) 'here1'
+!stop
+
 !JM
 if (p_qnR2c > NZERO) then
   ruR2n= R2x_food_n *suf *Depth_Ben*px_limit
@@ -672,12 +700,22 @@ if (p_qnR2c > NZERO) then
   reR2n= R2x_food_n *se_uR2 *Depth_Ben*px_limit
 endif
 
+!write(LOGUNIT,*) 'here2'
+!stop
+
   fluc=RI_Fc *suf *Depth_Ben
   !limit uptake to maximum of p_max per step (see at calulation of p_max)
+!write(LOGUNIT,*) 'here3'
+!stop
   cx_any=CalcPelMassInM2(ppR6c)
+!write(LOGUNIT,*) 'here4'
+!stop
   call LimitChange_vector(POSITIVE,fluc,cx_any,max_change_per_step, &
                                                         lim_tot_column)
   choice  =   food_RI * Depth_Ben/(NZERO+RI_Fc(:))*lim_tot_column
+
+!write(LOGUNIT,*) 'here'
+!stop
 
   ruR6c      =   RI_Fc(:)* suf* choice
   ruR6n      =   RI_Fn(:)* suf* choice
@@ -716,6 +754,8 @@ endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! net growth rate ( only for output)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!write(LOGUNIT,*) 'net growth rate'
+!stop
 
   rugc_corr=ruPIc+ ruR2c + ruR3c +  ruZIc+ ruZEc+ ruR6c
   rrac= p_pur(y)*( rugc_corr- retR1c-retR6c- retQ6c)
@@ -851,6 +891,8 @@ endif
   jY3RIc(:)  =jY3RIc(:)  +   retR6c
 
 
+!write(LOGUNIT,*) 'pseudo faeces'
+!stop
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -870,11 +912,16 @@ endif
   !flux mg detritus /m2
   fluc= fluc*Depth_Ben
   sx_any=fluc/(NZERO + RI_Fc(:))
+!write(LOGUNIT,*) 'pf1'
+!stop
   
   cx_any=CalcPelMassInM2(ppR6c)
   call LimitChange_vector(POSITIVE,fluc,cx_any,corr_max,lim_tot_column)
   rx_any = sx_any * min(lim_tot_column,px_limit)*RI_Fc
   jRIQIc(:)=jRIQIc(:)+max(ZERO,r * RI_Fc(:) -ruR6c)
+
+!write(LOGUNIT,*) 'pf2'
+!stop
 
   call addbotflux_vector(POSITIVE,iiPel,ppR6c,iiBen,ppQ6c, &
                                            +max(ZERO,rx_any-ruR6c))
@@ -884,28 +931,46 @@ endif
   rx_any = rx_any * min(lim_tot_column,px_limit)
   call addbotflux_vector(POSITIVE,iiPel,ppR6n,iiBen,ppQ6n, &
                                            +max(ZERO,rx_any-ruR6n))
+!write(LOGUNIT,*) 'pf3'
+!stop
+
   cx_any=CalcPelMassInM2(ppR6p)
   rx_any= sx_any*RI_Fp
   call LimitChange_vector(POSITIVE,rx_any,cx_any,corr_max,lim_tot_column)
+!write(LOGUNIT,*) 'pf4'
+!stop
   rx_any = rx_any * min(lim_tot_column,px_limit)
+!write(LOGUNIT,*) 'pf4b'
+!stop
   call addbotflux_vector(POSITIVE,iiPel,ppR6p,iiBen,ppQ6p, &
                                            +max(ZERO,rx_any -ruR6p))
+!write(LOGUNIT,*) 'pf5'
+!stop
 
   !uptake of detritus for pseudofaeces production per m3
-  call CorrectConcNearBed_vector(Depth_Ben(:),sediR6_Ben(:),p_height(y),&
+  call CorrectConcNearBed_vector(Depth_Ben(:),sediR6_Ben(:),p_height(y), &
                                         corr_not,NO_BOXES_XY,px_limit)
   fluc =   px_limit*(DONE- p_pR6Pels(y))  &
        * edry * et * eO * vum * efsatY3(y,:)* yc(:) *RTc
   call LimitChange_vector(POSITIVE,fluc,RTc,corr_max,px_limit)
   sx_any=fluc/(NZERO + RI_Fc(:))
+!write(LOGUNIT,*) 'pf55'
+!stop
+
   cx_any=CalcPelMassInM2(ppR6s)
   rx_any= sx_any*RI_Fs
   call LimitChange_vector(POSITIVE,rx_any,cx_any,corr_max,lim_tot_column)
+!write(LOGUNIT,*) 'pf58'
+!stop
   rx_any = rx_any * min(lim_tot_column,px_limit)
   jRIQIs(:)=jRIQIs(:)+max(ZERO,rx_any-ruR6s)
+!write(LOGUNIT,*) 'pf59'
+!stop
   call addbotflux_vector(POSITIVE,iiPel,ppR6s,iiBen,ppQ6s, &
                                            +max(ZERO,rx_any -ruR6s))
 
+!write(LOGUNIT,*) 'pf6'
+!stop
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! larvae spawning is setupped in such a way that it start when food
   ! saturation is reached and filtering-rate can be lowered.
@@ -916,6 +981,8 @@ endif
   ! by the quotient young/total. In this way only 2 per year a spwawing-event .
   ! take place(in spring and sometimes in autumn)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!write(LOGUNIT,*) 'larvae spawning'
+!stop
 
   if (CalcSuspensionFeeders(iiYy3)) then
     select case (y)
@@ -934,8 +1001,10 @@ endif
           ! there is food saturation
           ! quality food is high (low amount of pHaeocsysts)
           ! above p_clxTemp (10 C)
+          in_arg=efsatY3(y,:)-p_fsat_y
           sx_any=sx_any*insw_vector(active-DONE) &
-            *insw_vector(efsatY3(y,:)-p_fsat_y) &
+!JM            *insw_vector(efsatY3(y,:)-p_fsat_y) &
+            *insw_vector(in_arg) &
 !           *insw_vector(x_quality-0.50) &
             *insw_vector(ETW_Ben-p_clxTemp)
           sx_any=sx_any*insw_vector(sx_any-p_lxspawning) *&
@@ -969,6 +1038,9 @@ endif
   else
     jnetY3c=jnetYc
   endif
+!write(LOGUNIT,*) 'end FilterFeederDynamics'
+!stop
+
   end
 !BOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

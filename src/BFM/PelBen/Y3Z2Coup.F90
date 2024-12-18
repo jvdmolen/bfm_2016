@@ -84,16 +84,28 @@
   real(RLEN)  :: corr,px_any,rx_any
   real(RLEN)  :: ruYy3c,ruYy3n,ruYy3p
   real(RLEN)  :: toZ2c
+  real(RLEN)  :: toZ2c_flux  !JM added
+
+!write(LOGUNIT,*) 'subroutine Y3Z2coup'
+!stop
 
   if (CalcMesoZooPlankton(iiZ2) .and. CalcSuspensionFeeders(iiYy3) ) then
 
     cx_any=CalcPelMassInM2(ppZ2c)
+!write(LOGUNIT,*) 'before loop'
+!stop
     DO BoxNumberXY=1,NO_BOXES_XY
+!write(LOGUNIT,*) 'in loop loop',BoxNumberXY,NO_BOXES_XY
+!stop
       BoxNumber=PelBoxAbove(BoxNumberXY)
+!write(LOGUNIT,*) 'BoxNumber',BoxNumber
+!stop
 
       ! flux Yy3 -> Z2
       toZ2c=jspaY3c(BoxNumberXY)* p_pYy3Z2 
 
+!write(LOGUNIT,*) 'before resuspension'
+!stop
       !resuspension ude of hight current.
       ! the positive flux ( flux to water column) is limtied
       ! by the bioasmass of Yy3. test on positive changes in this case.
@@ -102,6 +114,8 @@
       rx_any=exp(-p_xsteep *px_any)*p_sxresus(iiYy3)*Yy3c(BoxNumberXY)
       call LimitChange(POSITIVE,rx_any,Yy3c(BoxNumberXY),max_change_per_step)
       toZ2c=toZ2c+rx_any
+!write(LOGUNIT,*) 'before correctconc'
+!stop
 
       call CorrectConcNearBed(Depth(BoxNumber),sediMeZ(iiZ2,BoxNumber) &
                                    , p_heighty,1.0D+40,corr)
@@ -110,22 +124,39 @@
       call LimitChange(POSITIVE,ruYy3c,Z2c(BoxNumber)*Depth(BoxNumber),&
                                                     max_change_per_step)
       call LimitChange(POSITIVE,ruYy3c,cx_any(BoxNumberXY), max_change_per_step)
+!write(LOGUNIT,*) 'before use p_qnMEC'
+!stop
       ruYy3n  =   ruYy3c*p_qnMec(iiZ2)
       ruYy3p  =   ruYy3c*p_qpMec(iiZ2)
 
       call addbotflux(ANY,BoxNumberXY,iiBen,ppYy3c,iiPel,ppZ2c,toZ2c-ruYy3c)
+!JM      if (ppZ2n>0) then
+!JM        call addbotflux(ANY,BoxNumberXY,iiBen,ppYy3n,iiPel, &
+!JM                                             ppZ2n,toZ2c*p_qnY3c-ruYy3n)
+!JM        call addbotflux(ANY,BoxNumberXY,iiBen,ppYy3p,iiPel, &
+!JM                                             ppZ2p,toZ2c*p_qpY3c-ruYy3p)
+!JM      else
+!JM        call flux(BoxNumberXY,iiBen,ppYy3n,ppYy3n,-toZ2c*p_qnY3c+ruYy3n)
+!JM        call flux(BoxNumberXY,iiBen,ppYy3p,ppYy3p,-toZ2c*p_qpY3c+ruYy3p)
+!JM      endif
       if (ppZ2n>0) then
+        toZ2c_flux=toZ2c*p_qnY3c-ruYy3n
         call addbotflux(ANY,BoxNumberXY,iiBen,ppYy3n,iiPel, &
-                                             ppZ2n,toZ2c*p_qnY3c-ruYy3n)
+                                             ppZ2n,toZ2c_flux)
+        toZ2c_flux=toZ2c*p_qpY3c-ruYy3p
         call addbotflux(ANY,BoxNumberXY,iiBen,ppYy3p,iiPel, &
-                                             ppZ2p,toZ2c*p_qpY3c-ruYy3p)
+                                             ppZ2p,toZ2c_flux)
       else
-        call flux(BoxNumberXY,iiBen,ppYy3n,ppYy3n,-toZ2c*p_qnY3c+ruYy3n)
-        call flux(BoxNumberXY,iiBen,ppYy3p,ppYy3p,-toZ2c*p_qpY3c+ruYy3p)
+        toZ2c_flux=toZ2c*p_qnY3c+ruYy3n
+        call flux(BoxNumberXY,iiBen,ppYy3n,ppYy3n,-toZ2c_flux)
+        toZ2c_flux=toZ2c*p_qpY3c+ruYy3p
+        call flux(BoxNumberXY,iiBen,ppYy3p,ppYy3p,-toZ2c_flux)
       endif
      end DO
     
    endif
+!write(LOGUNIT,*) 'end subroutine Y3Z2coup'
+!stop
 
   end
 !BOP

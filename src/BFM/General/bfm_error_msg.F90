@@ -6,7 +6,8 @@
 ! !MODULE: error_functions ---
 !
 ! !INTERFACE:
-   MODULE bfm_error_msg
+!JM   MODULE bfm_error_msg
+   MODULE BFM_ERROR_MSG
 !
 ! !DESCRIPTION:
 !   Aim: to have a module and a call to routine wghich has the same

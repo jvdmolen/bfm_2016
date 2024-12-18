@@ -70,7 +70,7 @@
             j=ppPhytoPlankton(i,iiC)
             if (ppO3c.eq.0) nr=j
             jupPELc(BoxNumberXY)=jupPELc(BoxNumberXY) &
-                    +sum(D3SOURCE(j,nr,f:t)*d)*SEC_PER_DAY 
+                    +sum(D3SOURCE(f:t,j,nr)*d)*SEC_PER_DAY 
             if (ppO3c.gt.0)  &
               jminPELc(BoxNumberXY)=jminPELc(BoxNumberXY) &
                     +sum(D3SINK(f:t,j,nr)*d)*SEC_PER_DAY
@@ -153,14 +153,14 @@
               totBENc(BoxNumberXY)=totBENc(BoxNumberXY)+sc(BoxNumberXY)
               nr=ppG3c;if ( ppG3c.eq.0) nr=j
               jupBENc(BoxNumberXY)=jupBENc(BoxNumberXY)&
-                            +D2SOURCE(nr,j,BoxNumberXY) *SEC_PER_DAY
+                            +D2SOURCE(BoxNumberXY,nr,j) *SEC_PER_DAY
             enddo
             do i=1, iiBenBacteria
               j=ppBenBacteria(i,iiC)
               if (i.ne.iiH2) then
                 nr=ppG3c;if ( ppG3c.eq.0) nr=j
                 if (i.eq.iiHN)jupBENc(BoxNumberXY)=jupBENc(BoxNumberXY)&
-                            +D2SOURCE(nr,j,BoxNumberXY) *SEC_PER_DAY
+                            +D2SOURCE(BoxNumberXY,nr,j) *SEC_PER_DAY
                 !Aerobic bacteria+ nitrifiers
                 jminBENc(BoxNumberXY)=jminBENc(BoxNumberXY) &
                     +D2SINK(BoxNumberXY,j,nr) *SEC_PER_DAY

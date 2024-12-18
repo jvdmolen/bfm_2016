@@ -2161,7 +2161,7 @@
 
           integer, intent(IN)             ::iistate
           integer, intent(IN)             ::mode
-          real(RLEN) ::Source_D3_vector(size(D3SOURCE,DIM=3))
+          real(RLEN) ::Source_D3_vector(size(D3SOURCE,DIM=1))
 
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           select case (mode)
@@ -2186,7 +2186,7 @@
 
           integer, intent(IN) ::iistate
           integer, intent(IN) ::mode
-          real(RLEN) ::Source_D2_vector(size(D2SOURCE,DIM=3))
+          real(RLEN) ::Source_D2_vector(size(D2SOURCE,DIM=1))
 
 
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2

@@ -45,7 +45,7 @@
 !   structure of the code based on ideas of M. Vichi.
 !
 ! !INTERFACE
-      subroutine CorrectConcNearBed_vector(depthlayer, sedi, fto, &
+      subroutine CorrectConcNearBed_vector(DepthLayer, Sedi, fto, &
                       p_p_max,n, correction)
 !
 ! !USES:

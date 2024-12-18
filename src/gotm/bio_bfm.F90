@@ -182,7 +182,7 @@
    D3SOURCE => pp(1:NO_BOXES,:,:)
    D3SINK   => dd(1:NO_BOXES,:,:)
    D3STATETYPE => pelvar_type
-   if (numc_diag > 0) D3DIAGNOS => diag(:,1:NO_BOXES)
+   if (numc_diag > 0) D3DIAGNOS => diag(1:NO_BOXES,:)
 
    !---------------------------------------------
    ! Benthic pointers
@@ -195,9 +195,9 @@
       D2SOURCE => ppb(1:NO_BOXES_XY,:,:)
       D2SINK   => ddb(1:NO_BOXES_XY,:,:)
       D2STATETYPE => benvar_type
-      if (numbc_diag>0) D2DIAGNOS => diagb(:,1:NO_BOXES_XY)
+      if (numbc_diag>0) D2DIAGNOS => diagb(1:NO_BOXES_XY,:)
 #ifdef INCLUDE_DIAGNOS_PRF
-      if (numbc_prf>0) D3DIAGNOS_PRF => diagb_prf(:,1:NO_BOXES_PRF)
+      if (numbc_prf>0) D3DIAGNOS_PRF => diagb_prf(1:NO_BOXES_PRF,:)
 #endif
    else
       ! allocate memory anyhow to avoid problems with BFM allocation
@@ -210,9 +210,9 @@
       allocate(D2SINK(1:NO_BOXES_XY,1:NO_D2_BOX_STATES,1:NO_D2_BOX_STATES))
       allocate(D2STATETYPE(1:NO_D2_BOX_STATES ))
       if (numbc_diag>0)  &
-         allocate(D2DIAGNOS(1:NO_D2_BOX_DIAGNOSS,1:NO_BOXES_XY))
+         allocate(D2DIAGNOS(1:NO_BOXES_XY,1:NO_D2_BOX_DIAGNOSS))
       if (numbc_prf>0)  &
-         allocate(D2DIAGNOS(1:NO_D3_BOX_DIAGNOSS_PRF,1:NO_BOXES_PRF))
+         allocate(D2DIAGNOS(1:NO_BOXES_PRF,1:NO_D3_BOX_DIAGNOSS_PRF))
    end if
 
    end subroutine pointers_gotm_bfm
@@ -233,6 +233,7 @@
 !
 ! !USES:
    use mem
+   use bfm_output,only:setup_bio_output
    IMPLICIT NONE
 !
 ! !REVISION HISTORY:
@@ -242,6 +243,7 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
+   call setup_bio_output
    call set_var_info_bfm
    return
    end subroutine var_info_bfm
@@ -438,6 +440,7 @@ IMPLICIT NONE
 !-----------------------------------------------------------------------
 !BOC
 
+LEVEL1 'do_bio_bfm'
 
    !---------------------------------------------
    ! Compute BFM terms
@@ -447,8 +450,13 @@ IMPLICIT NONE
 !JM    call change_fish_predation()
 !JM #ENDIF
    call SiltDynamics
+LEVEL1 'ecologydynamics'
    call EcologyDynamics
+LEVEL1 'benthicsilt'
+!stop
    call BenthicSiltDist(0,0.0D+00)
+LEVEL1 'get_d3_model_flag'
+!stop
    call get_d3_model_flag_from_getm(d3_model_flag)
    Nloss=_ZERO_;Hloss =_ZERO_;
    if ( .not.(d3_model_flag.or.start.or.test_mode)) then
@@ -464,6 +472,8 @@ IMPLICIT NONE
       endif
    endif
    start=.false.
+LEVEL1 'surface fluxes',bio_setup
+!stop
    !---------------------------------------------
    ! Surface fluxes
    !---------------------------------------------
@@ -472,8 +482,10 @@ IMPLICIT NONE
    topm3psec=_ONE_/SEC_PER_DAY
    sfl=_ZERO_;
    if ( .NOT. AssignAirPelFluxesInBFMFlag ) then
-     sfl(ppO2o) =   PELSURFACE(ppO2o,1) *topm3psec
-     if ( ppO3C > 0 ) sfl(ppO3c) =   PELSURFACE(ppO3c,1) *topm3psec
+!JM     sfl(ppO2o) =   PELSURFACE(ppO2o,1) *topm3psec
+!JM     if ( ppO3C > 0 ) sfl(ppO3c) =   PELSURFACE(ppO3c,1) *topm3psec
+     sfl(ppO2o) =   PELSURFACE(1,ppO2o) *topm3psec
+     if ( ppO3C > 0 ) sfl(ppO3c) =   PELSURFACE(1,ppO3c) *topm3psec
    endif
    select case (surface_flux_method)
         case (-1)! absolutely nothing
@@ -540,6 +552,8 @@ IMPLICIT NONE
         if ( k > 0 ) bfl(k) = PELBOTTOM(k,1)*topm3psec
       enddo
    endif
+!LEVEL1 'end do_bio_bfm'
+!stop
    end subroutine do_bio_bfm
 !EOC
 !-----------------------------------------------------------------------
@@ -622,11 +636,11 @@ IMPLICIT NONE
    do j=1,NO_D3_BOX_STATES
      i= iiPELSINKREF(j)
      if ( i > 0 ) then
-       ll_larger=(maxval(abs(D3DIAGNOS(i,1:NO_BOXES_Z)))>0.001)
+       ll_larger=(maxval(abs(D3DIAGNOS(1:NO_BOXES_Z,i)))>0.001)
        c1dimz(NO_BOXES_Z)=0.0;
        if ( ll_larger) then
-        c1dimz(1:NO_BOXES_Z-1)=(Depth(2:NO_BOXES_Z)*D3DIAGNOS(i,1:NO_BOXES_Z-1)&
-                            +Depth(1:NO_BOXES_Z-1)*D3DIAGNOS(i,2:NO_BOXES_Z))/ &
+        c1dimz(1:NO_BOXES_Z-1)=(Depth(2:NO_BOXES_Z)*D3DIAGNOS(1:NO_BOXES_Z-1,i)&
+                            +Depth(1:NO_BOXES_Z-1)*D3DIAGNOS(2:NO_BOXES_Z,i))/ &
                                 (Depth(1:NO_BOXES_Z)+Depth(2:NO_BOXES_Z-1))
         if (pelvar_type(j)>=SILTTRANSPORT) then
            corr=1.0D+00
@@ -776,7 +790,7 @@ IMPLICIT NONE
 !BOC
 
    if ( numc_diag > 0 ) then
-     allocate(diag(1:numc_diag,0:nlev),stat=rc)
+     allocate(diag(0:nlev,1:numc_diag),stat=rc)
     if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (cc)'
      diag=_ZERO_                                                     !BFM
    endif
@@ -811,13 +825,13 @@ IMPLICIT NONE
      benvar_type = 0
 
      if ( numbc_diag > 0 ) then
-       allocate(diagb(1:numbc_diag,0:1),stat=rc)
+       allocate(diagb(0:1,1:numbc_diag),stat=rc)
        if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (diagb)'
        diagb=_ZERO_                                                 !BFM
 
 #ifdef INCLUDE_DIAGNOS_PRF
       if (numbc_prf>0)  then
-         allocate(diagb_prf(1:numbc_prf,0:nprf),stat=rc)
+         allocate(diagb_prf(0:nprf,1:numbc_prf),stat=rc)
          if (rc /= 0) STOP 'allocate_memory_bfm: Error allocating (diagb_prf)'
          diagb_prf=_ZERO_                                           !BFM
       endif
@@ -1356,7 +1370,7 @@ IMPLICIT NONE
         rk=real(NO_D3_BOX_DIAGNOSS )/real(k)
         n=int(m*rk);m=int((m-1)*rk)+1
         D3DIAGNOS=_ZERO_;
-        D3DIAGNOS(m:n,:)= value
+        D3DIAGNOS(:,m:n)= value
         if (l.eq.0) STDERR "test_structure Reset D3DIAGNOS on ",value,rk,m,n
      else
         D3DIAGNOS=value
@@ -1374,7 +1388,7 @@ IMPLICIT NONE
         n=int(m*rk);m=int((m-1)*rk)+1
         if (NO_D2_BOX_DIAGNOSS-k<n)n=NO_D2_BOX_DIAGNOSS
         D2DIAGNOS=_ZERO_;
-        D2DIAGNOS(m:n,:)= value
+        D2DIAGNOS(:,m:n)= value
         if (l.eq.0) STDERR "test_structure Reset D2DIAGNOS on ",value,m,n
      else
         D2DIAGNOS=value

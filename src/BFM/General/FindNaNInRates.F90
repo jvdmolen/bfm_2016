@@ -9,7 +9,7 @@
 ! DESCRIPTION
 !
 ! !INTERFACE
-  subroutine FindExtremesInRates(mode,iiSys,ppState,message)
+  subroutine FindExtremesInRates(mode_arg,iiSys_arg,ppState_arg,message)
 !
 ! !USES:
 
@@ -20,11 +20,11 @@
   use global_mem, ONLY:RLEN,LOGUNIT
   use mem,    ONLY: iiBen, iiPel,Source_D2_vector,Source_D3_vector, &
               NO_BOXES_XY,NO_BOXES,D2STATE,D3STATE
-#ifdef BFM_GOTM
-  use bio_var,ONLY: var_names, stPelStates,stBenStates
-#else
-  use api_bfm,only: var_names, stPelStates,stBenStates
-#endif
+!JM #ifdef BFM_GOTM
+  use bio_var,ONLY: var_names, stPelStateS,stBenStateS
+!JM #else
+!JM   use api_bfm,only: var_names, stPelStates,stBenStates
+!JM #endif
 
   use mem_Param,only:nan_check
   use BFM_ERROR_MSG,only:set_warning_for_getm
@@ -58,10 +58,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
-  integer,intent(IN)                   ::mode
-  integer,intent(IN)                   ::iiSys
-  integer,intent(IN)                   ::ppState
-  character(len=*)                     ::message
+  integer,intent(IN)                   ::mode_arg
+  integer,intent(IN)                   ::iiSys_arg
+  integer,intent(IN)                   ::ppState_arg
+  character(len=*),intent(IN)                     ::message
 
   real(RLEN),dimension(NO_BOXES)    :: r3,s3
   real(RLEN),dimension(NO_BOXES_XY) :: r2,s2
@@ -69,17 +69,34 @@
   integer                           :: jout
   real(RLEN), external  :: GetDelta
 
+!JM declare as local variables
+  integer                   ::mode
+  integer                   ::iiSys
+  integer                   ::ppState
+
+  mode=mode_arg
+  iiSys=iiSys_arg
+  ppState=ppState_arg
+
+!write(LOGUNIT,*)'findextremes',mode,iiSys,ppState,message,nan_check
+!write(LOGUNIT,*)iiPel,iiBen
+!stop
   jout=0
   if ( .not.nan_check) return
   select case (iiSys)
     case (iiPel)
+!write(LOGUNIT,*)'pel',mode
+!stop
+!if (.false.) then
       r3=Source_D3_vector(ppState,0)
-      if (mode==3) s3=D3STATE(:,ppSTATE)+GetDelta()*r3
+      if (mode==3) s3=D3STATE(:,ppState)+GetDelta()*r3
       select case  (mode)
         case(1) ;call findnan(r3,NO_BOXES,jout)
         case(2) ;call findlarge(r3,NO_BOXES,1.0D+05,jout)
         case(3) ;call findnega(s3,NO_BOXES,jout)
       end select
+!write(LOGUNIT,*)'jout check',jout
+!stop
       if ( jout>0) then
          write(logunit,'(A)') message
          write(logunit,'(A,A,A,I2)') &
@@ -87,12 +104,17 @@
          if (mode.eq.2)write(logunit,'(''Rate of '',A,''('',I2,'')='',G13.6)') &
               trim(var_names(stPelStateS+ppState-1)),jout,r3(jout)
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
-              trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(jout,ppSTATE)
+              trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(jout,ppState)
          call set_warning_for_getm
       endif
+!endif
+!write(LOGUNIT,*)'after jout check',mode,iiSys,ppState,message
+!stop
     case (iiBen)
+!write(LOGUNIT,*)'ben'
+!stop
       r2=Source_D2_vector(ppState,0)
-      if (mode==3) s2=D2STATE(:,ppSTATE)+GetDelta()*r2
+      if (mode==3) s2=D2STATE(:,ppState)+GetDelta()*r2
       select case  (mode)
         case(1) ;call findnan(r2,NO_BOXES_XY,jout)
         case(2) ;call findlarge(r2,NO_BOXES_XY,1.0D+04,jout)
@@ -105,31 +127,39 @@
          if (mode.eq.2)write(logunit,'(''Rate of '',A,''('',I2,'')='',G13.6)') &
               trim(var_names(stBenStateS+ppState-1)),jout,r2(jout)
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
-              trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(jout,ppSTATE)
+              trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(jout,ppState)
          call set_warning_for_getm
       endif
    end select
+!write(LOGUNIT,*)'end findestremes',mode,iiSys,ppState,message
+!stop
   end subroutine FindExtremesInRates
 
   subroutine FindLargeInRates(iiSys,ppState,message)
+!use global_mem, ONLY:LOGUNIT
   IMPLICIT NONE
   integer,intent(IN)                   ::iiSys
   integer,intent(IN)                   ::ppState
-  character(len=*)                     ::message
+  character(len=*),intent(IN)                 ::message
+!write(LOGUNIT,*)'findlargeinrates',iiSYS,ppState,message
+!stop
+!JM an invalid pointer error occurs when returning from this call, I don't understand what the problem is
      call FindExtremesInRates(2,iiSys,ppState,message)
+!write(LOGUNIT,*)'end findlargeinrates'
+!stop
   end subroutine FindLargeInRates
   subroutine FindNegaInRates(iiSys,ppState,message)
   IMPLICIT NONE
   integer,intent(IN)                   ::iiSys
   integer,intent(IN)                   ::ppState
-  character(len=*)                     ::message
+  character(len=*),intent(IN)                     ::message
      call FindExtremesInRates(3,iiSys,ppState,message)
   end subroutine FindNegaInRates
   subroutine FindNaNInRates(iiSys,ppState,message)
   IMPLICIT NONE
   integer,intent(IN)                   ::iiSys
   integer,intent(IN)                   ::ppState
-  character(len=*)                     ::message
+  character(len=*),intent(IN)                     ::message
      call FindExtremesInRates(1,iiSys,ppState,message)
   end subroutine FindNaNInRates
  subroutine findnan( vector,n,iout)
@@ -301,7 +331,7 @@ subroutine findsmall( vector,n,small,iout)
 
   integer,intent(IN)                   ::iiSys
   integer,intent(IN)                   ::ppState
-  character(len=*)                     ::message
+  character(len=*),intent(IN)                     ::message
 
   real(RLEN),dimension(NO_BOXES)    :: r3
   real(RLEN),dimension(NO_BOXES_XY) :: r2

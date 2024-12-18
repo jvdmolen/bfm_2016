@@ -21,7 +21,7 @@
 !   structure of the code based on ideas of M. Vichi.
 !
 ! !INTERFACE
-  subroutine BenBacDynamics(hx,  pphxc, pphxn, pphxp)
+  subroutine BenBacDynamics(hx_arg,  pphxc_arg, pphxn_arg, pphxp_arg)
 !
 ! !USES:
 
@@ -87,10 +87,10 @@
 
 ! !INPUT:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  integer,intent(IN)  :: hx
-  integer,intent(IN) :: pphxc
-  integer,intent(IN) :: pphxn
-  integer,intent(IN) :: pphxp
+  integer,intent(IN)  :: hx_arg
+  integer,intent(IN) :: pphxc_arg
+  integer,intent(IN) :: pphxn_arg
+  integer,intent(IN) :: pphxp_arg
 
 !
 !
@@ -130,6 +130,12 @@
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer                            :: iout
+!JM make local variables
+  integer  :: hx
+  integer :: pphxc
+  integer :: pphxn
+  integer :: pphxp
+
   real(RLEN),dimension(NO_BOXES_XY)  :: clm
   real(RLEN),dimension(NO_BOXES_XY)  :: cm
   real(RLEN),dimension(NO_BOXES_XY)  :: chm
@@ -167,6 +173,13 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: jNIBIn,jNIBIp
   real(RLEN),dimension(NO_BOXES_XY)  :: limit_oxygen
   real(RLEN),dimension(NO_BOXES_XY)  :: cquN3,cquR1n,pxlayer2,pxlayer3
+  real(RLEN),dimension(NO_BOXES_XY)  :: fr_lim_arg  !JM added
+
+  !JM pass args to local vars
+  hx=hx_arg
+  pphxc=pphxc_arg
+  pphxn=pphxn_arg
+  pphxp=pphxp_arg
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
@@ -349,8 +362,11 @@
   limit_oxygen=DONE
   if ( hx==iiH1) then
     rx_any= eo*(rugc* p_pur/MW_C +rrmc)
+!JM    call DoubleLimitChange_vector(POSITIVE,rx_any,G2_xavail_o, &
+!JM          fr_lim_HI_o(hx,:),max_change_per_step, limit_oxygen)
+    fr_lim_arg=fr_lim_HI_o(hx,:)
     call DoubleLimitChange_vector(POSITIVE,rx_any,G2_xavail_o, &
-          fr_lim_HI_o(hx,:),max_change_per_step, limit_oxygen)
+          fr_lim_arg,max_change_per_step, limit_oxygen)
     rugc=rugc*((DONE-eo)+eo*limit_oxygen)
     eo=eo*limit_oxygen/((DONE-eo)+eo*limit_oxygen)
   endif

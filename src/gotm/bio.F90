@@ -603,6 +603,8 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
+LEVEL1 'do_bio',ll_write_results
+
    if (bio_calc) then
 !          call test_model_states(1,0,numbc,1,ccb)
 !          call test_model_rates(1,0,numbc,1)
@@ -615,6 +617,7 @@
  
 
 #ifdef BFM_GOTM
+LEVEL1 'get_flag'
       call get_d3_model_flag_from_getm(d3_model_flag)
       ! Somtimes it happens that a concentration become negative
       ! after calculations of the 3d-transport
@@ -636,14 +639,18 @@
           dt_eff=dt/float(split_factor)
 
 #ifdef BFM_GOTM
+LEVEL1 'mass_conv'
           call test_mass_conservation(mass_test_after_odv,1,'', &
                                                   totsysn_old,totsysp_old)
 #endif
 
           if ( bio_setup >0 ) then  
+LEVEL1 'ode'
             call ode_solver(ode_method,numc,nlev,dt_eff,cc)
           endif
 #ifdef BFM_GOTM
+LEVEL1 'check negatives'
+!stop
           if (bio_model==6.and.nega_test_after_odv) then
             call test_on_all_negative_states (.true., llsumh2, &
               bio_setup, h_l, numcc,nlev,warning_level, 'ode_solver', cc, kt )
@@ -653,6 +660,8 @@
               call set_warning_for_getm 
             endif
           endif
+LEVEL1 'mass conv'
+!stop
           call test_mass_conservation(mass_test_after_odv,4,'ode_solver', &
                                                    totsysn_old,totsysp_old)
 #endif

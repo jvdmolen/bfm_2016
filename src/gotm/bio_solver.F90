@@ -128,6 +128,7 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
+LEVEL1 'ode_solver'
 
 ! Allocate global variables
    if (.NOT. allocated(cc0)) then
@@ -140,10 +141,14 @@
       allocate(ppsum(0:nlev,1:numc))
       allocate(ddsum(0:nlev,1:numc))
 #ifdef BFM_GOTM
-      allocate(ccb0(1:numbc,0:nlev))
-      allocate(ccb1(1:numbc,0:nlev))
-      allocate(ppbsum(1:numbc,0:nlev))
-      allocate(ddbsum(1:numbc,0:nlev))
+!JM      allocate(ccb0(1:numbc,0:nlev))
+!JM      allocate(ccb1(1:numbc,0:nlev))
+!JM      allocate(ppbsum(1:numbc,0:nlev))
+!JM      allocate(ddbsum(1:numbc,0:nlev))
+      allocate(ccb0(0:nlev,1:numbc))
+      allocate(ccb1(0:nlev,1:numbc))
+      allocate(ppbsum(0:nlev,1:numbc))
+      allocate(ddbsum(0:nlev,1:numbc))
       STDERR "bio_solver numc=",numc
       STDERR "bio_solver nlev=",nlev
       STDERR "bio_solver dt=",dt
@@ -153,7 +158,15 @@
       allocate(dd(0:nlev,1:numc,1:numc))
 #endif
    end if
+!#ifdef BFM_GOTM
+!   dt_local=dt
+!#else
    dt_local=dt/SEC_PER_DAY
+!#endif
+LEVEL1 'calling solver',solver
+LEVEL1 'dt,SEC_PER_DAY',dt,SEC_PER_DAY
+LEVEL1 'dt_local,numc,nlev',dt_local,numc,nlev
+
    select case (solver)
       case (1)
          call euler_forward(dt_local,numc,nlev,cc)
