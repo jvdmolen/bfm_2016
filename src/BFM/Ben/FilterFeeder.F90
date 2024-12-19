@@ -195,9 +195,9 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: edry  !on tidal flat when it is nearly food uptake is stopped.
   real(RLEN),dimension(NO_BOXES_XY)  :: foodpm2
   real(RLEN),dimension(NO_BOXES_XY)  :: food
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES_XY):: limit_PIc !calc. food
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES_XY):: food_PIc !calc. food
-  real(RLEN),dimension(iiMesoZooPlankton,NO_BOXES_XY)::food_ZEc ! calc. food
+  real(RLEN),dimension(NO_BOXES_XY,iiPhytoPlankton):: limit_PIc !calc. food
+  real(RLEN),dimension(NO_BOXES_XY,iiPhytoPlankton):: food_PIc !calc. food
+  real(RLEN),dimension(NO_BOXES_XY,iiMesoZooPlankton)::food_ZEc ! calc. food
   real(RLEN),dimension(NO_BOXES_XY)  :: food_PT ! calculated phyto food
   real(RLEN),dimension(NO_BOXES_XY)  :: food_ZE ! calculated phyto food
   real(RLEN),dimension(NO_BOXES_XY)  :: food_ZI ! calculated zoo food
@@ -294,7 +294,7 @@
   yp = D2STATE(:,ppyp)
 
    !puP6Y3 stands for the correction for Phaeo Colonies: too largen ones are not eaten.
-   limit_PIc =DONE; limit_PIc(iiP6,:)=puP6Y3(y,:)
+   limit_PIc =DONE; limit_PIc(:,iiP6)=puP6Y3(:,y)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! response on lowtide on tial flat:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -331,23 +331,23 @@
 
   food_PT=ZERO;R2x_food_c=ZERO;food_R3=ZERO;R2x_food_n=ZERO
   do i=1,iiPhytoPlankton
-     cx_any =  limit_PIc(i,:) * PI_Benc(i,:) *p_puPI(y,i)
+     cx_any =  limit_PIc(:,i) * PI_Benc(:,i) *p_puPI(y,i)
      px_any= MM_vector(  cx_any,  clu)
      cx_any =  cx_any  *px_any
-     call CorrectConcNearBed_vector(actual_depth(:),sediPI_Ben(i,:),p_height(y),&
-                                        corr_not,NO_BOXES_XY,  puPIY3(i,:))
-     food_PIc(i,:)=cx_any*puPIY3(i,:)
-     food_PT(:)  = food_PT(:)+ food_PIc(i,:)
+     call CorrectConcNearBed_vector(actual_depth(:),sediPI_Ben(:,i),p_height(y),&
+                                        corr_not,NO_BOXES_XY,  puPIY3(:,i))
+     food_PIc(:,i)=cx_any*puPIY3(:,i)
+     food_PT(:)  = food_PT(:)+ food_PIc(:,i)
      select  case  (i)
        case (iiP1,iiP5)
          !take up only R2 is proportion to (resuspended Benthic) diatom
          ! correction for sedimentation is doen in one time
-         cx_any =  food_PIc(i,:)*R2_Benc(:)/(NZERO+PI_Benc(i,:))*insw(p_pueR2(y))
+         cx_any =  food_PIc(:,i)*R2_Benc(:)/(NZERO+PI_Benc(:,i))*insw(p_pueR2(y))
          R2x_food_c(:)=R2x_food_c(:)+cx_any
          R2x_food_n(:)=R2x_food_n(:)+cx_any*R2_Benn(:)/(NZERO+R2_Benc(:))
        case (iiP6)
-        cx_any =  limit_PIc(i,:) * R3_Benc*  px_any
-        food_R3=food_R3+cx_any*puPIY3(i,:)
+        cx_any =  limit_PIc(:,i) * R3_Benc*  px_any
+        food_R3=food_R3+cx_any*puPIY3(:,i)
         food=food+food_R3
      end select
   enddo
@@ -361,13 +361,13 @@
   ! For meso:
   food_ZE=ZERO
   do i=1,iiMesoZooPlankton
-     cx_any =  ZE_Benc(i,:) *p_puZE(y,i)
+     cx_any =  ZE_Benc(:,i) *p_puZE(y,i)
      px_any =   MM_vector(  cx_any,  clu)
      cx_any =  cx_any  * px_any
-     call CorrectConcNearBed_vector(actual_depth(:),sediZE_Ben(i,:),p_height(y), &
-                                       corr_not,NO_BOXES_XY,  puZEY3(i,:))
-     food_ZEc(i,:)=cx_any*puZEY3(i,:)
-     food_ZE(:)  = food_ZE(:)+ food_ZEc(i,:)
+     call CorrectConcNearBed_vector(actual_depth(:),sediZE_Ben(:,i),p_height(y), &
+                                       corr_not,NO_BOXES_XY,  puZEY3(:,i))
+     food_ZEc(:,i)=cx_any*puZEY3(:,i)
+     food_ZE(:)  = food_ZE(:)+ food_ZEc(:,i)
   enddo
   food  =   food  + food_ZE(:)
 
@@ -430,23 +430,23 @@
   ! With filtering the filterfeeder provide himself also with oxygen.
   rugc= min(su,et*eO*p_sum(y)) *max(ZERO,yc(:))
   ! filtering saturation ( high at low , low at hight food)
-  efsatY3(y,:)=min(DONE,su/(et*eO*p_sum(y)))
+  efsatY3(:,y)=min(DONE,su/(et*eO*p_sum(y)))
 ! fsat=su/(NZERO+ et*eO*edry * vum*food)
   ! Calculate cost of energy for filtering based on realized rate of uptake.
-  rrmc = max(edry * eO * p_sra(y)*efsatY3(y,:), p_srs(y))* max(ZERO,yc(:))* et
+  rrmc = max(edry * eO * p_sra(y)*efsatY3(:,y), p_srs(y))* max(ZERO,yc(:))* et
 
   !check oxygen and limit growth if Oxygen consumption is too high
   rx_any=(rugc*p_pur(y)+rrmc)/MW_C
   call LimitChange_vector(POSITIVE,rx_any,O2o_Ben,max_change_per_step,px_limit)
   rrmc=px_limit*rrmc
   rugc=px_limit*rugc
-  efsatY3(y,:)=px_limit*efsatY3(y,:)
+  efsatY3(:,y)=px_limit*efsatY3(:,y)
 
   foodpm2 =food*Depth_Ben
 
   !diagnostic output:
-  rugY3c(y,:)=rugc
-  jrrY3c(y,:)=p_srs(y)* max(NZERO,yc(:))* et
+  rugY3c(:,y)=rugc
+  jrrY3c(:,y)=p_srs(y)* max(NZERO,yc(:))* et
 
   ! Relative growth rate corrected for actual amount of food:
 
@@ -509,47 +509,47 @@
   do i=1,iiPhytoPlankton
     ! calculate rel max uptake  of /m3/d. Check uptake pressure
     ! in lowest layer and limit if necessary
-    fluc = suf*food_PIc(i,:)
-    call LimitChange_vector(POSITIVE,fluc,PI_Benc(i,:),corr_max,px_limit)
-    choice=food_PIc(i,:)* Depth_Ben/(NZERO + PI_Benc(i,:))*min(lim_tot_column,px_limit)
+    fluc = suf*food_PIc(:,i)
+    call LimitChange_vector(POSITIVE,fluc,PI_Benc(:,i),corr_max,px_limit)
+    choice=food_PIc(:,i)* Depth_Ben/(NZERO + PI_Benc(:,i))*min(lim_tot_column,px_limit)
     ! all uptake below are uptakes per square m2  dimension choice :m
-    ruc=suf*choice*PI_Benc(i,:)
-    jPIY3c(i,:) = jPIY3c(i,:) + ruc
+    ruc=suf*choice*PI_Benc(:,i)
+    jPIY3c(:,i) = jPIY3c(:,i) + ruc
     j= ppPhytoPlankton(i,iiC)
     call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyc,ruc)
     ruPIc  = ruPIc  +  ruc
-    rePIR6c  = rePIR6c  +  PI_Benc(i,:)* se_uPIR6c* choice
-    rePIR1c  = rePIR1c  +  PI_Benc(i,:)* se_uPIR1c* choice
+    rePIR6c  = rePIR6c  +  PI_Benc(:,i)* se_uPIR6c* choice
+    rePIR1c  = rePIR1c  +  PI_Benc(:,i)* se_uPIR1c* choice
     !N fluxes
-!   t=suf*choice*PI_Benn(i,:)
+!   t=suf*choice*PI_Benn(:,i)
     j= ppPhytoPlankton(i,iiN)
-    qx_any=PI_Benn(i,:)/(NZERO+PI_Benc(i,:))
+    qx_any=PI_Benn(:,i)/(NZERO+PI_Benc(:,i))
     qx_any=min(qx_any,p_qnRc(i)*p_xqn(i))
-    rx_any=suf*qx_any*choice*PI_Benc(i,:)
+    rx_any=suf*qx_any*choice*PI_Benc(:,i)
     call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyn,rx_any)
     ruPIn  = ruPIn  +  rx_any
 !   rePIn  = rePIn  +  rec*qx_any
-    rePIR6n  = rePIR6n  +  PI_Benn(i,:)* se_uPIR6n* choice
-    rePIR1n  = rePIR1n  +  PI_Benn(i,:)* se_uPIR1n* choice
+    rePIR6n  = rePIR6n  +  PI_Benn(:,i)* se_uPIR6n* choice
+    rePIR1n  = rePIR1n  +  PI_Benn(:,i)* se_uPIR1n* choice
     !P fluxes
-!   t=suf*choice*PI_Benp(i,:)
+!   t=suf*choice*PI_Benp(:,i)
     j= ppPhytoPlankton(i,iiP)
-    qx_any=PI_Benp(i,:)/(NZERO+PI_Benc(i,:))
+    qx_any=PI_Benp(:,i)/(NZERO+PI_Benc(:,i))
     qx_any=min(qx_any,p_qpRc(i)*p_xqp(i))
-    rx_any=suf*qx_any*choice*PI_Benc(i,:)
+    rx_any=suf*qx_any*choice*PI_Benc(:,i)
     call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyp,rx_any)
     ruPIp  = ruPIp  + rx_any
 !   rePIp  = rePIp  + rec*qx_any
-    rePIR6p  = rePIR6p  +  PI_Benp(i,:)* se_uPIR6p* choice
-    rePIR1p  = rePIR1p  +  PI_Benp(i,:)* se_uPIR1p* choice
+    rePIR6p  = rePIR6p  +  PI_Benp(:,i)* se_uPIR6p* choice
+    rePIR1p  = rePIR1p  +  PI_Benp(:,i)* se_uPIR1p* choice
     !Chl fluxes
-    j= ppPhytoPlankton(i,iiL) ;rx_any=PI_Benl(i,:)* suf* choice
+    j= ppPhytoPlankton(i,iiL) ;rx_any=PI_Benl(:,i)* suf* choice
     call openbotflux_vector(NEGATIVE,iiPel,j,-rx_any)
     !Si fluxes
     j= ppPhytoPlankton(i,iiS) ; if (j>0) then
-      qx_any=PI_Bens(i,:)/(NZERO+PI_Benc(i,:))
+      qx_any=PI_Bens(:,i)/(NZERO+PI_Benc(:,i))
       qx_any=min(qx_any,p_qsRc(i)*p_xqs(i))
-      ruPIs=suf*qx_any*choice*PI_Benc(i,:)
+      ruPIs=suf*qx_any*choice*PI_Benc(:,i)
       call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppQ6s,ruPIs)
     endif
 
@@ -559,8 +559,8 @@
        !classes we need to know how much eachmember
        ! eat in order to correct for size changes in the PhaeoColonies
        ! See alsp in Settling.
-       ruc=PI_Benc(i,:)* suf* choice
-       jP6Y3c(y,:)= jP6Y3c(y,:)+ruc
+       ruc=PI_Benc(:,i)* suf* choice
+       jP6Y3c(:,y)= jP6Y3c(:,y)+ruc
        call PhaeocystisCalc_1l(k,i, r,ruc,DONE)
 
        !Phaeo.uptake: carbon outside cells but in colony
@@ -605,24 +605,24 @@
   reZIR6c=ZERO;reZIR6n=ZERO;reZIR6p=ZERO
   reZIR1c=ZERO;reZIR1n=ZERO;reZIR1p=ZERO
   do i=1,iiMicroZooPlankton
-    rx_any=ZI_Fc(i,:)* suf* choice; ruZIc=ruZIc+rx_any
+    rx_any=ZI_Fc(:,i)* suf* choice; ruZIc=ruZIc+rx_any
     j= ppMicroZooPlankton(i,iiC)
     call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyc,rx_any)
-    rx_any=ZI_Fn(i,:)* suf* choice; ruZIn=ruZIn+rx_any
+    rx_any=ZI_Fn(:,i)* suf* choice; ruZIn=ruZIn+rx_any
     j= ppMicroZooPlankton(i,iiN)
     if (j>0) call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyn,rx_any)
     if (j<1)call flux_vector(iiBen,ppyn,ppyn,rx_any)
-    rx_any=ZI_Fp(i,:)* suf* choice; ruZIp=ruZIp+rx_any
+    rx_any=ZI_Fp(:,i)* suf* choice; ruZIp=ruZIp+rx_any
     j= ppMicroZooPlankton(i,iiP)
     if (j>0) call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyp,rx_any)
     if (j<1)call flux_vector(iiBen,ppyp,ppyp,rx_any)
 
-    reZIR6c  =reZIR6c +   ZI_Fc(i,:)* se_uZIR6c* choice
-    reZIR1c  =reZIR1c +   ZI_Fc(i,:)* se_uZIR1c* choice
-    reZIR6n  =reZIR6n +   ZI_Fn(i,:)* se_uZIR6n* choice
-    reZIR1n  =reZIR1n +   ZI_Fn(i,:)* se_uZIR1n* choice
-    reZIR6p  =reZIR6p +   ZI_Fp(i,:)* se_uZIR6p* choice
-    reZIR1p  =reZIR1p +   ZI_Fp(i,:)* se_uZIR1p* choice
+    reZIR6c  =reZIR6c +   ZI_Fc(:,i)* se_uZIR6c* choice
+    reZIR1c  =reZIR1c +   ZI_Fc(:,i)* se_uZIR1c* choice
+    reZIR6n  =reZIR6n +   ZI_Fn(:,i)* se_uZIR6n* choice
+    reZIR1n  =reZIR1n +   ZI_Fn(:,i)* se_uZIR1n* choice
+    reZIR6p  =reZIR6p +   ZI_Fp(:,i)* se_uZIR6p* choice
+    reZIR1p  =reZIR1p +   ZI_Fp(:,i)* se_uZIR1p* choice
   enddo
 
   jZIY3c(:)  = jZIY3c(:) +    ruZIc
@@ -649,30 +649,30 @@
     do i=1,iiMesoZooPlankton
       ! calculate rel max uptake  of /m3/d. Check uptake pressure
       ! in lowest layer and limit if necessary
-      fluc = suf*food_ZEc(i,:)
-      call LimitChange_vector(POSITIVE,fluc, ZE_Benc(i,:),corr_max,px_limit)
-      choice=food_ZEc(i,:)* Depth_Ben/(NZERO + ZE_Benc(i,:))* &
+      fluc = suf*food_ZEc(:,i)
+      call LimitChange_vector(POSITIVE,fluc, ZE_Benc(:,i),corr_max,px_limit)
+      choice=food_ZEc(:,i)* Depth_Ben/(NZERO + ZE_Benc(:,i))* &
                                                     min(lim_tot_column,px_limit)
       ! all uptake below are uptakes per square m2  dimension choice :m
-      jZEY3c(i,:) = jZEY3c(i,:) + ZE_Benc(i,:)* suf* choice
-      rx_any=  ZE_Benc(i,:)* suf* choice;ruZEc  = ruZEc  +   rx_any
+      jZEY3c(:,i) = jZEY3c(:,i) + ZE_Benc(:,i)* suf* choice
+      rx_any=  ZE_Benc(:,i)* suf* choice;ruZEc  = ruZEc  +   rx_any
       j= ppMesoZooPlankton(i,iiC)
       call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyc,rx_any)
-      rx_any=  ZE_Benn(i,:)* suf* choice;ruZEn  = ruZEn  +   rx_any
+      rx_any=  ZE_Benn(:,i)* suf* choice;ruZEn  = ruZEn  +   rx_any
       j= ppMesoZooPlankton(i,iiN)
       if (j>0) call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyn,rx_any)
       if (j<1)call flux_vector(iiBen,ppyn,ppyn,rx_any)
-      rx_any=  ZE_Benp(i,:)* suf* choice;ruZEp  = ruZEp  +   rx_any
+      rx_any=  ZE_Benp(:,i)* suf* choice;ruZEp  = ruZEp  +   rx_any
       j= ppMesoZooPlankton(i,iiP)
       if (j>0) call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyp,rx_any)
       if (j<1)call flux_vector(iiBen,ppyp,ppyp,rx_any)
 
-      reZER6c  = reZER6c  +   ZE_Benc(i,:)* se_uZER6c* choice
-      reZER1c  = reZER1c  +   ZE_Benc(i,:)* se_uZER1c* choice
-      reZER6n  = reZER6n  +   ZE_Benn(i,:)* se_uZER6n* choice
-      reZER1n  = reZER1n  +   ZE_Benn(i,:)* se_uZER1n* choice
-      reZER6p  = reZER6p  +   ZE_Benp(i,:)* se_uZER6p* choice
-      reZER1p  = reZER1p  +   ZE_Benp(i,:)* se_uZER1p* choice
+      reZER6c  = reZER6c  +   ZE_Benc(:,i)* se_uZER6c* choice
+      reZER1c  = reZER1c  +   ZE_Benc(:,i)* se_uZER1c* choice
+      reZER6n  = reZER6n  +   ZE_Benn(:,i)* se_uZER6n* choice
+      reZER1n  = reZER1n  +   ZE_Benn(:,i)* se_uZER1n* choice
+      reZER6p  = reZER6p  +   ZE_Benp(:,i)* se_uZER6p* choice
+      reZER1p  = reZER1p  +   ZE_Benp(:,i)* se_uZER1p* choice
     enddo
 
   ! new food originating for mesozooplankton for Y3 is added here to Y3
@@ -805,7 +805,7 @@ endif
   call flux_vector(               iiBen, ppyc,ppG3c,  r*(DONE-p_pePel(y)) )
   call addbotflux_vector(POSITIVE,iiBen,ppyc,iiPel,ppO3c,r*p_pePel(y))
   jPLO3c=jPLO3c+r*p_pePel(y)
-  jrrY3c(y,:)=r
+  jrrY3c(:,y)=r
 
   call flux_vector(iiBen, ppG2o,ppG2o,-( r/ MW_C))
   call addbotflux_vector(POSITIVE,iiPel,ppO2o,iiBen,ppG2o, &
@@ -848,7 +848,7 @@ endif
   reQ1p  =   rx_any*p_peZ_R1p
   reQ6p  =   rx_any-reQ1p
 
-  jmY3c(y,:)=jmY3c(y,:)+reQ6c
+  jmY3c(:,y)=jmY3c(:,y)+reQ6c
   retQ6c  =   retQ6c+ reQ6c
   retQ6n  =   retQ6n+ reQ6n
   retQ6p  =   retQ6p+ reQ6p
@@ -907,7 +907,7 @@ endif
                                         corr_not,NO_BOXES_XY,px_limit)
   !flux mg detritus /m3
   fluc =   px_limit*(DONE- p_pR6Pel(y))  &
-         * edry * et * eO *  vum * efsatY3(y,:)* yc(:) *RTc
+         * edry * et * eO *  vum * efsatY3(:,y)* yc(:) *RTc
   call LimitChange_vector(POSITIVE,fluc,RTc,corr_max,px_limit)
   !flux mg detritus /m2
   fluc= fluc*Depth_Ben
@@ -951,7 +951,7 @@ endif
   call CorrectConcNearBed_vector(Depth_Ben(:),sediR6_Ben(:),p_height(y), &
                                         corr_not,NO_BOXES_XY,px_limit)
   fluc =   px_limit*(DONE- p_pR6Pels(y))  &
-       * edry * et * eO * vum * efsatY3(y,:)* yc(:) *RTc
+       * edry * et * eO * vum * efsatY3(:,y)* yc(:) *RTc
   call LimitChange_vector(POSITIVE,fluc,RTc,corr_max,px_limit)
   sx_any=fluc/(NZERO + RI_Fc(:))
 !write(LOGUNIT,*) 'pf55'
@@ -1001,9 +1001,9 @@ endif
           ! there is food saturation
           ! quality food is high (low amount of pHaeocsysts)
           ! above p_clxTemp (10 C)
-          in_arg=efsatY3(y,:)-p_fsat_y
+          in_arg=efsatY3(:,y)-p_fsat_y  !JM pass this way
           sx_any=sx_any*insw_vector(active-DONE) &
-!JM            *insw_vector(efsatY3(y,:)-p_fsat_y) &
+!JM            *insw_vector(efsatY3(:,y)-p_fsat_y) &
             *insw_vector(in_arg) &
 !           *insw_vector(x_quality-0.50) &
             *insw_vector(ETW_Ben-p_clxTemp)

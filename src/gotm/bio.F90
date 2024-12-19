@@ -677,7 +677,9 @@ LEVEL1 'mass conv'
         i=0;if (present(counter)) i=counter
         if (bio_model==6) then
 !         if ( allocated(cc_before_transport)) cc_before_transport=cc;
+LEVEL1 'call assignadvrates'
           call assign_adv_rates(dt)
+LEVEL1 'advection diffusion start loop'
           do j=1,numcc
             if (bio_setup /= 2 ) then
               ! inclusive SILTTRANSPORT
@@ -749,11 +751,13 @@ LEVEL1 'mass conv'
               end if
             end if
           enddo
+LEVEL1 'advdiff end loop'
           if ( kt.lt.0) then
             call gotm_error('do_bio', 'negative state value');
             return
           endif
           call CalcSiltResuspension()
+LEVEL1 'end advection diffusion for BFM'
         elseif (bio_model==7) then
           do j=1,numcc
 !           do diffusion step
@@ -847,6 +851,7 @@ LEVEL1 'mass conv'
       end if
 
    end if
+LEVEL1 'end do_bio'
    return
    end subroutine do_bio
 !EOC

@@ -364,7 +364,7 @@
     rx_any= eo*(rugc* p_pur/MW_C +rrmc)
 !JM    call DoubleLimitChange_vector(POSITIVE,rx_any,G2_xavail_o, &
 !JM          fr_lim_HI_o(hx,:),max_change_per_step, limit_oxygen)
-    fr_lim_arg=fr_lim_HI_o(hx,:)
+    fr_lim_arg=fr_lim_HI_o(:,hx)
     call DoubleLimitChange_vector(POSITIVE,rx_any,G2_xavail_o, &
           fr_lim_arg,max_change_per_step, limit_oxygen)
     rugc=rugc*((DONE-eo)+eo*limit_oxygen)
@@ -423,7 +423,7 @@
   cK4n=max(ZERO,cK4n)
   cK3n=max(ZERO,cK3n)
 
-  t=fr_lim_HI_n(hx,:)
+  t=fr_lim_HI_n(:,hx)
   rum4n = max(ZERO,p_qun       *hxc *M4n)
   call DoubleLimitChange_vector(POSITIVE,rum4n,cK4n,t,max_change_per_step)
   rum3n = max(ZERO,p_qun*cquN3*hxc *M3n)
@@ -433,7 +433,7 @@
   rx_any=rumun/p_qnUc
   call DoubleLimitChange_vector(POSITIVE,rx_any,uQ1c,t,max_change_per_step,t)
   rumun=rumun*min(s,t)
-  t=fr_lim_HI_p(hx,:)
+  t=fr_lim_HI_p(:,hx)
   rum1p =  max(ZERO,p_qup       *hxc *M1p)
   call DoubleLimitChange_vector(POSITIVE,rum1p,cK1p,t,max_change_per_step)
   rumup = Mup *et* p_qup *hxc
@@ -482,7 +482,7 @@
     reR7c=ZERO;rx_any=ZERO
   endwhere
 ! call LimitChange_vector(POSITIVE,rx_any,cx_any, max_change_per_step)
-  jnetHIc(hx,:)=runc
+  jnetHIc(:,hx)=runc
 
   rupn=max(ZERO,runc*p_qnc-r_xgrazing_c*qnHc)
   cx_any=p_qnc* hxc(:)-hxn(:)

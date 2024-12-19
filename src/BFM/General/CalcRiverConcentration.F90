@@ -56,8 +56,8 @@
   integer,intent(IN)         :: kmax
   integer,intent(IN)         :: numc
   real(RLEN),intent(IN)      :: ETW(1:kmax)
-  real(RLEN),intent(IN)      :: cc_old_river(1:numc,1:kmax)
-  real(RLEN),intent(INOUT)   :: cc_river(1:numc,1:kmax)
+  real(RLEN),intent(IN)      :: cc_old_river(1:kmax,1:numc)
+  real(RLEN),intent(INOUT)   :: cc_river(1:kmax,1:numc)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! external functions
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -75,15 +75,15 @@
        ESW=0.3;
        call CalcCO2SatInField(kmax,numc,ERHO,ETW,ESW,cc_river)
      case ( ppBac)
-       cc_river(mode,:)=(cc_river(ppB1c,:)) &
-                /(NZERO+cc_old_river(ppB1c,:))*cc_old_river(mode,:)
+       cc_river(:,mode)=(cc_river(:,ppB1c)) &
+                /(NZERO+cc_old_river(:,ppB1c))*cc_old_river(:,mode)
      case ( ppR6c)
-       cc_river(mode,:)=(cc_river(ppN1p,:))*(1.0/0.70-1.0) /0.000391
-!      cc_river(ppR9x,:)=cc_river(mode,:)/p_qR6cQ9x
+       cc_river(:,mode)=(cc_river(:,ppN1p))*(1.0/0.70-1.0) /0.000391
+!      cc_river(ppR9x,:)=cc_river(:,mode)/p_qR6cQ9x
      case ( ppR6n)
-       cc_river(mode,:)=(cc_river(ppN3n,:)+cc_river(ppN4n,:))*(1.0/0.93-1.0)
+       cc_river(:,mode)=(cc_river(:,ppN3n)+cc_river(:,ppN4n))*(1.0/0.93-1.0)
      case ( ppR6p)
-       cc_river(mode,:)=cc_river(ppN1p,:)*(1.0/0.70-1.0)
+       cc_river(:,mode)=cc_river(:,ppN1p)*(1.0/0.70-1.0)
    end select
 #endif
 

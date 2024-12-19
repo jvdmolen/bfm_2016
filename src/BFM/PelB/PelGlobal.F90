@@ -134,7 +134,7 @@
   real(RLEN),dimension(NO_BOXES)  :: nc,nn,np,ns
 !                                    number pf macro.agg,size_macroagg
   real(RLEN),dimension(NO_BOXES)  :: x_macro_n,x_cell_n
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES)  :: PIx_macr_c,R2x_macr_c
+  real(RLEN),dimension(NO_BOXES,iiPhytoPlankton)  :: PIx_macr_c,R2x_macr_c
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Vectors used  of group vectors
@@ -221,20 +221,20 @@
       cx_any=MicroZooPlankton(i,iiC)
 !write(LOGUNIT,*)'pelglobal microzoo'
       if (ppMicroZooPlankton(i,iiN) > 0 )  then
-        qn_mz(i,:)= MicroZooPlankton(i,iiN)/(NZERO+cx_any )
+        qn_mz(:,i)= MicroZooPlankton(i,iiN)/(NZERO+cx_any )
       else
 !write(LOGUNIT,*)'pelglobal microzoo 2'
-        qn_mz(i,:)= p_qnMic(i)
+        qn_mz(:,i)= p_qnMic(i)
 !write(LOGUNIT,*)'pelglobal microzoo 3'
       endif
       if (ppMicroZooPlankton(i,iiP) > 0 ) then
-        qp_mz(i,:)= MicroZooPlankton(i,iiP)/(NZERO+cx_any )
+        qp_mz(:,i)= MicroZooPlankton(i,iiP)/(NZERO+cx_any )
       else
-        qp_mz(i,:)= p_qpMic(i)
+        qp_mz(:,i)= p_qpMic(i)
       endif
       POC=POC+cx_any
-      PON=PON+cx_any*qn_mz(i,:)
-      POP=POP+cx_any*qp_mz(i,:)
+      PON=PON+cx_any*qn_mz(:,i)
+      POP=POP+cx_any*qp_mz(:,i)
     end do
 !write(LOGUNIT,*)'pelglobal mesozoo'
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -244,18 +244,18 @@
     do i = 1 , (iiMesoZooPlankton)
       cx_any=MesoZooPlankton(i,iiC)
       if (ppMesoZooPlankton(i,iiN) > 0 ) then
-        qnZc(i,:)= MesoZooPlankton(i,iiN)/(NZERO+ cx_any)
+        qnZc(:,i)= MesoZooPlankton(i,iiN)/(NZERO+ cx_any)
       else
-        qnZc(i,:)= p_qnMec(i)
+        qnZc(:,i)= p_qnMec(i)
       endif
       if (ppMesoZooPlankton(i,iiP) > 0 ) then
-        qpZc(i,:)= MesoZooPlankton(i,iiP)/(NZERO+ cx_any)
+        qpZc(:,i)= MesoZooPlankton(i,iiP)/(NZERO+ cx_any)
       else
-        qpZc(i,:)= p_qpMec(i)
+        qpZc(:,i)= p_qpMec(i)
       endif
       POC=POC+cx_any
-      PON=PON+cx_any*qnZc(i,:)
-      POP=POP+cx_any*qpZc(i,:)
+      PON=PON+cx_any*qnZc(:,i)
+      POP=POP+cx_any*qpZc(:,i)
     end do
 
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -269,33 +269,33 @@
     do i = 1 , iiPhytoPlankton
       cx_any= PhytoPlankton(i,iiC)
       where (cx_any.gt.NZERO)
-        qnPc(i,:)= PhytoPlankton(i,iiN)/cx_any
-        qpPc(i,:)= PhytoPlankton(i,iiP)/cx_any
+        qnPc(:,i)= PhytoPlankton(i,iiN)/cx_any
+        qpPc(:,i)= PhytoPlankton(i,iiP)/cx_any
         POC=POC+cx_any
-        PON=PON+cx_any*qnPc(i,:)
-        POP=POP+cx_any*qpPc(i,:)
+        PON=PON+cx_any*qnPc(:,i)
+        POP=POP+cx_any*qpPc(:,i)
       elsewhere
-        qnPc(i,:)=p_xqn(i)*p_qnRc(i)
-        qpPc(i,:)=p_xqp(i)*p_qpRc(i)
+        qnPc(:,i)=p_xqn(i)*p_qnRc(i)
+        qpPc(:,i)=p_xqp(i)*p_qpRc(i)
       endwhere
-      PI_dw(i,:)=p_xsize_c(i) &
-          *(DONE+(MW_O+2.0*MW_H+MW_N*qnPc(i,:)+(MW_P+4.0*MW_O)*qpPc(I,:))/MW_C)
+      PI_dw(:,i)=p_xsize_c(i) &
+          *(DONE+(MW_O+2.0*MW_H+MW_N*qnPc(:,i)+(MW_P+4.0*MW_O)*qpPc(:,i))/MW_C)
       if (i== iiP6 ) then
         !Limit in an artifical way the quotum.
         !If Phaeocystis contain more N an P than maximum
         !the  N and P is found in the colony but outside the cells.
-        qnPc(i,:)=min(qnPc(i,:),p_xqn(i)*p_qnRc(i))
-        qpPc(i,:)=min(qpPc(i,:),p_xqp(i)*p_qpRc(i))
+        qnPc(:,i)=min(qnPc(:,i),p_xqn(i)*p_qnRc(i))
+        qpPc(:,i)=min(qpPc(:,i),p_xqp(i)*p_qpRc(i))
       endif
-      qlPc(i,:)=min(DONE*p_qchlc(i), max(0.1* p_qlPlc(i), &
+      qlPc(:,i)=min(DONE*p_qchlc(i), max(0.1* p_qlPlc(i), &
                   PhytoPlankton(i,iiL)/(NZERO+ PhytoPlankton(i,iiC))))
-      qsPc(i,:)=ZERO
+      qsPc(:,i)=ZERO
       j=ppPhytoPlankton(i,iiS)
       if (j>0) then
-         qsPc(i,:) = PhytoPlankton(i,iiS)/(NZERO+ PhytoPlankton(i,iiC))
-         PI_dw(i,:)=PI_dw(i,:)+p_xsize_c(i)*((MW_Si+3.0*MW_O)*qsPc(I,:))/MW_C
+         qsPc(:,i) = PhytoPlankton(i,iiS)/(NZERO+ PhytoPlankton(i,iiC))
+         PI_dw(:,i)=PI_dw(:,i)+p_xsize_c(i)*((MW_Si+3.0*MW_O)*qsPc(:,i))/MW_C
       endif
-      flPIR6s(i,:) = ZERO
+      flPIR6s(:,i) = ZERO
     end do
 
 !write(LOGUNIT,*)'pelglobal bac'
@@ -343,10 +343,10 @@
                                               CalcPhytoPlankton(i)) then
           lcl_Ph => PhytoPlankton(i,iiC)
           !first determine nutrient status.range:0-2  (depleted->rich)
-          iNN=min((qpPc(i,:)- p_qplc(i))/(p_qpRc(i)- p_qplc(i)), &
-              (qnPc(i,:)- p_lqnlc(i))/(p_qnRc(i)- p_lqnlc(i)))
+          iNN=min((qpPc(:,i)- p_qplc(i))/(p_qpRc(i)- p_qplc(i)), &
+              (qnPc(:,i)- p_lqnlc(i))/(p_qnRc(i)- p_lqnlc(i)))
           if (p_qslc(i).gt.ZERO) &
-             iNN=min(iNN,(qsPc(i,:)- p_qslc(i))/(p_qsRc(i)- p_qslc(i)))
+             iNN=min(iNN,(qsPc(:,i)- p_qslc(i))/(p_qsRc(i)- p_qslc(i)))
           iNN=max(ZERO,iNN)
           ! Check if diatoms are really nutrient limited
           !Calculate fraction of algal type which will be part of MacroAggratate
@@ -377,10 +377,10 @@
           ! Determine the fraction of R2 which is sticked to the MacroAggrate
           ! amount min(free R2 ,(limitation for diatom)
           !  * (amount R2 based on phytoplankton and fixed relation)
-!         R2x_macr_c(i,:)= min(R2c,rec_qP1R2*lcl_Ph)
-          R2x_macr_c(i,:)= min(R2c,qR2P1*lcl_Ph)
-!         PIx_macr_c(i,:)= min(lcl_Ph,R2c*qP1R2)
-          PIx_macr_c(i,:)= min(lcl_Ph,R2c*rec_qR2P1)
+!         R2x_macr_c(:,i)= min(R2c,rec_qP1R2*lcl_Ph)
+          R2x_macr_c(:,i)= min(R2c,qR2P1*lcl_Ph)
+!         PIx_macr_c(:,i)= min(lcl_Ph,R2c*qP1R2)
+          PIx_macr_c(:,i)= min(lcl_Ph,R2c*rec_qR2P1)
           !Im sediPI the value of pxMAStickControl is tempory stored
         endif
       enddo
@@ -395,39 +395,39 @@
           lcl_Ph => PhytoPlankton(i,iiC)
           !Im sediPI the value of pxMAStickControl is tempory stored
            ! MacroAggregaat = phytoplankton+ R2c
-!          x_macro_c=(R2x_macr_c(i,:) +PIx_macr_c(i,:) )  &
+!          x_macro_c=(R2x_macr_c(:,i) +PIx_macr_c(:,i) )  &
 !            *min(DONE,(NZERO+lcl_Ph)/ &
 !             max(NZERO,R2c-lcl_Ph/p_qlP1R2/pxMAStickControl) )
-           x_macro_c=(R2x_macr_c(i,:) +PIx_macr_c(i,:) )  &
+           x_macro_c=(R2x_macr_c(:,i) +PIx_macr_c(:,i) )  &
              *min(DONE,(NZERO+lcl_Ph)/ &
               max(NZERO,R2c-lcl_Ph*p_qhR2P1*pxMAStickControl) )
            ! size of macroaggregaat is determined by a fraction of conc. which 
            ! is a macro-aggrgaat divided by the optimum conentration TEP/
-!          xSizeMA_m=p_xsize_m(i)*max(DONE,R2x_macr_c(i,:)/p_chR2R2c)
+!          xSizeMA_m=p_xsize_m(i)*max(DONE,R2x_macr_c(:,i)/p_chR2R2c)
            ! recalculation in dry weight for use in Stoke equation. Weight of 
            ! one cells is multiplied with tota mass of macroaggregaat in dry 
            ! weight and weight of diatom fraction in macroaggregaat.(Implicitly
            ! assuming that macroaggrgaat consists of 1 diatom cell with
            ! around TEP.
-           cx_any=PI_dw(i,:)*PIx_macr_c(i,:)/p_xsize_c(i) &
-                           +R2x_macr_c(i,:)*(DONE+(2.0*MW_H+MW_O)/MW_C)
+           cx_any=PI_dw(:,i)*PIx_macr_c(:,i)/p_xsize_c(i) &
+                           +R2x_macr_c(:,i)*(DONE+(2.0*MW_H+MW_O)/MW_C)
            xSizeMA_d=p_xsize_c(i)*max(DONE,cx_any/(NZERO &
-             +max(p_xsize_c(i),PIx_macr_c(i,:)) ) )
+             +max(p_xsize_c(i),PIx_macr_c(:,i)) ) )
            xSizeMA_m=p_xsize_m(i)*max(DONE,xSizeMA_d/ &
-                                         PI_dw(i,:))**(0.333333)
+                                         PI_dw(:,i))**(0.333333)
            buoyancy=pxMAStickControl
            call CalcSinking(NO_BOXES,xSizeMA_m,xSizeMA_d,ETW,ESW,sedi_macragg)
            sedi_macragg=sedi_macragg*buoyancy
-           sediPI(i,:)=sedi_macragg* PIx_macr_c(i,:)/(NZERO+lcl_Ph)+p_rrPIm(i)
-           sediR2=sediR2 + R2x_macr_c(i,:) *sedi_macragg
+           sediPI(:,i)=sedi_macragg* PIx_macr_c(:,i)/(NZERO+lcl_Ph)+p_rrPIm(i)
+           sediR2=sediR2 + R2x_macr_c(:,i) *sedi_macragg
          elseif (CalcPhytoPlankton(i)) then
-           sediPI(i,:)=p_rrPIm(i)
+           sediPI(:,i)=p_rrPIm(i)
          endif
          call findnan(sediR2,NO_BOXES,iout)
          if (iout>0) then
             write(logunit,*) 'PelGLobal I in sediR2c layer',iout, &
-              sedi_macragg(iout),R2c(iout), R2x_macr_c(i,iout), &
-              qR2P1(iout),rec_qR2P1(iout),lcl_Ph(iout),R2x_macr_c(i,iout)
+              sedi_macragg(iout),R2c(iout), R2x_macr_c(iout,i), &
+              qR2P1(iout),rec_qR2P1(iout),lcl_Ph(iout),R2x_macr_c(iout,i)
         endif
        enddo
        !STEP5
@@ -445,7 +445,7 @@
              sxMACatchControl=RelAttachRateToTEP(1,NO_BOXES,mx_any,E, &
                 radius_macro=xSizeMA_m,number_macros=x_macro_n)
              px_any=meet*pxMAStickControl*sxMACatchControl/(NZERO+sx_any)
-             sediPI(i,:)=sediPI(i,:) &
+             sediPI(:,i)=sediPI(:,i) &
                     +min(DONE,px_any)*sedi_macragg
            endif
          enddo
@@ -457,15 +457,15 @@
          call findnan(sediB1,NO_BOXES,iout)
          if (iout>0) then
           write(logunit,*) 'PelGLobal II in sediB1c layer',iout, &
-          sedi_macragg(iout),R2c(iout), R2x_macr_c(i,iout), &
-          qR2P1(iout),lcl_Ph(iout),R2x_macr_c(i,iout),&
+          sedi_macragg(iout),R2c(iout), R2x_macr_c(iout,i), &
+          qR2P1(iout),lcl_Ph(iout),R2x_macr_c(iout,i),&
            px_any(iout),sxMACatchControl(iout),meet(iout),pxMAStickCOntrol(iout)
          endif
        endif
      endif
 !    sediPI(iiP5,:)=35.0*P5c**(0.9647)
 !    sediPI(iiP5,:)=2.0*sediR9
-     sediPI(iiP5,:)=86400.0*0.002
+     sediPI(:,iiP5)=86400.0*0.002
     ! Calculate sinking rate (dummy is here a dummy variable) on basis of size and wight of colonies.
     ! Compare sinking with siinkin due to sticking to macroaggregates produced by diatoms.
 !write(LOGUNIT,*)'pelglobal pheocystis calc_sedimentation',rx_any
@@ -474,20 +474,20 @@
    call PhaeocystisCalc(CALC_SEDIMENTATION,iiP6,rx_any,dummy,p_xsize_m(iiP6))
 !write(LOGUNIT,*)'pelglobal sediPI'
 !stop
-    sediPI(iiP6,:)=max(sediPI(iiP6,:),rx_any)
+    sediPI(:,iiP6)=max(sediPI(:,iiP6),rx_any)
 !write(LOGUNIT,*)'pelglobal sediPI 2'
 !stop
 
      do i = 1 , iiPhytoPlankton
       if (CalcPhytoPlankton(i)) &
-        sediPI(i,2:NO_BOXES)= &
-                       (sediPI(i,2:NO_BOXES)+sediPI(i,1:NO_BOXES-1))*0.5
+        sediPI(2:NO_BOXES,i)= &
+                       (sediPI(2:NO_BOXES,i)+sediPI(1:NO_BOXES-1,i))*0.5
      end do
 
      p_xfree_R2=DONE
      where (R2c(:) > 1.0D-10 )
-      p_xfree_R2=max(ZERO,R2c-R2x_macr_c(iiP1,:))/(NZERO+R2c)
-      sediR2(:)=(sediR2(:)+max(ZERO,R2c-R2x_macr_c(iiP1,:))*p_raR2m)/(NZERO+R2c)
+      p_xfree_R2=max(ZERO,R2c-R2x_macr_c(:,iiP1))/(NZERO+R2c)
+      sediR2(:)=(sediR2(:)+max(ZERO,R2c-R2x_macr_c(:,iiP1))*p_raR2m)/(NZERO+R2c)
       sediR2(2:NO_BOXES)=(sediR2(2:NO_BOXES)+sediR2(1:NO_BOXES-1))*0.5
     endwhere
 !write(LOGUNIT,*)'pelglobal findnan'
@@ -500,17 +500,17 @@
     do i = 1, iiMesoZooPlankton
       if (p_rMem(i) < ZERO ) then
         eo= MM_power_vector(max(NZERO,O2o(:)),  p_clMeO2o(i),3)
-        sediMeZ(i,:)=p_rMem(i)* (DONE-eo)
-        sediMeZ(i,NO_BOXES_Z)=ZERO
+        sediMeZ(:,i)=p_rMem(i)* (DONE-eo)
+        sediMeZ(NO_BOXES_Z,i)=ZERO
       else
-        sediMeZ(i,:)=p_rMem(i)
+        sediMeZ(:,i)=p_rMem(i)
       endif
     end do
 
     do i = 1, iiMicroZooPlankton
       eo= MM_power_vector(max(NZERO,O2o(:)),  p_clMiO2o(i),3)
-      sediMiZ(i,:)=p_rMim(i)* (DONE-eo)
-      sediMiZ(i,NO_BOXES_Z)=ZERO
+      sediMiZ(:,i)=p_rMim(i)* (DONE-eo)
+      sediMiZ(NO_BOXES_Z,i)=ZERO
     end do
 
 !write(LOGUNIT,*)'pelglobal sediR6'
@@ -559,10 +559,10 @@
      if (CalcPhytoPlankton(i) ) then
        cx_any=PhytoPlankton(i,iiC)
        rscalar=max(ZERO,sum(cx_any*Depth))/OCDepth(1)
-       sediPI(i,:)= sediPI(i,:) *max(ZERO, &
+       sediPI(:,i)= sediPI(:,i) *max(ZERO, &
          (rscalar/(rscalar+ xlow_mass_c))- (xlow_mass_c/(rscalar+ xlow_mass_c)))
      else
-       sediPI(i,:)=ZERO
+       sediPI(:,i)=ZERO
      endif
     enddo
 !write(LOGUNIT,*)'pelglobal limit'

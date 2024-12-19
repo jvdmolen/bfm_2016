@@ -130,12 +130,17 @@
 
       select case (mode)
         case(0)   ! initialization
+LEVEL1 'bfm output case 0',bio_setup,stPelStateS,stPelFluxE
           i=count(var_ave(stPelStateS:stPelFluxE))
+LEVEL1 'i',i
           if ( (i> 0) .and. bio_setup/=2) then
+LEVEL1 'allocating'
             allocate(cc_ave(0:nlev,1:i),stat=rc)
+LEVEL1 'rc',rc
             if (rc /= 0) stop 'init_bio(): Error allocating cc_ave)'
              cc_ave=0
           endif
+LEVEL1 allocated(cc_ave)
           i=count(var_ave(stBenStateS:stBenFluxE))
           if ( ( i> 0) .and. bio_setup>1) then
             allocate(ccb_ave(0:1,1:i),stat=rc)
@@ -152,6 +157,9 @@
 #endif
 
           ave_count=0.0
+LEVEL1 'bfm output case 0 end'
+!JM: gaat fout, want var_ave is overal .false.
+!stop
         case(1)  ! prepare for printing
           do j=1,numc
             if ( adv1d_courant(j)> 0.0 ) then
@@ -162,8 +170,8 @@
               adv1d_courant(j)=0.0;adv1d_number(j)=0.0
              endif
            enddo
-           if (bio_setup/=2) cc_ave=cc_ave/ave_count
-           if (bio_setup>1) ccb_ave=ccb_ave/ave_count
+           if (bio_setup/=2.and.allocated(cc_ave)) cc_ave(:,:)=cc_ave(:,:)/ave_count
+           if (bio_setup>1.and.allocated(ccb_ave)) ccb_ave=ccb_ave/ave_count
 #ifdef INCLUDE_DIAGNOS_PRF
            if (bio_setup>1.and.allocated(ccb_ave_prf)) &
                                        ccb_ave_prf=ccb_ave_prf/ave_count
@@ -247,7 +255,8 @@
              j=j+1
              if ( var_ave(i) ) then
                 k=k+1
-                call make_flux_output(2,j,0,nlev,dt,c1dimz,llcalc)
+!JM bug?                call make_flux_output(2,j,0,nlev,dt,c1dimz,llcalc)
+                call make_flux_output(2,j,0,1,dt,c1dimz,llcalc)
                 if ( ave_count< 1.5 ) then
                    ccb_ave(0:1,k)=c1dimz(0:1)
                 else

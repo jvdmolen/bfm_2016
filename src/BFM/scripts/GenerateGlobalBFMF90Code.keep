@@ -1004,10 +1004,10 @@ switch -- $mode {
 	regsub -all {\(|\)} $name " " tmp
 	set root [ lindex $tmp 0 ]; set grpname [ lindex $tmp 1 ]
 	set memberlist [ searchforgroup $dim $grpname ]
-#JM	PrintLine -print "$root => D$i${TYPE}(pp${root}(ii[ lindex $memberlist 0 ]):\
-#JM						pp${root}(ii[ lindex $memberlist end ]),:)"
-	PrintLine -print "$root => D$i${TYPE}(:,pp${root}(ii[ lindex $memberlist 0 ]):\
-						pp${root}(ii[ lindex $memberlist end ]))"
+	PrintLine -print "$root => D$i${TYPE}(pp${root}(ii[ lindex $memberlist 0 ]):\
+						pp${root}(ii[ lindex $memberlist end ]),:)"
+#JMt	PrintLine -print "$root => D$i${TYPE}(:,pp${root}(ii[ lindex $memberlist 0 ]):\
+#JMt						pp${root}(ii[ lindex $memberlist end ]))"
 	PrintLine -print "$root=ZERO"
       }
     }
@@ -1038,13 +1038,12 @@ switch -- $mode {
     }
     set n [ lindex $VARS(ex_diagnos,2d,index) $i ]
     set m [ llength $VARS($dim,$type,name) ]
-#JM    PrintLine -print "PEL${SPEC} => D2DIAGNOS($n\+1:$n\+$m,:); PEL$SPEC=ZERO"
-#JM    foreach name $VARS($dim,$type,name) {
-#JM      PrintLine -print "j${spec}$name => D2DIAGNOS($n+pp$name,:); j${spec}$name=ZERO"
-#JM    }
-    PrintLine -print "PEL${SPEC} => D2DIAGNOS(:,$n\+1:$n\+$m); PEL$SPEC=ZERO"
+    PrintLine -print "PEL${SPEC} => D2DIAGNOS($n\+1:$n\+$m,:); PEL$SPEC=ZERO"
     foreach name $VARS($dim,$type,name) {
-      PrintLine -print "j${spec}$name => D2DIAGNOS(:,$n+pp$name); j${spec}$name=ZERO"
+      PrintLine -print "j${spec}$name => D2DIAGNOS($n+pp$name,:); j${spec}$name=ZERO"
+#JMt    PrintLine -print "PEL${SPEC} => D2DIAGNOS(:,$n\+1:$n\+$m); PEL$SPEC=ZERO"
+#JMt    foreach name $VARS($dim,$type,name) {
+#JMt      PrintLine -print "j${spec}$name => D2DIAGNOS(:,$n+pp$name); j${spec}$name=ZERO"
     }
   }
   3d-state-intfield-alloc-pointer {

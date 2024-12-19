@@ -83,7 +83,7 @@
      integer     :: i
      integer,dimension(NO_BOXES)  ::  Ntp,Ntn,iOne
      real(RLEN), dimension(:), pointer  ::lcl_Phytoc
-     real(RLEN),dimension(iiPhytoPlankton,NO_BOXES)  :: prodPI_p,prodPI_n
+     real(RLEN),dimension(NO_BOXES,iiPhytoPlankton)  :: prodPI_p,prodPI_n
      real(RLEN),dimension(NO_BOXES)  :: r3,s3  !,reac
      real(RLEN),dimension(NO_BOXES)  :: prodtn,prodtp,massmnc,massmpc
      real(RLEN),dimension(NO_BOXES)  :: prodBN_n,prodB1_n,prodB1_p,masstc
@@ -122,13 +122,13 @@
       if (CalcMacroPhyto) then
       activeMacro=.false.
       do i=1,iiMacroStructure
-        activeMacro(i)=sum(save_MacroPhyt_status(i,:))>0
+        activeMacro(i)=sum(save_MacroPhyt_status(:,i))>0
         if (activeMacro(i)) then
-          mtm=Depth_layer_Msc(i,:)
+          mtm=Depth_layer_Msc(:,i)
           lcl_Phytoc=>MacroStructure(i,iiC)
-          psur_dyn= lcl_Phytoc *p_pAqcMa(i) *farm_surface(i,:)/surface
+          psur_dyn= lcl_Phytoc *p_pAqcMa(i) *farm_surface(:,i)/surface
           !mmol/2 --> mmol/m3 above floating body
-          i2=layerMsm(i,:)*save_MacroPhyt_status(i,:)
+          i2=layerMsm(:,i)*save_MacroPhyt_status(:,i)
           call recalc_ben_to_pel(GET,i2,lcl_Phytoc,mtm,psur_dyn,r3)
           where (r3.gt.ZERO)
              masstc=masstc+r3;Ntn=Ntn+iOne;Ntp=Ntp+iOne
@@ -148,14 +148,14 @@
           lcl_Phytoc=>PhytoPlankton(i,iiC)
           call PhaeocystisCalc(CALC_REL_NITRATE_UPTAKE,i, &
                            lim_qu,don, p_quPn(i))
-!         prodPI_n(i,:)=lim_qu*p_quPn(i)*max(massmnc,lcl_Phytoc)
-          prodPI_n(i,:)=p_quPn(i)*max(massmnc,lcl_Phytoc)
+!         prodPI_n(:,i)=lim_qu*p_quPn(i)*max(massmnc,lcl_Phytoc)
+          prodPI_n(:,i)=p_quPn(i)*max(massmnc,lcl_Phytoc)
           call PhaeocystisCalc(CALC_REL_PHOSPHATE_UPTAKE,i, &
                            lim_qu,dop, p_quPp(i))
-!         prodPI_p(i,:)=lim_qu*p_quPp(i)*max(massmpc,lcl_Phytoc)
-          prodPI_p(i,:)=p_quPp(i)*max(massmpc,lcl_Phytoc)
-          prodtn=prodtn+prodPI_n(i,:)
-          prodtp=prodtp+prodPI_p(i,:)
+!         prodPI_p(:,i)=lim_qu*p_quPp(i)*max(massmpc,lcl_Phytoc)
+          prodPI_p(:,i)=p_quPp(i)*max(massmpc,lcl_Phytoc)
+          prodtn=prodtn+prodPI_n(:,i)
+          prodtp=prodtp+prodPI_p(:,i)
         endif
       enddo
 
@@ -188,21 +188,21 @@
         if (activeMacro(i))then
           prodMa_n=ZERO
           prodMa_p=ZERO
-          mtm=Depth_layer_Msc(i,:)
+          mtm=Depth_layer_Msc(:,i)
           psur=DONE
        !mmol/2 --> mmol/m3 above floating body
-          i2=layerMsm(i,:)*save_MacroPhyt_status(i,:)
+          i2=layerMsm(:,i)*save_MacroPhyt_status(:,i)
           lcl_Phytoc=>MacroStructure(i,iiC)
-          psur_dyn= lcl_Phytoc *p_pAqcMa(i) *farm_surface(i,:)/surface
+          psur_dyn= lcl_Phytoc *p_pAqcMa(i) *farm_surface(:,i)/surface
           call recalc_ben_to_pel(GET,i2,lcl_Phytoc,mtm,psur_dyn,r3)
        !For the  calculation of nutrient limitation add 1 mg C /m3
        !Calculate frond surface macrophytes
           where (r3.gt.ZERO)
 
-            prodMa_n(i,:)=p_qunMa(i)*max(massmnc,r3)
-            prodMa_p(i,:)=p_qupMa(i)*max(massmpc,r3)
-            prodtn=prodtn+prodMa_n(i,:)
-            prodtp=prodtp+prodMa_p(i,:)
+            prodMa_n(:,i)=p_qunMa(i)*max(massmnc,r3)
+            prodMa_p(:,i)=p_qupMa(i)*max(massmpc,r3)
+            prodtn=prodtn+prodMa_n(:,i)
+            prodtp=prodtp+prodMa_p(:,i)
           endwhere
          if (save_MacroPhyt_status(i,1)==1 &
            .and.prodMa_p(i,layerMsm(i,1))<1.0D-10) write(LOGUNIT,*) &
@@ -224,11 +224,11 @@
           psur=DONE
        !mmol/2 --> mmol/m3 above floating body
           lcl_Phytoc=>MacroStructure(i,iiC)
-          i2=layerMsm(i,:)*save_MacroPhyt_status(i,:)
+          i2=layerMsm(:,i)*save_MacroPhyt_status(:,i)
           call recalc_ben_to_pel(GET,i2,lcl_Phytoc,mtm,psur,r3)
           where (r3.gt.ZERO)
-            fr_lim_Ma_n(i,:)=prodMa_n(i,:)/prodtn
-            fr_lim_Ma_p(i,:)=prodMa_p(i,:)/prodtp
+            fr_lim_Ma_n(:,i)=prodMa_n(:,i)/prodtn
+            fr_lim_Ma_p(:,i)=prodMa_p(:,i)/prodtp
           endwhere
 !         j=layerMsm(i,1)
 !         write(LOGUNIT,*) 'LNU:',i,j,fr_lim_Ma_n(i,j),fr_lim_Ma_p(i,j)
@@ -237,8 +237,8 @@
 #endif
       do i=1, iiPhytoPlankton
        if ( CalcPhytoPlankton(i)) then
-        fr_lim_PI_n(i,:)=prodPI_n(i,:)/prodtn
-        fr_lim_PI_p(i,:)=prodPI_p(i,:)/prodtp
+        fr_lim_PI_n(:,i)=prodPI_n(:,i)/prodtn
+        fr_lim_PI_p(:,i)=prodPI_p(:,i)/prodtp
        endif
       enddo
       end

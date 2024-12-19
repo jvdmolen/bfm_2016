@@ -86,13 +86,13 @@
           nrphyto=p_useparams(i)
           if(CoupledtoBDc(nrphyto)>=0) then
             bphytoc=max(ZERO,BenPhyto(i,iiC))
-            prodBP_n(i,:)=p_quPn(nrphyto) *(cNIBTc+bphytoc)
-            prodBP_p(i,:)=p_quPp(nrphyto) *(cNIBTc+bphytoc)
-            prod_n=prod_n+prodBP_n(i,:)
-            prod_p=prod_p+prodBP_p(i,:)
+            prodBP_n(:,i)=p_quPn(nrphyto) *(cNIBTc+bphytoc)
+            prodBP_p(:,i)=p_quPp(nrphyto) *(cNIBTc+bphytoc)
+            prod_n=prod_n+prodBP_n(:,i)
+            prod_p=prod_p+prodBP_p(:,i)
           else
-            prodBP_n(i,:)=ZERO;
-            prodBP_p(i,:)=ZERO;
+            prodBP_n(:,i)=ZERO;
+            prodBP_p(:,i)=ZERO;
           endif
         enddo
       else
@@ -127,22 +127,22 @@
       fr_lim_HI_o=DONE
       fr_lim_BPI_n=DONE
       fr_lim_BPI_p=DONE
-      fr_lim_HI_n(iiH1,:)=prodH1_n/prod_n
+      fr_lim_HI_n(:,iiH1)=prodH1_n/prod_n
       fr_lim_Ha_n=prodHa_n/prod_n
       if ( fr_lim_Ha_n(1)<0.0) then
          write(LOGUNIT,*) 'fr_lim_Ha_N<0.0',prodHa_n,p_qunA,cNIBTc,Hac
          write(LOGUNIT,*) bphytoc,H1c,HNc
       endif
-      fr_lim_HI_p(iiH1,:)=prodH1_p/prod_p
-      fr_lim_HI_n(iiHN,:)=prodHN_n/prod_n
-      fr_lim_HI_p(iiHN,:)=prodHN_p/prod_p
-      fr_lim_HI_o(iiH1,:)=prodH1_o/prod_o
-      fr_lim_HI_o(iiHN,:)=prodHN_o/prod_o
+      fr_lim_HI_p(:,iiH1)=prodH1_p/prod_p
+      fr_lim_HI_n(:,iiHN)=prodHN_n/prod_n
+      fr_lim_HI_p(:,iiHN)=prodHN_p/prod_p
+      fr_lim_HI_o(:,iiH1)=prodH1_o/prod_o
+      fr_lim_HI_o(:,iiHN)=prodHN_o/prod_o
       fr_lim_Ha_o=prodHa_o/prod_o
       if (active_Phyto) then
         do i=1,iiBenPhyto
-          fr_lim_BPI_n(i,:)=prodBP_n(i,:)/prod_n
-          fr_lim_BPI_p(i,:)=prodBP_p(i,:)/prod_p
+          fr_lim_BPI_n(:,i)=prodBP_n(:,i)/prod_n
+          fr_lim_BPI_p(:,i)=prodBP_p(:,i)/prod_p
         enddo
       endif
      end

@@ -140,10 +140,10 @@
   real(RLEN),dimension(NO_BOXES)  :: sm
   real(RLEN),dimension(NO_BOXES)  :: rmdc
   real(RLEN),dimension(NO_BOXES)  :: runc,runn,runp
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES)     :: cumPIc
+  real(RLEN),dimension(NO_BOXES,iiPhytoPlankton)     :: cumPIc
   real(RLEN),dimension(NO_BOXES)  :: cumR3c
-  real(RLEN),dimension(iiMicroZooPlankton,NO_BOXES)  :: cumMIZc
-  real(RLEN),dimension(iiMesoZooPlankton,NO_BOXES)   :: cumMEZc
+  real(RLEN),dimension(NO_BOXES,iiMicroZooPlankton)  :: cumMIZc
+  real(RLEN),dimension(NO_BOXES,iiMesoZooPlankton)   :: cumMEZc
   real(RLEN),dimension(NO_BOXES)  :: ruPIc
   real(RLEN),dimension(NO_BOXES)  :: ruMIZc
   real(RLEN),dimension(NO_BOXES)  :: ruMEZc
@@ -185,44 +185,44 @@
   do i = 1 , ( iiPhytoPlankton)
     if (CalcPhytoPlankton(i)) then
      phytoc=> PhytoPlankton(i,iiC)
-     cumPIc(i,:)  =   p_puPI(zoo,i)* phytoc
+     cumPIc(:,i)  =   p_puPI(zoo,i)* phytoc
 
      !output and input cumPIc input:p_puPI
-     call PhaeocystisCalc(CALC_FOOD_MESOZOO,i,cumPIc(i,:),cumPIc(i,:), &
+     call PhaeocystisCalc(CALC_FOOD_MESOZOO,i,cumPIc(:,i),cumPIc(:,i), &
                                                            p_puPI(zoo,i))
-     cmuc =  cmuc+ cumPIc(i,:)
-     cmuac=  cmuac+ cumPIc(i,:)
-     ceuc =  ceuc+ cumPIc(i,:) *p_peuPI(zoo)
+     cmuc =  cmuc+ cumPIc(:,i)
+     cmuac=  cmuac+ cumPIc(:,i)
+     ceuc =  ceuc+ cumPIc(:,i) *p_peuPI(zoo)
      if ( i==iiP6) then
       !TEP material in colony`
-       cumR3c=  cumPIc(i,:) *R3c/(NZERO+phytoc)
+       cumR3c=  cumPIc(:,i) *R3c/(NZERO+phytoc)
        cmuc  = cmuc+ cumR3c
        cmuac =   cmuac+ cumR3c
        ceuc  =   ceuc+ cumR3c *p_peuR3(zoo)
      endif
    else
-     cumPIc(i,:) = ZERO
+     cumPIc(:,i) = ZERO
    endif
   end do
   do i = 1 , ( iiMicroZooPlankton)
     if (CalcMicroZooPlankton(i).and.p_puMiZ(zoo,i)>ZERO) then
-      cumMIZc(i,:)  =   p_puMIZ(zoo,i)* MicroZooPlankton(i,iiC)
-      cmuc =   cmuc +cumMIZc(i,:)
-      cmuzc=   cmuzc+cumMIZc(i,:)
-      ceuc =   ceuc +cumMIZc(i,:) *p_peuMIZ(zoo)
+      cumMIZc(:,i)  =   p_puMIZ(zoo,i)* MicroZooPlankton(i,iiC)
+      cmuc =   cmuc +cumMIZc(:,i)
+      cmuzc=   cmuzc+cumMIZc(:,i)
+      ceuc =   ceuc +cumMIZc(:,i) *p_peuMIZ(zoo)
     else
-      cumMIZc(i,:) = ZERO
+      cumMIZc(:,i) = ZERO
     endif
   end do
 
   do i = 1 , ( iiMesoZooPlankton)
     if (CalcMesoZooPlankton(i).and.p_puMEZ(zoo,i)>ZERO) then
-      cumMEZc(i,:) =   p_puMEZ(zoo,i)* MesoZooPlankton(i,iiC)
-      cmuc =   cmuc +cumMEZc(i,:)
-      cmuzc=   cmuzc+cumMEZc(i,:)
-      ceuc =   ceuc +cumMEZc(i,:) *p_peuMEZ(zoo)
+      cumMEZc(:,i) =   p_puMEZ(zoo,i)* MesoZooPlankton(i,iiC)
+      cmuc =   cmuc +cumMEZc(:,i)
+      cmuzc=   cmuzc+cumMEZc(:,i)
+      ceuc =   ceuc +cumMEZc(:,i) *p_peuMEZ(zoo)
    else
-      cumMEZc(i,:) = ZERO
+      cumMEZc(:,i) = ZERO
    endif
   end do
 
@@ -266,7 +266,7 @@
   do i = 1 , iiPhytoPlankton
     phytoc=> PhytoPlankton(i,iiC)
     if (CalcPhytoPlankton(i).and.p_puPI(zoo,i) > ZERO ) then
-      ruPIc  =   (put_u +psloppy)* cumPIc(i,:)
+      ruPIc  =   (put_u +psloppy)* cumPIc(:,i)
       !output:  ( =rx_any)  input ruPIc input:p_puPI
       call PhaeocystisCalc(CALC_GRAZING_MESOZOO,i,rx_any,ruPIc,p_puPI(zoo,i))
       rugc  =   rugc+ ruPIc
@@ -307,10 +307,10 @@
       j=ppPhytoPlankton(i,iiS)
       if (j>0) then
          phytonps=> PhytoPlankton(i,iiS)
-         flPIR6s(i,:)  =   flPIR6s(i,:)+ ruPIc* phytonps/(NZERO+phytoc)
+         flPIR6s(:,i)  =   flPIR6s(:,i)+ ruPIc* phytonps/(NZERO+phytoc)
       endif
       if ( i==iiP6) then
-        ru_xfs_c=ruPIc/(NZERO+cumPIc(i,:)) * cumR3c
+        ru_xfs_c=ruPIc/(NZERO+cumPIc(:,i)) * cumR3c
         iout= fixed_quota_flux_vector( check_fixed_quota, iiPel, ppzooc, &
                        ppR3c,ppzooc, ru_xfs_c ,tfluxc)
         rugc  =   rugc+ ru_xfs_c
@@ -331,11 +331,11 @@
 
   do i = 1 , ( iiMicroZooPlankton)
     if (CalcMicroZooPlankton(i).and.p_puMiZ(zoo,i)>ZERO) then
-      ruMIZc  =   put_zu* cumMIZc(i,:)
+      ruMIZc  =   put_zu* cumMIZc(:,i)
       rugc  =   rugc+ ruMIZc
-      ru_xfs_n  =   + ruMIZc* qn_mz(i,:)
+      ru_xfs_n  =   + ruMIZc* qn_mz(:,i)
       rugn  =   rugn+ ru_xfs_n
-      ru_xfs_p  =   + ruMIZc* qp_mz(i,:)
+      ru_xfs_p  =   + ruMIZc* qp_mz(:,i)
       rugp  =   rugp+ ru_xfs_p
       rx_any = ruMIZc*min(p_peuMIZ(zoo),DONE-p_peZ_R1c)
       rea6c  = rea6c +  rx_any
@@ -363,15 +363,15 @@
   rZ2Z3c=ZERO
   do i = 1 , ( iiMesoZooPlankton)
     if (CalcMesoZooPlankton(i).and.p_puMEZ(zoo,i)>ZERO) then
-      ruMEZc  =   put_zu* cumMEZc(i,:)
+      ruMEZc  =   put_zu* cumMEZc(:,i)
       ! intra-group predation is not computed
       if ( zoo.eq.i.and.zoo.eq.iiZ3)  &
             jPelFishInput(1)= jPelFishInput(1) + sum(ruMEZc*Depth)
 
       rugc  =   rugc+ ruMEZc
-      ru_xfs_n  =   + ruMEZc* qnZc(i,:)
+      ru_xfs_n  =   + ruMEZc* qnZc(:,i)
       rugn  =   rugn+ ru_xfs_n
-      ru_xfs_p  =   + ruMEZc* qpZc(i,:)
+      ru_xfs_p  =   + ruMEZc* qpZc(:,i)
       rugp  =   rugp+ ru_xfs_p
       rx_any = ruMEZc*min(p_peuMEZ(zoo),DONE-p_peZ_R1c)
       rea6c  = rea6c +  rx_any
@@ -383,7 +383,7 @@
       rea6p  = rea6p +  rx_any
       rea1p  = rea1p +  ru_xfs_p*p_peuMEZ(zoo)-rx_any
       if ( zoo.eq.iiZ3.and.i.eq.iiZ2 ) rZ2Z3c=ruMEZc-rea1c-rea6c
-      if (i.eq.iiZ2) jmY3c(iiYy3,1)=jmY3c(iiYy3,1)+sum(ruMEZc*Depth)
+      if (i.eq.iiZ2) jmY3c(1,iiYy3)=jmY3c(1,iiYy3)+sum(ruMEZc*Depth)
     else
       ruMEZc=ZERO;ru_xfs_n=ZERO;ru_xfs_p=ZERO;
     endif
@@ -405,8 +405,8 @@
   rrac  =   p_pur(zoo)* rugc
 
   rrsc  =   max(pvum*p_srs(zoo),p_srm(zoo))* et*eo* zooc
-  rrsn  =   rrsc * qnZc(zoo,:)
-  rrsp  =   rrsc * qpZc(zoo,:)
+  rrsn  =   rrsc * qnZc(:,zoo)
+  rrsp  =   rrsc * qpZc(:,zoo)
 
   jrrMec(1)= jrrMec(1)+sum(rrsc*Depth)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -452,18 +452,18 @@
   ! Natural mortality + low oxygen mortality
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rmc  =   (p_sd(zoo)+ p_srs(zoo)*(DONE-eo))* zooc *et
-  rmn  =   (p_sd(zoo)+ p_srs(zoo)*(DONE-eo))* zooc *et * qnZc(zoo,:)
-  rmp  =   (p_sd(zoo)+ p_srs(zoo)*(DONE-eo))* zooc *et*  qpZc(zoo,:)
+  rmn  =   (p_sd(zoo)+ p_srs(zoo)*(DONE-eo))* zooc *et * qnZc(:,zoo)
+  rmp  =   (p_sd(zoo)+ p_srs(zoo)*(DONE-eo))* zooc *et*  qpZc(:,zoo)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Density dependent mortality
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   sm   =   p_smd(zoo)* zooc
   rmdc  =   sm * zooc
-! rmdn  =   rmdc * qnZc(zoo,:)
-! rmdp  =   rmdc * qpZc(zoo,:)
+! rmdn  =   rmdc * qnZc(:,zoo)
+! rmdp  =   rmdc * qpZc(:,zoo)
 
-  if (zoo.eq.iiZ2) jmY3c(iiYy3,1)=jmY3c(iiYy3,1)+sum((rmc+rmdc)*Depth)
+  if (zoo.eq.iiZ2) jmY3c(1,iiYy3)=jmY3c(1,iiYy3)+sum((rmc+rmdc)*Depth)
 
   jPelFishInput(1)= jPelFishInput(1) + sum((rmdc+rmc)*Depth)
 
@@ -499,7 +499,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    rx_any=rq6c
    call TopPredLosses(iiPel,NO_BOXES,sm,0.6D+00, &
-        zooc,zooc*qnZc(zoo,:),zooc*qpZc(zoo,:), &
+        zooc,zooc*qnZc(:,zoo),zooc*qpZc(:,zoo), &
         rrac,flZIR1n,flZIR1c,renp,rq6c,rq6n,rq6p)
    call flux_vector( iiPel, ppRZc,ppRZc, rq6c-rx_any)
 
@@ -548,7 +548,7 @@
     !decreases the filterfeeder larvae will hesitate
     !to go back to benthos in case of presence of much (pelagic) food...
     px_any=DONE/(DONE+p_sum(zoo)/(NZERO+p_vum(zoo) *cmuc))
-    sediMeZ(zoo,:)=sediMeZ(zoo,:)*min(DONE,px_any)
+    sediMeZ(:,zoo)=sediMeZ(:,zoo)*min(DONE,px_any)
   endif
 
   renn=tfluxc*p_qnc(zoo)

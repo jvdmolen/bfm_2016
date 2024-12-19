@@ -166,7 +166,7 @@
 
     case ( NOTRANSPORT )
 
-      rate_EPLi  =   p_ruEPLi(phyto)*( new_EPLi- EPLi(phyto,:))
+      rate_EPLi  =   p_ruEPLi(phyto)*( new_EPLi- EPLi(:,phyto))
       call flux_vector( iiPel, &
         ppPhytoPlankton(phyto,iiL),ppPhytoPlankton(phyto,iiL), rate_EPLi )
 
@@ -175,8 +175,8 @@
 
     case default
 
-      rate_PLi = Source_D3_vector(ppPhytoPlankton(phyto,iiC),0)* EPLi(phyto,:)+ &
-        p_ruEPLi(phyto)*( new_EPLi- EPLi(phyto,:))* phytoc
+      rate_PLi = Source_D3_vector(ppPhytoPlankton(phyto,iiC),0)* EPLi(:,phyto)+ &
+        p_ruEPLi(phyto)*( new_EPLi- EPLi(:,phyto))* phytoc
       call flux_vector( iiPel, &
         ppPhytoPlankton(phyto,iiL),ppPhytoPlankton(phyto,iiL), rate_PLi )
 

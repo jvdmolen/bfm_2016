@@ -512,58 +512,58 @@
     CAc => D3DIAGNOS(:,ppCAc); CAc=ZERO
     DIC => D3DIAGNOS(:,ppDIC); DIC=ZERO
 
-    iNPI => D3DIAGNOS(ppiNPI(iiP1): ppiNPI(iiP6),:)
+    iNPI => D3DIAGNOS(:,ppiNPI(iiP1): ppiNPI(iiP6))
     iNPI=ZERO
-    sugPI => D3DIAGNOS(ppsugPI(iiP1): ppsugPI(iiP6),:)
+    sugPI => D3DIAGNOS(:,ppsugPI(iiP1): ppsugPI(iiP6))
     sugPI=ZERO
-    sunPI => D3DIAGNOS(ppsunPI(iiP1): ppsunPI(iiP6),:)
+    sunPI => D3DIAGNOS(:,ppsunPI(iiP1): ppsunPI(iiP6))
     sunPI=ZERO
-    sdoPI => D3DIAGNOS(ppsdoPI(iiP1): ppsdoPI(iiP6),:)
+    sdoPI => D3DIAGNOS(:,ppsdoPI(iiP1): ppsdoPI(iiP6))
     sdoPI=ZERO
-    qpPc => D3DIAGNOS(ppqpPc(iiP1): ppqpPc(iiP6),:)
+    qpPc => D3DIAGNOS(:,ppqpPc(iiP1): ppqpPc(iiP6))
     qpPc=ZERO
-    qnPc => D3DIAGNOS(ppqnPc(iiP1): ppqnPc(iiP6),:)
+    qnPc => D3DIAGNOS(:,ppqnPc(iiP1): ppqnPc(iiP6))
     qnPc=ZERO
-    qsPc => D3DIAGNOS(ppqsPc(iiP1): ppqsPc(iiP6),:)
+    qsPc => D3DIAGNOS(:,ppqsPc(iiP1): ppqsPc(iiP6))
     qsPc=ZERO
-    qlPc => D3DIAGNOS(ppqlPc(iiP1): ppqlPc(iiP6),:)
+    qlPc => D3DIAGNOS(:,ppqlPc(iiP1): ppqlPc(iiP6))
     qlPc=ZERO
-    qpZc => D3DIAGNOS(ppqpZc(iiZ3): ppqpZc(iiZ2),:)
+    qpZc => D3DIAGNOS(:,ppqpZc(iiZ3): ppqpZc(iiZ2))
     qpZc=ZERO
-    qnZc => D3DIAGNOS(ppqnZc(iiZ3): ppqnZc(iiZ2),:)
+    qnZc => D3DIAGNOS(:,ppqnZc(iiZ3): ppqnZc(iiZ2))
     qnZc=ZERO
-    qp_mz => D3DIAGNOS(ppqp_mz(iiZ5): ppqp_mz(iiZ6),:)
+    qp_mz => D3DIAGNOS(:,ppqp_mz(iiZ5): ppqp_mz(iiZ6))
     qp_mz=ZERO
-    qn_mz => D3DIAGNOS(ppqn_mz(iiZ5): ppqn_mz(iiZ6),:)
+    qn_mz => D3DIAGNOS(:,ppqn_mz(iiZ5): ppqn_mz(iiZ6))
     qn_mz=ZERO
-    flPIR1n => D3DIAGNOS(ppflPIR1n(iiP1): ppflPIR1n(iiP6),:)
+    flPIR1n => D3DIAGNOS(:,ppflPIR1n(iiP1): ppflPIR1n(iiP6))
     flPIR1n=ZERO
-    flPIR1p => D3DIAGNOS(ppflPIR1p(iiP1): ppflPIR1p(iiP6),:)
+    flPIR1p => D3DIAGNOS(:,ppflPIR1p(iiP1): ppflPIR1p(iiP6))
     flPIR1p=ZERO
-    flPIR6n => D3DIAGNOS(ppflPIR6n(iiP1): ppflPIR6n(iiP6),:)
+    flPIR6n => D3DIAGNOS(:,ppflPIR6n(iiP1): ppflPIR6n(iiP6))
     flPIR6n=ZERO
-    flPIR6p => D3DIAGNOS(ppflPIR6p(iiP1): ppflPIR6p(iiP6),:)
+    flPIR6p => D3DIAGNOS(:,ppflPIR6p(iiP1): ppflPIR6p(iiP6))
     flPIR6p=ZERO
-    flPIR6s => D3DIAGNOS(ppflPIR6s(iiP1): ppflPIR6s(iiP6),:)
+    flPIR6s => D3DIAGNOS(:,ppflPIR6s(iiP1): ppflPIR6s(iiP6))
     flPIR6s=ZERO
-    fr_lim_PI_n => D3DIAGNOS(ppfr_lim_PI_n(iiP1): ppfr_lim_PI_n(iiP6),:)
+    fr_lim_PI_n => D3DIAGNOS(:,ppfr_lim_PI_n(iiP1): ppfr_lim_PI_n(iiP6))
     fr_lim_PI_n=ZERO
-    fr_lim_PI_p => D3DIAGNOS(ppfr_lim_PI_p(iiP1): ppfr_lim_PI_p(iiP6),:)
+    fr_lim_PI_p => D3DIAGNOS(:,ppfr_lim_PI_p(iiP1): ppfr_lim_PI_p(iiP6))
     fr_lim_PI_p=ZERO
-    fl_xgrazing_PIc => D3DIAGNOS(ppfl_xgrazing_PIc(iiP1):&
-     & ppfl_xgrazing_PIc(iiP6),:)
+    fl_xgrazing_PIc => D3DIAGNOS(:,ppfl_xgrazing_PIc(iiP1):&
+     & ppfl_xgrazing_PIc(iiP6))
     fl_xgrazing_PIc=ZERO
-    sediPI => D3DIAGNOS(ppsediPI(iiP1): ppsediPI(iiP6),:)
+    sediPI => D3DIAGNOS(:,ppsediPI(iiP1): ppsediPI(iiP6))
     sediPI=ZERO
-    sediMiZ => D3DIAGNOS(ppsediMiZ(iiZ5): ppsediMiZ(iiZ6),:)
+    sediMiZ => D3DIAGNOS(:,ppsediMiZ(iiZ5): ppsediMiZ(iiZ6))
     sediMiZ=ZERO
-    sediMeZ => D3DIAGNOS(ppsediMeZ(iiZ3): ppsediMeZ(iiZ2),:)
+    sediMeZ => D3DIAGNOS(:,ppsediMeZ(iiZ3): ppsediMeZ(iiZ2))
     sediMeZ=ZERO
-    PI_dw => D3DIAGNOS(ppPI_dw(iiP1): ppPI_dw(iiP6),:)
+    PI_dw => D3DIAGNOS(:,ppPI_dw(iiP1): ppPI_dw(iiP6))
     PI_dw=ZERO
-    eiPI => D3DIAGNOS(ppeiPI(iiP1): ppeiPI(iiP6),:)
+    eiPI => D3DIAGNOS(:,ppeiPI(iiP1): ppeiPI(iiP6))
     eiPI=ZERO
-    EPLi => D3DIAGNOS(ppEPLi(iiP1): ppEPLi(iiP6),:)
+    EPLi => D3DIAGNOS(:,ppEPLi(iiP1): ppEPLi(iiP6))
     EPLi=ZERO
 
     PrsM1p => D3DIAGNOS_PRF(:,ppPrsM1p); PrsM1p=ZERO
@@ -944,95 +944,95 @@
     jG33G23h => D2DIAGNOS(:,ppjG33G23h); jG33G23h=ZERO
     jG33G23c => D2DIAGNOS(:,ppjG33G23c); jG33G23c=ZERO
 
-    jbotBPc => D2DIAGNOS(ppjbotBPc(iiBP1): ppjbotBPc(iiBP1),:)
+    jbotBPc => D2DIAGNOS(:,ppjbotBPc(iiBP1): ppjbotBPc(iiBP1))
     jbotBPc=ZERO
-    sunBI => D2DIAGNOS(ppsunBI(iiBP1): ppsunBI(iiBP1),:)
+    sunBI => D2DIAGNOS(:,ppsunBI(iiBP1): ppsunBI(iiBP1))
     sunBI=ZERO
-    sugBI => D2DIAGNOS(ppsugBI(iiBP1): ppsugBI(iiBP1),:)
+    sugBI => D2DIAGNOS(:,ppsugBI(iiBP1): ppsugBI(iiBP1))
     sugBI=ZERO
-    jBTQIc => D2DIAGNOS(ppjBTQIc(iiQ1): ppjBTQIc(iiQ21),:)
+    jBTQIc => D2DIAGNOS(:,ppjBTQIc(iiQ1): ppjBTQIc(iiQ21))
     jBTQIc=ZERO
-    jBTQIn => D2DIAGNOS(ppjBTQIn(iiQ1): ppjBTQIn(iiQ21),:)
+    jBTQIn => D2DIAGNOS(:,ppjBTQIn(iiQ1): ppjBTQIn(iiQ21))
     jBTQIn=ZERO
-    jBTQIp => D2DIAGNOS(ppjBTQIp(iiQ1): ppjBTQIp(iiQ21),:)
+    jBTQIp => D2DIAGNOS(:,ppjBTQIp(iiQ1): ppjBTQIp(iiQ21))
     jBTQIp=ZERO
-    jQIBTc => D2DIAGNOS(ppjQIBTc(iiQ1): ppjQIBTc(iiQ21),:)
+    jQIBTc => D2DIAGNOS(:,ppjQIBTc(iiQ1): ppjQIBTc(iiQ21))
     jQIBTc=ZERO
-    jQIBTn => D2DIAGNOS(ppjQIBTn(iiQ1): ppjQIBTn(iiQ21),:)
+    jQIBTn => D2DIAGNOS(:,ppjQIBTn(iiQ1): ppjQIBTn(iiQ21))
     jQIBTn=ZERO
-    jQIBTp => D2DIAGNOS(ppjQIBTp(iiQ1): ppjQIBTp(iiQ21),:)
+    jQIBTp => D2DIAGNOS(:,ppjQIBTp(iiQ1): ppjQIBTp(iiQ21))
     jQIBTp=ZERO
-    jnetHIc => D2DIAGNOS(ppjnetHIc(iiH1): ppjnetHIc(iiHN),:)
+    jnetHIc => D2DIAGNOS(:,ppjnetHIc(iiH1): ppjnetHIc(iiHN))
     jnetHIc=ZERO
-    jugYIc => D2DIAGNOS(ppjugYIc(iiY1): ppjugYIc(iiY5),:)
+    jugYIc => D2DIAGNOS(:,ppjugYIc(iiY1): ppjugYIc(iiY5))
     jugYIc=ZERO
-    jnetYIc => D2DIAGNOS(ppjnetYIc(iiY1): ppjnetYIc(iiY5),:)
+    jnetYIc => D2DIAGNOS(:,ppjnetYIc(iiY1): ppjnetYIc(iiY5))
     jnetYIc=ZERO
-    jmYIc => D2DIAGNOS(ppjmYIc(iiY1): ppjmYIc(iiY5),:)
+    jmYIc => D2DIAGNOS(:,ppjmYIc(iiY1): ppjmYIc(iiY5))
     jmYIc=ZERO
-    jmY3c => D2DIAGNOS(ppjmY3c(iiYy3): ppjmY3c(iiY3),:)
+    jmY3c => D2DIAGNOS(:,ppjmY3c(iiYy3): ppjmY3c(iiY3))
     jmY3c=ZERO
-    jrrY3c => D2DIAGNOS(ppjrrY3c(iiYy3): ppjrrY3c(iiY3),:)
+    jrrY3c => D2DIAGNOS(:,ppjrrY3c(iiYy3): ppjrrY3c(iiY3))
     jrrY3c=ZERO
-    jrrYIc => D2DIAGNOS(ppjrrYIc(iiY1): ppjrrYIc(iiY5),:)
+    jrrYIc => D2DIAGNOS(:,ppjrrYIc(iiY1): ppjrrYIc(iiY5))
     jrrYIc=ZERO
-    rugY3c => D2DIAGNOS(pprugY3c(iiYy3): pprugY3c(iiY3),:)
+    rugY3c => D2DIAGNOS(:,pprugY3c(iiYy3): pprugY3c(iiY3))
     rugY3c=ZERO
-    efsatY3 => D2DIAGNOS(ppefsatY3(iiYy3): ppefsatY3(iiY3),:)
+    efsatY3 => D2DIAGNOS(:,ppefsatY3(iiYy3): ppefsatY3(iiY3))
     efsatY3=ZERO
-    fr_lim_HI_n => D2DIAGNOS(ppfr_lim_HI_n(iiH1): ppfr_lim_HI_n(iiHN),:)
+    fr_lim_HI_n => D2DIAGNOS(:,ppfr_lim_HI_n(iiH1): ppfr_lim_HI_n(iiHN))
     fr_lim_HI_n=ZERO
-    fr_lim_HI_p => D2DIAGNOS(ppfr_lim_HI_p(iiH1): ppfr_lim_HI_p(iiHN),:)
+    fr_lim_HI_p => D2DIAGNOS(:,ppfr_lim_HI_p(iiH1): ppfr_lim_HI_p(iiHN))
     fr_lim_HI_p=ZERO
-    fr_lim_HI_o => D2DIAGNOS(ppfr_lim_HI_o(iiH1): ppfr_lim_HI_o(iiHN),:)
+    fr_lim_HI_o => D2DIAGNOS(:,ppfr_lim_HI_o(iiH1): ppfr_lim_HI_o(iiHN))
     fr_lim_HI_o=ZERO
-    fr_lim_BPI_n => D2DIAGNOS(ppfr_lim_BPI_n(iiBP1):&
-     & ppfr_lim_BPI_n(iiBP1),:)
+    fr_lim_BPI_n => D2DIAGNOS(:,ppfr_lim_BPI_n(iiBP1):&
+     & ppfr_lim_BPI_n(iiBP1))
     fr_lim_BPI_n=ZERO
-    fr_lim_BPI_p => D2DIAGNOS(ppfr_lim_BPI_p(iiBP1):&
-     & ppfr_lim_BPI_p(iiBP1),:)
+    fr_lim_BPI_p => D2DIAGNOS(:,ppfr_lim_BPI_p(iiBP1):&
+     & ppfr_lim_BPI_p(iiBP1))
     fr_lim_BPI_p=ZERO
-    ZI_Fc => D2DIAGNOS(ppZI_Fc(iiZ5): ppZI_Fc(iiZ6),:)
+    ZI_Fc => D2DIAGNOS(:,ppZI_Fc(iiZ5): ppZI_Fc(iiZ6))
     ZI_Fc=ZERO
-    ZI_Fn => D2DIAGNOS(ppZI_Fn(iiZ5): ppZI_Fn(iiZ6),:)
+    ZI_Fn => D2DIAGNOS(:,ppZI_Fn(iiZ5): ppZI_Fn(iiZ6))
     ZI_Fn=ZERO
-    ZI_Fp => D2DIAGNOS(ppZI_Fp(iiZ5): ppZI_Fp(iiZ6),:)
+    ZI_Fp => D2DIAGNOS(:,ppZI_Fp(iiZ5): ppZI_Fp(iiZ6))
     ZI_Fp=ZERO
-    jPIY3c => D2DIAGNOS(ppjPIY3c(iiP1): ppjPIY3c(iiP6),:)
+    jPIY3c => D2DIAGNOS(:,ppjPIY3c(iiP1): ppjPIY3c(iiP6))
     jPIY3c=ZERO
-    jP6Y3c => D2DIAGNOS(ppjP6Y3c(iiYy3): ppjP6Y3c(iiY3),:)
+    jP6Y3c => D2DIAGNOS(:,ppjP6Y3c(iiYy3): ppjP6Y3c(iiY3))
     jP6Y3c=ZERO
-    jZEY3c => D2DIAGNOS(ppjZEY3c(iiZ3): ppjZEY3c(iiZ2),:)
+    jZEY3c => D2DIAGNOS(:,ppjZEY3c(iiZ3): ppjZEY3c(iiZ2))
     jZEY3c=ZERO
-    jPIQ6s => D2DIAGNOS(ppjPIQ6s(iiBP1): ppjPIQ6s(iiBP1),:)
+    jPIQ6s => D2DIAGNOS(:,ppjPIQ6s(iiBP1): ppjPIQ6s(iiBP1))
     jPIQ6s=ZERO
-    PI_Benc => D2DIAGNOS(ppPI_Benc(iiP1): ppPI_Benc(iiP6),:)
+    PI_Benc => D2DIAGNOS(:,ppPI_Benc(iiP1): ppPI_Benc(iiP6))
     PI_Benc=ZERO
-    PI_Benn => D2DIAGNOS(ppPI_Benn(iiP1): ppPI_Benn(iiP6),:)
+    PI_Benn => D2DIAGNOS(:,ppPI_Benn(iiP1): ppPI_Benn(iiP6))
     PI_Benn=ZERO
-    PI_Benp => D2DIAGNOS(ppPI_Benp(iiP1): ppPI_Benp(iiP6),:)
+    PI_Benp => D2DIAGNOS(:,ppPI_Benp(iiP1): ppPI_Benp(iiP6))
     PI_Benp=ZERO
-    PI_Benl => D2DIAGNOS(ppPI_Benl(iiP1): ppPI_Benl(iiP6),:)
+    PI_Benl => D2DIAGNOS(:,ppPI_Benl(iiP1): ppPI_Benl(iiP6))
     PI_Benl=ZERO
-    PI_Bens => D2DIAGNOS(ppPI_Bens(iiP1): ppPI_Bens(iiP6),:)
+    PI_Bens => D2DIAGNOS(:,ppPI_Bens(iiP1): ppPI_Bens(iiP6))
     PI_Bens=ZERO
-    ZE_Benc => D2DIAGNOS(ppZE_Benc(iiZ3): ppZE_Benc(iiZ2),:)
+    ZE_Benc => D2DIAGNOS(:,ppZE_Benc(iiZ3): ppZE_Benc(iiZ2))
     ZE_Benc=ZERO
-    ZE_Benn => D2DIAGNOS(ppZE_Benn(iiZ3): ppZE_Benn(iiZ2),:)
+    ZE_Benn => D2DIAGNOS(:,ppZE_Benn(iiZ3): ppZE_Benn(iiZ2))
     ZE_Benn=ZERO
-    ZE_Benp => D2DIAGNOS(ppZE_Benp(iiZ3): ppZE_Benp(iiZ2),:)
+    ZE_Benp => D2DIAGNOS(:,ppZE_Benp(iiZ3): ppZE_Benp(iiZ2))
     ZE_Benp=ZERO
-    puPIY3 => D2DIAGNOS(pppuPIY3(iiP1): pppuPIY3(iiP6),:)
+    puPIY3 => D2DIAGNOS(:,pppuPIY3(iiP1): pppuPIY3(iiP6))
     puPIY3=ZERO
-    puZEY3 => D2DIAGNOS(pppuZEY3(iiZ3): pppuZEY3(iiZ2),:)
+    puZEY3 => D2DIAGNOS(:,pppuZEY3(iiZ3): pppuZEY3(iiZ2))
     puZEY3=ZERO
-    puP6Y3 => D2DIAGNOS(pppuP6Y3(iiYy3): pppuP6Y3(iiY3),:)
+    puP6Y3 => D2DIAGNOS(:,pppuP6Y3(iiYy3): pppuP6Y3(iiY3))
     puP6Y3=ZERO
-    sediPI_Ben => D2DIAGNOS(ppsediPI_Ben(iiP1): ppsediPI_Ben(iiP6),:)
+    sediPI_Ben => D2DIAGNOS(:,ppsediPI_Ben(iiP1): ppsediPI_Ben(iiP6))
     sediPI_Ben=ZERO
-    sediZE_Ben => D2DIAGNOS(ppsediZE_Ben(iiZ3): ppsediZE_Ben(iiZ2),:)
+    sediZE_Ben => D2DIAGNOS(:,ppsediZE_Ben(iiZ3): ppsediZE_Ben(iiZ2))
     sediZE_Ben=ZERO
-    jnetPIc => D2DIAGNOS(ppjnetPIc(iiP1): ppjnetPIc(iiP6),:)
+    jnetPIc => D2DIAGNOS(:,ppjnetPIc(iiP1): ppjnetPIc(iiP6))
     jnetPIc=ZERO
 
 
@@ -1040,121 +1040,121 @@
   ! 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    PELSURFACE => D2DIAGNOS(357+1:357+56,:); PELSURFACE=ZERO
-    jsurR9x => D2DIAGNOS(357+ppR9x,:); jsurR9x=ZERO
-    jsurO2o => D2DIAGNOS(357+ppO2o,:); jsurO2o=ZERO
-    jsurN1p => D2DIAGNOS(357+ppN1p,:); jsurN1p=ZERO
-    jsurN3n => D2DIAGNOS(357+ppN3n,:); jsurN3n=ZERO
-    jsurN4n => D2DIAGNOS(357+ppN4n,:); jsurN4n=ZERO
-    jsurN5s => D2DIAGNOS(357+ppN5s,:); jsurN5s=ZERO
-    jsurN6r => D2DIAGNOS(357+ppN6r,:); jsurN6r=ZERO
-    jsurB1c => D2DIAGNOS(357+ppB1c,:); jsurB1c=ZERO
-    jsurB1n => D2DIAGNOS(357+ppB1n,:); jsurB1n=ZERO
-    jsurB1p => D2DIAGNOS(357+ppB1p,:); jsurB1p=ZERO
-    jsurBac => D2DIAGNOS(357+ppBac,:); jsurBac=ZERO
-    jsurP1c => D2DIAGNOS(357+ppP1c,:); jsurP1c=ZERO
-    jsurP1n => D2DIAGNOS(357+ppP1n,:); jsurP1n=ZERO
-    jsurP1p => D2DIAGNOS(357+ppP1p,:); jsurP1p=ZERO
-    jsurP1l => D2DIAGNOS(357+ppP1l,:); jsurP1l=ZERO
-    jsurP1s => D2DIAGNOS(357+ppP1s,:); jsurP1s=ZERO
-    jsurP2c => D2DIAGNOS(357+ppP2c,:); jsurP2c=ZERO
-    jsurP2n => D2DIAGNOS(357+ppP2n,:); jsurP2n=ZERO
-    jsurP2p => D2DIAGNOS(357+ppP2p,:); jsurP2p=ZERO
-    jsurP2l => D2DIAGNOS(357+ppP2l,:); jsurP2l=ZERO
-    jsurP3c => D2DIAGNOS(357+ppP3c,:); jsurP3c=ZERO
-    jsurP3n => D2DIAGNOS(357+ppP3n,:); jsurP3n=ZERO
-    jsurP3p => D2DIAGNOS(357+ppP3p,:); jsurP3p=ZERO
-    jsurP3l => D2DIAGNOS(357+ppP3l,:); jsurP3l=ZERO
-    jsurP4c => D2DIAGNOS(357+ppP4c,:); jsurP4c=ZERO
-    jsurP4n => D2DIAGNOS(357+ppP4n,:); jsurP4n=ZERO
-    jsurP4p => D2DIAGNOS(357+ppP4p,:); jsurP4p=ZERO
-    jsurP4l => D2DIAGNOS(357+ppP4l,:); jsurP4l=ZERO
-    jsurP5c => D2DIAGNOS(357+ppP5c,:); jsurP5c=ZERO
-    jsurP5n => D2DIAGNOS(357+ppP5n,:); jsurP5n=ZERO
-    jsurP5p => D2DIAGNOS(357+ppP5p,:); jsurP5p=ZERO
-    jsurP5l => D2DIAGNOS(357+ppP5l,:); jsurP5l=ZERO
-    jsurP5s => D2DIAGNOS(357+ppP5s,:); jsurP5s=ZERO
-    jsurP6c => D2DIAGNOS(357+ppP6c,:); jsurP6c=ZERO
-    jsurP6n => D2DIAGNOS(357+ppP6n,:); jsurP6n=ZERO
-    jsurP6p => D2DIAGNOS(357+ppP6p,:); jsurP6p=ZERO
-    jsurP6l => D2DIAGNOS(357+ppP6l,:); jsurP6l=ZERO
-    jsurPcc => D2DIAGNOS(357+ppPcc,:); jsurPcc=ZERO
-    jsurR1c => D2DIAGNOS(357+ppR1c,:); jsurR1c=ZERO
-    jsurR1n => D2DIAGNOS(357+ppR1n,:); jsurR1n=ZERO
-    jsurR1p => D2DIAGNOS(357+ppR1p,:); jsurR1p=ZERO
-    jsurR2c => D2DIAGNOS(357+ppR2c,:); jsurR2c=ZERO
-    jsurR2n => D2DIAGNOS(357+ppR2n,:); jsurR2n=ZERO
-    jsurR3c => D2DIAGNOS(357+ppR3c,:); jsurR3c=ZERO
-    jsurR6c => D2DIAGNOS(357+ppR6c,:); jsurR6c=ZERO
-    jsurR6n => D2DIAGNOS(357+ppR6n,:); jsurR6n=ZERO
-    jsurR6p => D2DIAGNOS(357+ppR6p,:); jsurR6p=ZERO
-    jsurR6s => D2DIAGNOS(357+ppR6s,:); jsurR6s=ZERO
-    jsurRZc => D2DIAGNOS(357+ppRZc,:); jsurRZc=ZERO
-    jsurO3c => D2DIAGNOS(357+ppO3c,:); jsurO3c=ZERO
-    jsurO3h => D2DIAGNOS(357+ppO3h,:); jsurO3h=ZERO
-    jsurZ3c => D2DIAGNOS(357+ppZ3c,:); jsurZ3c=ZERO
-    jsurZ4c => D2DIAGNOS(357+ppZ4c,:); jsurZ4c=ZERO
-    jsurZ2c => D2DIAGNOS(357+ppZ2c,:); jsurZ2c=ZERO
-    jsurZ5c => D2DIAGNOS(357+ppZ5c,:); jsurZ5c=ZERO
-    jsurZ6c => D2DIAGNOS(357+ppZ6c,:); jsurZ6c=ZERO
+    PELSURFACE => D2DIAGNOS(:,357+1:357+56); PELSURFACE=ZERO
+    jsurR9x => D2DIAGNOS(:,357+ppR9x); jsurR9x=ZERO
+    jsurO2o => D2DIAGNOS(:,357+ppO2o); jsurO2o=ZERO
+    jsurN1p => D2DIAGNOS(:,357+ppN1p); jsurN1p=ZERO
+    jsurN3n => D2DIAGNOS(:,357+ppN3n); jsurN3n=ZERO
+    jsurN4n => D2DIAGNOS(:,357+ppN4n); jsurN4n=ZERO
+    jsurN5s => D2DIAGNOS(:,357+ppN5s); jsurN5s=ZERO
+    jsurN6r => D2DIAGNOS(:,357+ppN6r); jsurN6r=ZERO
+    jsurB1c => D2DIAGNOS(:,357+ppB1c); jsurB1c=ZERO
+    jsurB1n => D2DIAGNOS(:,357+ppB1n); jsurB1n=ZERO
+    jsurB1p => D2DIAGNOS(:,357+ppB1p); jsurB1p=ZERO
+    jsurBac => D2DIAGNOS(:,357+ppBac); jsurBac=ZERO
+    jsurP1c => D2DIAGNOS(:,357+ppP1c); jsurP1c=ZERO
+    jsurP1n => D2DIAGNOS(:,357+ppP1n); jsurP1n=ZERO
+    jsurP1p => D2DIAGNOS(:,357+ppP1p); jsurP1p=ZERO
+    jsurP1l => D2DIAGNOS(:,357+ppP1l); jsurP1l=ZERO
+    jsurP1s => D2DIAGNOS(:,357+ppP1s); jsurP1s=ZERO
+    jsurP2c => D2DIAGNOS(:,357+ppP2c); jsurP2c=ZERO
+    jsurP2n => D2DIAGNOS(:,357+ppP2n); jsurP2n=ZERO
+    jsurP2p => D2DIAGNOS(:,357+ppP2p); jsurP2p=ZERO
+    jsurP2l => D2DIAGNOS(:,357+ppP2l); jsurP2l=ZERO
+    jsurP3c => D2DIAGNOS(:,357+ppP3c); jsurP3c=ZERO
+    jsurP3n => D2DIAGNOS(:,357+ppP3n); jsurP3n=ZERO
+    jsurP3p => D2DIAGNOS(:,357+ppP3p); jsurP3p=ZERO
+    jsurP3l => D2DIAGNOS(:,357+ppP3l); jsurP3l=ZERO
+    jsurP4c => D2DIAGNOS(:,357+ppP4c); jsurP4c=ZERO
+    jsurP4n => D2DIAGNOS(:,357+ppP4n); jsurP4n=ZERO
+    jsurP4p => D2DIAGNOS(:,357+ppP4p); jsurP4p=ZERO
+    jsurP4l => D2DIAGNOS(:,357+ppP4l); jsurP4l=ZERO
+    jsurP5c => D2DIAGNOS(:,357+ppP5c); jsurP5c=ZERO
+    jsurP5n => D2DIAGNOS(:,357+ppP5n); jsurP5n=ZERO
+    jsurP5p => D2DIAGNOS(:,357+ppP5p); jsurP5p=ZERO
+    jsurP5l => D2DIAGNOS(:,357+ppP5l); jsurP5l=ZERO
+    jsurP5s => D2DIAGNOS(:,357+ppP5s); jsurP5s=ZERO
+    jsurP6c => D2DIAGNOS(:,357+ppP6c); jsurP6c=ZERO
+    jsurP6n => D2DIAGNOS(:,357+ppP6n); jsurP6n=ZERO
+    jsurP6p => D2DIAGNOS(:,357+ppP6p); jsurP6p=ZERO
+    jsurP6l => D2DIAGNOS(:,357+ppP6l); jsurP6l=ZERO
+    jsurPcc => D2DIAGNOS(:,357+ppPcc); jsurPcc=ZERO
+    jsurR1c => D2DIAGNOS(:,357+ppR1c); jsurR1c=ZERO
+    jsurR1n => D2DIAGNOS(:,357+ppR1n); jsurR1n=ZERO
+    jsurR1p => D2DIAGNOS(:,357+ppR1p); jsurR1p=ZERO
+    jsurR2c => D2DIAGNOS(:,357+ppR2c); jsurR2c=ZERO
+    jsurR2n => D2DIAGNOS(:,357+ppR2n); jsurR2n=ZERO
+    jsurR3c => D2DIAGNOS(:,357+ppR3c); jsurR3c=ZERO
+    jsurR6c => D2DIAGNOS(:,357+ppR6c); jsurR6c=ZERO
+    jsurR6n => D2DIAGNOS(:,357+ppR6n); jsurR6n=ZERO
+    jsurR6p => D2DIAGNOS(:,357+ppR6p); jsurR6p=ZERO
+    jsurR6s => D2DIAGNOS(:,357+ppR6s); jsurR6s=ZERO
+    jsurRZc => D2DIAGNOS(:,357+ppRZc); jsurRZc=ZERO
+    jsurO3c => D2DIAGNOS(:,357+ppO3c); jsurO3c=ZERO
+    jsurO3h => D2DIAGNOS(:,357+ppO3h); jsurO3h=ZERO
+    jsurZ3c => D2DIAGNOS(:,357+ppZ3c); jsurZ3c=ZERO
+    jsurZ4c => D2DIAGNOS(:,357+ppZ4c); jsurZ4c=ZERO
+    jsurZ2c => D2DIAGNOS(:,357+ppZ2c); jsurZ2c=ZERO
+    jsurZ5c => D2DIAGNOS(:,357+ppZ5c); jsurZ5c=ZERO
+    jsurZ6c => D2DIAGNOS(:,357+ppZ6c); jsurZ6c=ZERO
 
-    PELBOTTOM => D2DIAGNOS(413+1:413+56,:); PELBOTTOM=ZERO
-    jbotR9x => D2DIAGNOS(413+ppR9x,:); jbotR9x=ZERO
-    jbotO2o => D2DIAGNOS(413+ppO2o,:); jbotO2o=ZERO
-    jbotN1p => D2DIAGNOS(413+ppN1p,:); jbotN1p=ZERO
-    jbotN3n => D2DIAGNOS(413+ppN3n,:); jbotN3n=ZERO
-    jbotN4n => D2DIAGNOS(413+ppN4n,:); jbotN4n=ZERO
-    jbotN5s => D2DIAGNOS(413+ppN5s,:); jbotN5s=ZERO
-    jbotN6r => D2DIAGNOS(413+ppN6r,:); jbotN6r=ZERO
-    jbotB1c => D2DIAGNOS(413+ppB1c,:); jbotB1c=ZERO
-    jbotB1n => D2DIAGNOS(413+ppB1n,:); jbotB1n=ZERO
-    jbotB1p => D2DIAGNOS(413+ppB1p,:); jbotB1p=ZERO
-    jbotBac => D2DIAGNOS(413+ppBac,:); jbotBac=ZERO
-    jbotP1c => D2DIAGNOS(413+ppP1c,:); jbotP1c=ZERO
-    jbotP1n => D2DIAGNOS(413+ppP1n,:); jbotP1n=ZERO
-    jbotP1p => D2DIAGNOS(413+ppP1p,:); jbotP1p=ZERO
-    jbotP1l => D2DIAGNOS(413+ppP1l,:); jbotP1l=ZERO
-    jbotP1s => D2DIAGNOS(413+ppP1s,:); jbotP1s=ZERO
-    jbotP2c => D2DIAGNOS(413+ppP2c,:); jbotP2c=ZERO
-    jbotP2n => D2DIAGNOS(413+ppP2n,:); jbotP2n=ZERO
-    jbotP2p => D2DIAGNOS(413+ppP2p,:); jbotP2p=ZERO
-    jbotP2l => D2DIAGNOS(413+ppP2l,:); jbotP2l=ZERO
-    jbotP3c => D2DIAGNOS(413+ppP3c,:); jbotP3c=ZERO
-    jbotP3n => D2DIAGNOS(413+ppP3n,:); jbotP3n=ZERO
-    jbotP3p => D2DIAGNOS(413+ppP3p,:); jbotP3p=ZERO
-    jbotP3l => D2DIAGNOS(413+ppP3l,:); jbotP3l=ZERO
-    jbotP4c => D2DIAGNOS(413+ppP4c,:); jbotP4c=ZERO
-    jbotP4n => D2DIAGNOS(413+ppP4n,:); jbotP4n=ZERO
-    jbotP4p => D2DIAGNOS(413+ppP4p,:); jbotP4p=ZERO
-    jbotP4l => D2DIAGNOS(413+ppP4l,:); jbotP4l=ZERO
-    jbotP5c => D2DIAGNOS(413+ppP5c,:); jbotP5c=ZERO
-    jbotP5n => D2DIAGNOS(413+ppP5n,:); jbotP5n=ZERO
-    jbotP5p => D2DIAGNOS(413+ppP5p,:); jbotP5p=ZERO
-    jbotP5l => D2DIAGNOS(413+ppP5l,:); jbotP5l=ZERO
-    jbotP5s => D2DIAGNOS(413+ppP5s,:); jbotP5s=ZERO
-    jbotP6c => D2DIAGNOS(413+ppP6c,:); jbotP6c=ZERO
-    jbotP6n => D2DIAGNOS(413+ppP6n,:); jbotP6n=ZERO
-    jbotP6p => D2DIAGNOS(413+ppP6p,:); jbotP6p=ZERO
-    jbotP6l => D2DIAGNOS(413+ppP6l,:); jbotP6l=ZERO
-    jbotPcc => D2DIAGNOS(413+ppPcc,:); jbotPcc=ZERO
-    jbotR1c => D2DIAGNOS(413+ppR1c,:); jbotR1c=ZERO
-    jbotR1n => D2DIAGNOS(413+ppR1n,:); jbotR1n=ZERO
-    jbotR1p => D2DIAGNOS(413+ppR1p,:); jbotR1p=ZERO
-    jbotR2c => D2DIAGNOS(413+ppR2c,:); jbotR2c=ZERO
-    jbotR2n => D2DIAGNOS(413+ppR2n,:); jbotR2n=ZERO
-    jbotR3c => D2DIAGNOS(413+ppR3c,:); jbotR3c=ZERO
-    jbotR6c => D2DIAGNOS(413+ppR6c,:); jbotR6c=ZERO
-    jbotR6n => D2DIAGNOS(413+ppR6n,:); jbotR6n=ZERO
-    jbotR6p => D2DIAGNOS(413+ppR6p,:); jbotR6p=ZERO
-    jbotR6s => D2DIAGNOS(413+ppR6s,:); jbotR6s=ZERO
-    jbotRZc => D2DIAGNOS(413+ppRZc,:); jbotRZc=ZERO
-    jbotO3c => D2DIAGNOS(413+ppO3c,:); jbotO3c=ZERO
-    jbotO3h => D2DIAGNOS(413+ppO3h,:); jbotO3h=ZERO
-    jbotZ3c => D2DIAGNOS(413+ppZ3c,:); jbotZ3c=ZERO
-    jbotZ4c => D2DIAGNOS(413+ppZ4c,:); jbotZ4c=ZERO
-    jbotZ2c => D2DIAGNOS(413+ppZ2c,:); jbotZ2c=ZERO
-    jbotZ5c => D2DIAGNOS(413+ppZ5c,:); jbotZ5c=ZERO
-    jbotZ6c => D2DIAGNOS(413+ppZ6c,:); jbotZ6c=ZERO
+    PELBOTTOM => D2DIAGNOS(:,413+1:413+56); PELBOTTOM=ZERO
+    jbotR9x => D2DIAGNOS(:,413+ppR9x); jbotR9x=ZERO
+    jbotO2o => D2DIAGNOS(:,413+ppO2o); jbotO2o=ZERO
+    jbotN1p => D2DIAGNOS(:,413+ppN1p); jbotN1p=ZERO
+    jbotN3n => D2DIAGNOS(:,413+ppN3n); jbotN3n=ZERO
+    jbotN4n => D2DIAGNOS(:,413+ppN4n); jbotN4n=ZERO
+    jbotN5s => D2DIAGNOS(:,413+ppN5s); jbotN5s=ZERO
+    jbotN6r => D2DIAGNOS(:,413+ppN6r); jbotN6r=ZERO
+    jbotB1c => D2DIAGNOS(:,413+ppB1c); jbotB1c=ZERO
+    jbotB1n => D2DIAGNOS(:,413+ppB1n); jbotB1n=ZERO
+    jbotB1p => D2DIAGNOS(:,413+ppB1p); jbotB1p=ZERO
+    jbotBac => D2DIAGNOS(:,413+ppBac); jbotBac=ZERO
+    jbotP1c => D2DIAGNOS(:,413+ppP1c); jbotP1c=ZERO
+    jbotP1n => D2DIAGNOS(:,413+ppP1n); jbotP1n=ZERO
+    jbotP1p => D2DIAGNOS(:,413+ppP1p); jbotP1p=ZERO
+    jbotP1l => D2DIAGNOS(:,413+ppP1l); jbotP1l=ZERO
+    jbotP1s => D2DIAGNOS(:,413+ppP1s); jbotP1s=ZERO
+    jbotP2c => D2DIAGNOS(:,413+ppP2c); jbotP2c=ZERO
+    jbotP2n => D2DIAGNOS(:,413+ppP2n); jbotP2n=ZERO
+    jbotP2p => D2DIAGNOS(:,413+ppP2p); jbotP2p=ZERO
+    jbotP2l => D2DIAGNOS(:,413+ppP2l); jbotP2l=ZERO
+    jbotP3c => D2DIAGNOS(:,413+ppP3c); jbotP3c=ZERO
+    jbotP3n => D2DIAGNOS(:,413+ppP3n); jbotP3n=ZERO
+    jbotP3p => D2DIAGNOS(:,413+ppP3p); jbotP3p=ZERO
+    jbotP3l => D2DIAGNOS(:,413+ppP3l); jbotP3l=ZERO
+    jbotP4c => D2DIAGNOS(:,413+ppP4c); jbotP4c=ZERO
+    jbotP4n => D2DIAGNOS(:,413+ppP4n); jbotP4n=ZERO
+    jbotP4p => D2DIAGNOS(:,413+ppP4p); jbotP4p=ZERO
+    jbotP4l => D2DIAGNOS(:,413+ppP4l); jbotP4l=ZERO
+    jbotP5c => D2DIAGNOS(:,413+ppP5c); jbotP5c=ZERO
+    jbotP5n => D2DIAGNOS(:,413+ppP5n); jbotP5n=ZERO
+    jbotP5p => D2DIAGNOS(:,413+ppP5p); jbotP5p=ZERO
+    jbotP5l => D2DIAGNOS(:,413+ppP5l); jbotP5l=ZERO
+    jbotP5s => D2DIAGNOS(:,413+ppP5s); jbotP5s=ZERO
+    jbotP6c => D2DIAGNOS(:,413+ppP6c); jbotP6c=ZERO
+    jbotP6n => D2DIAGNOS(:,413+ppP6n); jbotP6n=ZERO
+    jbotP6p => D2DIAGNOS(:,413+ppP6p); jbotP6p=ZERO
+    jbotP6l => D2DIAGNOS(:,413+ppP6l); jbotP6l=ZERO
+    jbotPcc => D2DIAGNOS(:,413+ppPcc); jbotPcc=ZERO
+    jbotR1c => D2DIAGNOS(:,413+ppR1c); jbotR1c=ZERO
+    jbotR1n => D2DIAGNOS(:,413+ppR1n); jbotR1n=ZERO
+    jbotR1p => D2DIAGNOS(:,413+ppR1p); jbotR1p=ZERO
+    jbotR2c => D2DIAGNOS(:,413+ppR2c); jbotR2c=ZERO
+    jbotR2n => D2DIAGNOS(:,413+ppR2n); jbotR2n=ZERO
+    jbotR3c => D2DIAGNOS(:,413+ppR3c); jbotR3c=ZERO
+    jbotR6c => D2DIAGNOS(:,413+ppR6c); jbotR6c=ZERO
+    jbotR6n => D2DIAGNOS(:,413+ppR6n); jbotR6n=ZERO
+    jbotR6p => D2DIAGNOS(:,413+ppR6p); jbotR6p=ZERO
+    jbotR6s => D2DIAGNOS(:,413+ppR6s); jbotR6s=ZERO
+    jbotRZc => D2DIAGNOS(:,413+ppRZc); jbotRZc=ZERO
+    jbotO3c => D2DIAGNOS(:,413+ppO3c); jbotO3c=ZERO
+    jbotO3h => D2DIAGNOS(:,413+ppO3h); jbotO3h=ZERO
+    jbotZ3c => D2DIAGNOS(:,413+ppZ3c); jbotZ3c=ZERO
+    jbotZ4c => D2DIAGNOS(:,413+ppZ4c); jbotZ4c=ZERO
+    jbotZ2c => D2DIAGNOS(:,413+ppZ2c); jbotZ2c=ZERO
+    jbotZ5c => D2DIAGNOS(:,413+ppZ5c); jbotZ5c=ZERO
+    jbotZ6c => D2DIAGNOS(:,413+ppZ6c); jbotZ6c=ZERO
 
 !    3d-state-field-alloc-pointer river
     allocate(iiPELSINKREF(1:NO_D3_BOX_STATES ),stat=status)

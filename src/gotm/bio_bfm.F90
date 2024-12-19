@@ -302,7 +302,7 @@ IMPLICIT NONE
 !BOC
 
 !   LEVEL2 'calculating environmental forcings for the BFM'
-
+!LEVEL2 'set_env_bio_bfm, rho',rho
    !---------------------------------------------
    ! Assign depths of layers
    ! temperature and salinity
@@ -335,7 +335,8 @@ IMPLICIT NONE
    ESS(:)=R9x(:)
    nuh_l=nuh
    h_l=h
-
+!LEVEL2 'set_env_bio_bfm, ERHO',ERHO
+!stop
    !---------------------------------------------
    ! Compute extinction coefficient
    !---------------------------------------------
@@ -411,6 +412,7 @@ IMPLICIT NONE
                   ppPhytoPlankton,iiPhytoPlankton, &
                   PELBOTTOM, PELSURFACE, &
                   jK3G4n,jK23K13n,jK34K24n,flN3O4n,jK23G4n
+use mem, only: ERHO
 !JM #IFDEF INCLUDE_MACROPHYT
 !JM #ENDIF
 !JM #IFDEF INCLUDE_DAAN
@@ -451,6 +453,8 @@ LEVEL1 'do_bio_bfm'
 !JM #ENDIF
    call SiltDynamics
 LEVEL1 'ecologydynamics'
+!LEVEL1 'ERHO',ERHO
+!stop
    call EcologyDynamics
 LEVEL1 'benthicsilt'
 !stop
@@ -552,7 +556,7 @@ LEVEL1 'surface fluxes',bio_setup
         if ( k > 0 ) bfl(k) = PELBOTTOM(k,1)*topm3psec
       enddo
    endif
-!LEVEL1 'end do_bio_bfm'
+LEVEL1 'end do_bio_bfm'
 !stop
    end subroutine do_bio_bfm
 !EOC

@@ -149,7 +149,7 @@
                    cx_R2producers_c+lcl_PhytoPlankton(BoxNumber)
       enddo
       do i= 1,iiPhytoPlankton
-        sedi = sediPI(i,BoxNumber)
+        sedi = sediPI(BoxNumber,i)
         ! In this do-loop only the phytplankton types are checked on sedimentation
         ! which are not coupled to a benthic phytoplankton.
         if ( CoupledtoBDc(i)==0 .and. sedi> ZERO.and.   &
@@ -217,7 +217,7 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
       do i= 1,iiPhytoPlankton
-        sedi= sediPI(i,BoxNumber)
+        sedi= sediPI(BoxNumber,i)
         k= CoupledtoBDc(i)
         if ( k.ne.0 .and. sedi.gt.ZERO.and. CalcPhytoPlankton(i) ) then
         ! always settling pelagic phytoplankton is coupled to a BenPhyto type.

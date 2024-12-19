@@ -577,7 +577,7 @@
   ! Potential-Net prim prod. (mgC /m3/dd0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   run_xbc_c  =   max(  NZERO, ( sumc- slc)* phytoc)  ! net production
-  sugBI(bp,:)  =   run_xbc_c/( NZERO+ phytoc)
+  sugBI(:,bp)  =   run_xbc_c/( NZERO+ phytoc)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !  Determintation of optimum quotum..
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -607,19 +607,19 @@
   ! of the nutrient concentrations is 0.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  px_any=fr_lim_BPI_n(bp,:)*max(DONE,K4n/(NZERO+Kp4n))
+  px_any=fr_lim_BPI_n(:,bp)*max(DONE,K4n/(NZERO+Kp4n))
   rum4n =         p_qun(nrphyto)* phytoc *M4n
   call DoubleLimitChange_vector(POSITIVE,rum4n,min(Kp4n,K4n)/m3tm2,px_any, &
                                                        max_change_per_step)
-  px_any=fr_lim_BPI_n(bp,:)*max(DONE,K3n/(NZERO+Kp3n))
+  px_any=fr_lim_BPI_n(:,bp)*max(DONE,K3n/(NZERO+Kp3n))
   rum3n =  cqun3 *p_qun(nrphyto)* phytoc *M3n
   call DoubleLimitChange_vector(POSITIVE,rum3n,min(Kp3n,K3n)/m3tm2,px_any, &
                                                        max_change_per_step)
-  px_any=fr_lim_BPI_n(bp,:)*max(DONE,Qpun/(NZERO+Qun))
+  px_any=fr_lim_BPI_n(:,bp)*max(DONE,Qpun/(NZERO+Qun))
   rumun =  cquR1n*p_qun(nrphyto)* phytoc *Mun
   call DoubleLimitChange_vector(POSITIVE,rumun,min(Qpun,Qun)/m3tm2,px_any, &
                                                        max_change_per_step)
-  px_any=fr_lim_BPI_p(bp,:)*max(DONE,K1p/(NZERO+Kp1p))
+  px_any=fr_lim_BPI_p(:,bp)*max(DONE,K1p/(NZERO+Kp1p))
   rum1p =         p_qup(nrphyto)* phytoc *M1p
   call DoubleLimitChange_vector(POSITIVE,rum1p,min(Kp1p,K1p)/m3tm2,px_any, &
                                                        max_change_per_step)
@@ -692,7 +692,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Apparent Net prim prod. (mgC /m3/d)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  sunBI(bp,:)  =   runc/( NZERO+ phytoc)
+  sunBI(:,bp)  =   runc/( NZERO+ phytoc)
   sx_main=ses+srs
   sx_act=max(sx_main,sumc)
 
@@ -979,7 +979,7 @@
   call flux_vector( iiBen, ppbpc,ppQ6c, rr6c*m3tm2 )  ! source/sink.c
   call flux_vector( iiBen, ppbpn,ppQ6n, rr6n*m3tm2 )  ! source/sink.c
   call flux_vector( iiBen, ppbpp,ppQ6p, rr6p*m3tm2 )  ! source/sink.c
-  jPIQ6s(bp,:)  =   jPIQ6s(bp,:)      + rr6s*m3tm2
+  jPIQ6s(:,bp)  =   jPIQ6s(:,bp)      + rr6s*m3tm2
 
   call flux_vector( iiBen, ppbpn,ppQ1n, rr1n*m3tm2 )  ! source/sink.c
   call flux_vector( iiBen, ppbpp,ppQ1p, rr1p*m3tm2 )  ! source/sink.c

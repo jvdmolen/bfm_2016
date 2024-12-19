@@ -264,12 +264,12 @@ LEVEL1 'dt_local,numc,nlev',dt_local,numc,nlev
 #ifdef BFM_GOTM
    ! integrate pelagic variables 
    if (bio_setup/=2) then
-     cc(:,:) = cc(:,:) + dt*sum(pp(:,:,:)-dd(:,:,:),3)
+     cc(:,:) = cc(:,:) + dt*sum(pp(:,:,:)-dd(:,:,:),1)
    end if
    ! integrate benthic variables 
 !  rhs=ccb(ppY2p,1)
    if (bio_setup>1) then
-      ccb(:,:) = ccb(:,:) + dt*sum(ppb(:,:,:)-ddb(:,:,:),3)
+      ccb(:,:) = ccb(:,:) + dt*sum(ppb(:,:,:)-ddb(:,:,:),1)
    end if
 !  call findnega(ccb(ppY2p,1),1,iout)
 !  if ( iout.gt.0) then
@@ -635,11 +635,11 @@ LEVEL1 'dt_local,numc,nlev',dt_local,numc,nlev
 
 #ifdef BFM_GOTM
    if (bio_setup/=2) then
-     cc = (cc+dt*sum(pp(:,1:numc,1:numc),3))/(1.+dt*sum(dd(:,1:numc,1:numc),3)/(1.0D-80+cc))
+     cc = (cc+dt*sum(pp(:,1:numc,1:numc),1))/(1.+dt*sum(dd(:,1:numc,1:numc),1)/(1.0D-80+cc))
    end if
    ! compute benthic variables 
     if (bio_setup>1) then
-      ccb = (ccb+dt*sum(ppb(:,:,:),3))/(1.+dt*sum(ddb(:,:,:),3)/(1.0D-80+ccb))
+      ccb = (ccb+dt*sum(ppb(:,:,:),1))/(1.+dt*sum(ddb(:,:,:),1)/(1.0D-80+ccb))
     end if
 #else
    do ci=1,nlev

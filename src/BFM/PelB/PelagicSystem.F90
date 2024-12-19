@@ -232,7 +232,7 @@ use mem,only:ppR2c
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     if ( CalcPhytoCopy(iiP6) .and. CalcPhytoPlankton(iiP2)) then
 !write(LOGUNIT,*)'pelagicsystemdynamicx,pheo'
-       sx_any=sunPI(iiP2,:)
+       sx_any=sunPI(:,iiP2)
        call PhaeocystisCalc(NEW_COLONIES,iiP2,rx_any,sx_any,rzero)
     endif
 !write(LOGUNIT,*)'pelagicsystemdynamics, call pelglobaldynamics'

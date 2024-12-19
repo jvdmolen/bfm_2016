@@ -67,8 +67,8 @@
   real(RLEN),intent(IN)                  :: temp(0:kmax)
   real(RLEN),intent(IN)                  :: salt(0:kmax)
   real(RLEN),intent(IN)                  :: rho(0:kmax)
-  real(RLEN),intent(IN)                  :: cc_old(1:numc,0:kmax)
-  real(RLEN),intent(INOUT)               :: cc_inout(1:numc,0:kmax)
+  real(RLEN),intent(IN)                  :: cc_old(0:kmax,1:numc)
+  real(RLEN),intent(INOUT)               :: cc_inout(0:kmax,1:numc)
   integer,intent(OUT)                    :: error
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! local variables
@@ -90,21 +90,21 @@
   llNorthSea=.true.
   if (trim(area) .eq. "WaddenSea") llNorthSea=.false.
   if(mode.eq.depend.and.multi.gt.0.0) then
-        cc_inout(mode,0:kmax)=cc_inout(mode,0:kmax) *multi
+        cc_inout(0:kmax,mode)=cc_inout(0:kmax,mode) *multi
   elseif (mode.gt.0.and.depend>0.and.depend<=numc) then
-        cc_inout(mode,0:kmax)=cc_inout(depend,0:kmax) &
-            *cc_old(mode,0:kmax)/(NZERO+cc_old(depend,0:kmax))
+        cc_inout(0:kmax,mode)=cc_inout(0:kmax,depend) &
+            *cc_old(0:kmax,mode)/(NZERO+cc_old(0:kmax,depend))
         if (multi.gt.0.0) then
-          cc_inout(mode,0:kmax)=max(cc_inout(mode,0:kmax),cc_inout(depend,0:kmax)*multi)
+          cc_inout(0:kmax,mode)=max(cc_inout(0:kmax,mode),cc_inout(0:kmax,depend)*multi)
         endif
      return
   elseif (mode.eq.ppbac) then
-        cc_inout(mode,0:kmax)=min(cc_inout(mode,0:kmax),cc_inout(ppB1c,0:kmax))
+        cc_inout(0:kmax,mode)=min(cc_inout(0:kmax,mode),cc_inout(0:kmax,ppB1c))
   elseif (mode.eq.ppO3h.or.mode.eq.ppO3c) then
        j=getseq_number(side,bdy_side,4,.true.)
        if (j.eq.3.and.llNorthSea ) then
           ! From Lesly Salt
-          cc_inout(ppO3h,:)= salt(:)*28.1D+00+ 1391.0D+00
+          cc_inout(:,ppO3h)= salt(:)*28.1D+00+ 1391.0D+00
        else
        ! Calculated according 
        !Lee et al. GeoPhysical Research Letters, Vol. 33 L19605
@@ -113,38 +113,38 @@
        temp_corr=min(max(0.0D+00,temp(:)),20.0D+00)
        mDepth=OCDepth(1)
        p=OCDepth/mDepth
-       cc_inout(ppO3h,:)=(DONE-p)*cc_inout(ppO3h,:)+ &
+       cc_inout(:,ppO3h)=(DONE-p)*cc_inout(:,ppO3h)+ &
          p*(2305.0D+00+53.97D+00*(salt_corr(:)-35.0D+00) &
           +2.74D+00*(salt_corr(:)-35.0D+00)**2 - 1.16D+00*(temp_corr(:)-20.0D+00)- &
            0.04D+00*(temp_corr(:)-20.0D+00)**2 )
        endif
   elseif (mode.eq.ppR3c) then
     p=DONE
-    where(cc_inout(ppP6c,:) >1.0D-10)p=cc_inout(ppP6c,:)/(NZERO+ cc_inout(ppPcc,:))
-    p=insw_vector(1.99D+00-p)*cc_inout(ppP6c,:)
-    call PhaeocystisCalc(LIMIT_BOUND,iiP6,cc_inout(ppR3c,:),p,ZERO)
+    where(cc_inout(:,ppP6c) >1.0D-10)p=cc_inout(:,ppP6c)/(NZERO+ cc_inout(:,ppPcc))
+    p=insw_vector(1.99D+00-p)*cc_inout(:,ppP6c)
+    call PhaeocystisCalc(LIMIT_BOUND,iiP6,cc_inout(:,ppR3c),p,ZERO)
   endif
   select case (mode)
 #ifdef INCLUDE_PELCO2
     case (ppO3h)
        !See above
     case (ppO3c)
-       old_DIC(1:kmax)=cc_inout(ppO3c,1:kmax)
+       old_DIC(1:kmax)=cc_inout(1:kmax,ppO3c)
        mDepth=OCDepth(1)
        p=OCDepth/mDepth
        call CalcCO2SatInField(kmax,numc,rho(1:kmax),temp(1:kmax), &
-                                        salt(1:kmax),cc_inout(1:numc,1:kmax))
-       cc_inout(ppO3c,1:kmax)=cc_inout(ppO3c,1:kmax)*(DONE-p)+p*old_DIC(1:kmax)
-       temp_corr(1:kmax)=abs(old_DIC(1:kmax)/cc_inout(ppO3c,1:kmax)-1.0)
+                                        salt(1:kmax),cc_inout(1:kmax,1:numc))
+       cc_inout(1:kmax,ppO3c)=cc_inout(1:kmax,ppO3c)*(DONE-p)+p*old_DIC(1:kmax)
+       temp_corr(1:kmax)=abs(old_DIC(1:kmax)/cc_inout(1:kmax,ppO3c)-1.0)
        n=maxloc(temp_corr);m=n(1)
        if (abs(temp_corr(m))> 0.10) error=1;
        if (error.eq.1) then
          write(LOGUNIT,*) &
           'Boundary for O3c reset to equilibrium value in at least in one layer'
-         write(LOGUNIT,*) 'old:',old_DIC(m),'new:',cc_inout(ppO3c,m);
+         write(LOGUNIT,*) 'old:',old_DIC(m),'new:',cc_inout(m,ppO3c);
          forall (j=1:kmax,temp_corr(j)> 0.10) &
-         cc_inout(ppO3c,j)= max(0.95* cc_inout(ppO3c,j), &
-              min(1.05*cc_inout(ppO3c,j),0.5*(cc_inout(ppO3c,j)+old_DIC(j))))
+         cc_inout(j,ppO3c)= max(0.95* cc_inout(j,ppO3c), &
+              min(1.05*cc_inout(j,ppO3c),0.5*(cc_inout(j,ppO3c)+old_DIC(j))))
        endif
 #endif
   end select

@@ -210,12 +210,12 @@
 
   do i=1,iiPhytoPlankton
     if ( CalcPhytoPlankton(i) ) then
-      call flux_vector( iiPel, ppPhytoPlankton(i,iiN),ppR6n, flPIR6n(i,:) )
-      call flux_vector( iiPel, ppPhytoPlankton(i,iiN),ppR1n, flPIR1n(i,:) )
-      call flux_vector( iiPel, ppPhytoPlankton(i,iiP),ppR6p, flPIR6p(i,:) )
-      call flux_vector( iiPel, ppPhytoPlankton(i,iiP),ppR1p, flPIR1p(i,:) )
+      call flux_vector( iiPel, ppPhytoPlankton(i,iiN),ppR6n, flPIR6n(:,i) )
+      call flux_vector( iiPel, ppPhytoPlankton(i,iiN),ppR1n, flPIR1n(:,i) )
+      call flux_vector( iiPel, ppPhytoPlankton(i,iiP),ppR6p, flPIR6p(:,i) )
+      call flux_vector( iiPel, ppPhytoPlankton(i,iiP),ppR1p, flPIR1p(:,i) )
       j=ppPhytoPlankton(i,iiS)
-      if ( j.gt.0)  call flux_vector( iiPel, j,       ppR6s, flPIR6s(i,:) )
+      if ( j.gt.0)  call flux_vector( iiPel, j,       ppR6s, flPIR6s(:,i) )
     endif
   enddo
   call findnan(flR3R2c,NO_BOXES,iout)

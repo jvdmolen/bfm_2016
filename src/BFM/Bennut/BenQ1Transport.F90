@@ -146,18 +146,18 @@
     ppQ11u=ppBenUrea(iiQ1u,iiN);
     p_diff=p_diff_Q1
   endif
-  jQIBTx(iiQ1,:)=Source_D2_vector(ppQ1x,iiConsumption)
+  jQIBTx(:,iiQ1)=Source_D2_vector(ppQ1x,iiConsumption)
   if (mode.ne.iiN)  &
-         jQIBTx(iiQ1,:)=jQIBTx(iiQ1,:)-Source_D2_vector(ppQ1u,iiConsumption)
-  jBTQIx(iiQ1,:)=Source_D2_vector(ppQ1x,iiProduction)
+         jQIBTx(:,iiQ1)=jQIBTx(:,iiQ1)-Source_D2_vector(ppQ1u,iiConsumption)
+  jBTQIx(:,iiQ1)=Source_D2_vector(ppQ1x,iiProduction)
   if (mode.ne.iiN)  &
-          jBTQIx(iiQ1,:)=jBTQIx(iiQ1,:)-Source_D2_vector(ppQ1u,iiProduction)
-  jQIBTx(iiQ11,:)=Source_D2_vector(ppQ11x,iiConsumption)
+          jBTQIx(:,iiQ1)=jBTQIx(:,iiQ1)-Source_D2_vector(ppQ1u,iiProduction)
+  jQIBTx(:,iiQ11)=Source_D2_vector(ppQ11x,iiConsumption)
   if (mode.ne.iiN)  &
-          jQIBTx(iiQ11,:)=jQIBTx(iiQ11,:)-Source_D2_vector(ppQ11x,iiConsumption)
-  jBTQIx(iiQ11,:)=Source_D2_vector(ppQ11x,iiProduction)
+          jQIBTx(:,iiQ11)=jQIBTx(:,iiQ11)-Source_D2_vector(ppQ11x,iiConsumption)
+  jBTQIx(:,iiQ11)=Source_D2_vector(ppQ11x,iiProduction)
   if (mode.ne.iiN)  &
-          jBTQIx(iiQ11,:)=jBTQIx(iiQ11,:)-Source_D2_vector(ppQ11x,iiProduction)
+          jBTQIx(:,iiQ11)=jBTQIx(:,iiQ11)-Source_D2_vector(ppQ11x,iiProduction)
   if ( .not.combine_anabac) then
     if (mode.eq.iiN) then
       Q21x=BenUrea(iiQ2u,iiN);
@@ -166,10 +166,10 @@
       Q21x=BenLabileDetritus(iiQ21,iiC);
       ppQ21x=ppBenLabileDetritus(iiQ21,iiC);
     endif
-    jQIBTx(iiQ21,:)=Source_D2_vector(ppQ21x,iiConsumption)
-    jBTQIx(iiQ21,:)=Source_D2_vector(ppQ21x,iiProduction)
+    jQIBTx(:,iiQ21)=Source_D2_vector(ppQ21x,iiConsumption)
+    jBTQIx(:,iiQ21)=Source_D2_vector(ppQ21x,iiProduction)
   else
-    jQIBTx(iiQ21,:)=ZERO; jBTQIx(iiQ21,:)=ZERO
+    jQIBTx(:,iiQ21)=ZERO; jBTQIx(:,iiQ21)=ZERO
   endif
 
   do BoxNumberXY=1,NO_BOXES_XY
@@ -439,7 +439,7 @@
 
     if (isnan(flow)) then
         write(LOGUNIT,*) 'flow',flow
-        write(LOGUNIT,*) 'jBTQIx',jBTQIx(iiQ1,:)
+        write(LOGUNIT,*) 'jBTQIx',jBTQIx(:,iiQ1)
         write(LOGUNIT,*) 'Q1x',Q1x(:)
     endif
 

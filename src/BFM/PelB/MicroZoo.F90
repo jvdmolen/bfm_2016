@@ -121,10 +121,10 @@
   real(RLEN),dimension(NO_BOXES)  :: rumR3c
   real(RLEN),dimension(NO_BOXES)  :: rumB1c
   real(RLEN),dimension(NO_BOXES)  :: rumBac
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES)  :: rumPIc
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES)  :: food
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES)  :: suPI
-  real(RLEN),dimension(iiMicroZooPlankton,NO_BOXES)  :: rumZIc
+  real(RLEN),dimension(NO_BOXES,iiPhytoPlankton)  :: rumPIc
+  real(RLEN),dimension(NO_BOXES,iiPhytoPlankton)  :: food
+  real(RLEN),dimension(NO_BOXES,iiPhytoPlankton)  :: suPI
+  real(RLEN),dimension(NO_BOXES,iiMicroZooPlankton)  :: rumZIc
   real(RLEN),dimension(NO_BOXES)  :: rr1c,rr6c
   real(RLEN),dimension(NO_BOXES)  :: rr1n,rr6n
   real(RLEN),dimension(NO_BOXES)  :: rr1p,rr6p
@@ -178,41 +178,41 @@
     !if phyto is NOT phaeocystis output (r) is equal to input (r)
     !input and output=r input:p_suPI
     call PhaeocystisCalc(CALC_FOOD_MICROZOO,i,sx_any,sx_any,p_suPI(zoo,i))
-    suPI(i,:)=sx_any
+    suPI(:,i)=sx_any
     phytoc => PhytoPlankton(i,iiC)
-    food(j,:)=food(j,:)+sx_any*phytoc
+    food(:,j)=food(:,j)+sx_any*phytoc
   enddo
   do i = 1 , iiPhytoPlankton
-    if (p_type(i)>0 ) food(i,:)=food(p_type(i),:)
+    if (p_type(i)>0 ) food(:,i)=food(:,p_type(i))
   enddo
   do i = 1 , iiPhytoPlankton
     if ( p_suPI(zoo,i) .gt.ZERO.and.CalcPhytoPlankton(i)) then
       phytoc => PhytoPlankton(i,iiC)
-      rumPIc(i,:) = suPI(i,:)* phytoc
-      rumPIc(i,:) =rumPIc(i,:) * food(i,:)/(food(i,:) + p_minfood(zoo))
-      rumc  =   rumc+ rumPIc(i,:)
+      rumPIc(:,i) = suPI(:,i)* phytoc
+      rumPIc(:,i) =rumPIc(:,i) * food(:,i)/(food(:,i) + p_minfood(zoo))
+      rumc  =   rumc+ rumPIc(:,i)
       phytonps=>PhytoPlankton(i,iiN)
-      rumn  =   rumn+ rumPIc(i,:)* phytonps/(NZERO+phytoc)
+      rumn  =   rumn+ rumPIc(:,i)* phytonps/(NZERO+phytoc)
       phytonps=>PhytoPlankton(i,iiP)
-      rump  =   rump+ rumPIc(i,:)* phytonps/(NZERO+phytoc)
+      rump  =   rump+ rumPIc(:,i)* phytonps/(NZERO+phytoc)
       if ( i==iiP6) then
       !TEP material in colony`
         where (insw_vector(phytoc) >NZERO )
-         rumR3c =  rumPIc(i,:) *R3c/(NZERO+ phytoc)
+         rumR3c =  rumPIc(:,i) *R3c/(NZERO+ phytoc)
          rumc= rumc+ rumR3c
         endwhere
       endif
     else
-      rumPIc(i,:) =  ZERO
+      rumPIc(:,i) =  ZERO
     endif
  enddo
 
   do i = 1 , ( iiMicroZooPlankton)
     micro =>MicroZooPlankton(i,iiC)
-    rumZIc(i,:) = p_suZI(zoo,i)* micro* micro/( micro+  p_minfood(zoo))
-    rumc  =   rumc+ rumZIc(i,:)
-    rumn  =   rumn+ rumZIc(i,:)* qn_mz(i,:)
-    rump  =   rump+ rumZIc(i,:)* qp_mz(i,:)
+    rumZIc(:,i) = p_suZI(zoo,i)* micro* micro/( micro+  p_minfood(zoo))
+    rumc  =   rumc+ rumZIc(:,i)
+    rumn  =   rumn+ rumZIc(:,i)* qn_mz(:,i)
+    rump  =   rump+ rumZIc(:,i)* qp_mz(:,i)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -264,7 +264,7 @@
 
   do i = 1 , iiPhytoPlankton
     if (  p_suPI(zoo,i) > ZERO.and.CalcPhytoPlankton(i) ) then
-      ruPIc  =   put_u* rumPIc(i,:)
+      ruPIc  =   put_u* rumPIc(:,i)
       !if phyto is NOT phaeocystis output (ruPIc) is equal to input (ruPIc)
       !rx_any=dummy output ruPIc=input
       call PhaeocystisCalc(CALC_GRAZING_MICROZOO,i,rx_any,ruPIc,p_suPI(zoo,i))
@@ -292,7 +292,7 @@
         ! P1s is directly transferred to R6s
         ! PhytoPlankton[i].s -> R6.s = ruPIc * qsPc[i]
         phytonps=>PhytoPlankton(i,iiS)
-        flPIR6s(i,:)  =   flPIR6s(i,:)+ ruPIc* phytonps/(NZERO+phytoc)
+        flPIR6s(:,i)  =   flPIR6s(:,i)+ ruPIc* phytonps/(NZERO+phytoc)
       end if
       rx_any = ruPIc*min(p_pu_ea(zoo),DONE-p_pe_R1c)
       rea6c  = rea6c +  rx_any
@@ -305,7 +305,7 @@
       rea1p  = rea1p +  ru_xfs_p*p_pu_ea(zoo)-rx_any
       if ( i==iiP6) then
         !assumed is that all R3 not selected as food.
-        flR3R2c=flR3R2c+ruPIc/(NZERO+rumPIc(i,:)) * rumR3c
+        flR3R2c=flR3R2c+ruPIc/(NZERO+rumPIc(:,i)) * rumR3c
         call findnan(flR3R2c,NO_BOXES,iout)
         if ( iout>0) write(LOGUNIT,*) 'MicroZoo flR3R2=NAN', &
                  iout,rumR3c(iout),ruPIc(iout),rumPIc(i,iout),put_u(iout)
@@ -321,11 +321,11 @@
 
 
   do i = 1 , ( iiMicroZooPlankton)
-    ruZIc  =   put_u* rumZIc(i,:)
+    ruZIc  =   put_u* rumZIc(:,i)
     rugc  =   rugc+ ruZIc
-    ru_xfs_n  =ruZIc* qn_mz(i,:)
+    ru_xfs_n  =ruZIc* qn_mz(:,i)
     rugn  =   rugn+ ru_xfs_n
-    ru_xfs_p  =ruZIc* qp_mz(i,:)
+    ru_xfs_p  =ruZIc* qp_mz(:,i)
     rugp  =   rugp+ ru_xfs_p
     ! intra-group predation is not computed
     if ( i/= zoo) then
@@ -399,15 +399,15 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Organic Nitrogen dynamics
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    rr1n  =   rea1n + rdc* qn_mz(zoo,:)* p_peZ_R1n
-    rr6n  =   rea6n + rdc* qn_mz(zoo,:)* (DONE-p_peZ_R1n)
+    rr1n  =   rea1n + rdc* qn_mz(:,zoo)* p_peZ_R1n
+    rr6n  =   rea6n + rdc* qn_mz(:,zoo)* (DONE-p_peZ_R1n)
 
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Organic Phosphorus dynamics
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    rr1p  =   rea1p + rdc* qp_mz(zoo,:)* p_peZ_R1p
-    rr6p  =   rea6p + rdc* qp_mz(zoo,:)* (DONE-p_peZ_R1p)
+    rr1p  =   rea1p + rdc* qp_mz(:,zoo)* p_peZ_R1p
+    rr6p  =   rea6p + rdc* qp_mz(:,zoo)* (DONE-p_peZ_R1p)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Fluxes

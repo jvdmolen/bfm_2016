@@ -202,7 +202,7 @@
   cquMuBn = rscalar/(rscalar+M4n)
 
   !P uptake------------------------------------------------------------------
-  px_any=fr_lim_HI_p(iiHN,:)
+  px_any=fr_lim_HI_p(:,iiHN)
   rumAp=et*eo*ea* p_qupA*M1p*Hac*lHac
   rumBp=et*eo*ea* p_qupB*M1p*Hbc*lHbc
   rump=rumAp+rumBp
@@ -214,7 +214,7 @@
   px_any=fr_lim_Ha_n
   rumA4n=et*eo*ea* p_qunA*M4n*Hac*lHac
   call DoubleLimitChange_vector(POSITIVE,rumA4n,K4n,px_any,max_change_per_step)
-  px_any=fr_lim_HI_n(iiHN,:)-fr_lim_Ha_n
+  px_any=fr_lim_HI_n(:,iiHN)-fr_lim_Ha_n
   rumB4n=et*eo*ea* p_qunB*M4n*(Hbc)*lHbc
   call DoubleLimitChange_vector(POSITIVE,rumB4n,K4n,px_any,max_change_per_step)
   rum4n=rumA4n+rumB4n !total uptake of ammonium
@@ -228,7 +228,7 @@
                                          max_change_per_step, lim_r2)
   lim_r1=min(lim_r1,lim_r2)
   rumAun=rumAun*lim_r1
-  px_any=fr_lim_HI_n(iiHN,:)-fr_lim_Ha_n
+  px_any=fr_lim_HI_n(:,iiHN)-fr_lim_Ha_n
   rumBun=cquMuBn*p_qunB *et*eo*ea*Mun*Hbc*lHbc
   rx_any_c=rumBun/p_qnUc
   call DoubleLimitChange_vector(POSITIVE,rumBun,  Qun,px_any, &
@@ -274,7 +274,7 @@
 #endif
   !limitation on dissolved  oxygen
   rB=rK4K3n*p_qon_nitri*qB
-  px_any=fr_lim_HI_o(iiHN,:)-fr_lim_Ha_o
+  px_any=fr_lim_HI_o(:,iiHN)-fr_lim_Ha_o
   call DoubleLimitChange_vector(POSITIVE,rB,G2_xavail_o,px_any, &
                                 max_change_per_step,limit_oxygen_B)
   rA=rK4K3n*p_qon_nitri*qA
@@ -373,7 +373,7 @@
   reac =max(ZERO,runc-r_xnetgrowth_c)
   reaAc =max(ZERO,runAc-r_xnetgrowth_Ac)
   runc  =   r_xnetgrowth_c
-  jnetHIc(iiHN,:)=runc
+  jnetHIc(:,iiHN)=runc
 
   ! excretion of nutrients or in case of "negative" growth
   renn  =   renn *insw_vector(runc) -min(ZERO,misn)

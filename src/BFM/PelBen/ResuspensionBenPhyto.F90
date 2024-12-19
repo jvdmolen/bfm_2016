@@ -101,7 +101,7 @@
        dummy=ZERO
        do bp=1,iiBenPhyto
          nrphyto=p_useparams(bp)
-         jbotBPc(bp,:)=ZERO
+         jbotBPc(:,bp)=ZERO
          ll=CoupledtoBDc(nrphyto)
          ! only resuspension in case of more than a low biomass of BenPhyto.
          ! See further at ModuleBenPhyto.F90
@@ -166,7 +166,7 @@
            if (sum(pc).gt.NZERO) then
            ! just as with the silt model  in case of a resuspension event
            ! the diatoms are directly distributed over the whole water column
-             jbotBPc(bp,:)=pc*bpc
+             jbotBPc(:,bp)=pc*bpc
              ll=ppBenPhyto(bp,iiC);       call flux_vector(iiBen,ll,ll,-pc*bpc)
              ll=ppBenPhyto(bp,iiN);       call flux_vector(iiBen,ll,ll,-pl*bpn)
              ll=ppBenPhyto(bp,iiP);       call flux_vector(iiBen,ll,ll,-pl*bpp)

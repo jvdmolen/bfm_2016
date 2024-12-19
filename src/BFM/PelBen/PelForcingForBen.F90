@@ -138,45 +138,45 @@
         if (CalcPhytoPlankton(i)) then
           lcl_Plankton => PhytoPlankton(i,iiC)
           Pc=lcl_Plankton(BoxNumber); Pc=Pc * insw(Pc-1.0D-10)
-          PI_Benc(i,BoxNumberXY)=Pc
+          PI_Benc(BoxNumberXY,i)=Pc
           ctfPm2c=ctfPm2c+sum(Depth*lcl_Plankton)
           lcl_Plankton => PhytoPlankton(i,iiN)
-          PI_Benn(i,BoxNumberXY) = lcl_Plankton(BoxNumber)
+          PI_Benn(BoxNumberXY,i) = lcl_Plankton(BoxNumber)
           lcl_Plankton => PhytoPlankton(i,iiP)
-          PI_Benp(i,BoxNumberXY) = lcl_Plankton(BoxNumber)
+          PI_Benp(BoxNumberXY,i) = lcl_Plankton(BoxNumber)
           lcl_Plankton => PhytoPlankton(i,iiL)
-          PI_Benl(i,BoxNumberXY) = lcl_Plankton(BoxNumber)
+          PI_Benl(BoxNumberXY,i) = lcl_Plankton(BoxNumber)
           j=ppPhytoPlankton(i,iiS)
           if ( j > 0 ) then
             lcl_Plankton => PhytoPlankton(i,iiS)
-            PI_Bens(i,BoxNumberXY)  = lcl_Plankton(BoxNumber)
+            PI_Bens(BoxNumberXY,i)  = lcl_Plankton(BoxNumber)
           else
-            PI_Bens(i,BoxNumberXY)  =   ZERO
+            PI_Bens(BoxNumberXY,i)  =   ZERO
           end if
           select case  (i)
           case (iiP1)
             R2_Benc(BoxNumberXY)=R2_Benc(BoxNumberXY) &
                  +min(R2c(BoxNumber),Pc*qR2P1(BoxNumber))
             R2_Benn(BoxNumberXY)=R2_Benn(BoxNumberXY) &
-                  +min(R2n(BoxNumber),PI_Benn(i,BoxNumberXY)*qR2P1(BoxNumber))
+                  +min(R2n(BoxNumber),PI_Benn(BoxNumberXY,i)*qR2P1(BoxNumber))
           case (iiP6)
-            PI_Benn(i,BoxNumberXY) = qnPc(i,BoxNumber)*Pc
-            PI_Benp(i,BoxNumberXY) = qpPc(i,BoxNumber)*Pc
+            PI_Benn(BoxNumberXY,i) = qnPc(BoxNumber,i)*Pc
+            PI_Benp(BoxNumberXY,i) = qpPc(BoxNumber,i)*Pc
             R3_Benc(BoxNumberXY)=R3c(BoxNumber)
             lcl_Plankton => PhytoPlankton(i,iiN)
             Pnp=lcl_Plankton(BoxNumber)
-            r=max(ZERO,Pnp-PI_Benn(i,BoxNumberXY))
+            r=max(ZERO,Pnp-PI_Benn(BoxNumberXY,i))
             R3_Benn(BoxNumberXY)= r
             lcl_Plankton => PhytoPlankton(i,iiP)
             Pnp=lcl_Plankton(BoxNumber)
-            r=max(ZERO,Pnp-PI_Benp(i,BoxNumberXY))
+            r=max(ZERO,Pnp-PI_Benp(BoxNumberXY,i))
             R3_Benp(BoxNumberXY)= r
           end select
         else
-          PI_Benc(i,BoxNumberXY) = ZERO
-          PI_Benn(i,BoxNumberXY) = ZERO
-          PI_Benp(i,BoxNumberXY) = ZERO
-          PI_Bens(i,BoxNumberXY) = ZERO
+          PI_Benc(BoxNumberXY,i) = ZERO
+          PI_Benn(BoxNumberXY,i) = ZERO
+          PI_Benp(BoxNumberXY,i) = ZERO
+          PI_Bens(BoxNumberXY,i) = ZERO
           if ( i==iiP6) then
             R3_Benc(BoxNumberXY)= ZERO
             R3_Benn(BoxNumberXY)= ZERO
@@ -186,7 +186,7 @@
       end do
       ! if no Phaeocystis is included infood uptake for filterfeeder there is no limitation of filtering
       ! in the presence of Phaeocystis
-      sediPI_Ben(:,BoxNumberXY)  =  sediPI(:,BoxNumber)
+      sediPI_Ben(BoxNumberXY,:)  =  sediPI(BoxNumber,:)
 
       ZI_Fc =   ZERO
       ZI_Fn =   ZERO
@@ -196,21 +196,21 @@
       do i = 1 , iiMicroZooPlankton
         if (CalcMicroZooPlankton(i)) then
           lcl_Plankton => MicroZooPlankton(i,iiC)
-          ZI_Fc(i,BoxNumberXY)  = lcl_Plankton(BoxNumber)
+          ZI_Fc(BoxNumberXY,i)  = lcl_Plankton(BoxNumber)
           ctfZim2c(BoxNumberXY)=ctfZim2c(BoxNumberXY)+sum(Depth*lcl_Plankton)
           j = ppMicroZooPlankton(i,iiN)
           if ( j> 0) then
            lcl_Plankton => MicroZooPlankton(i,iiN)
-           ZI_Fn(i,BoxNumberXY)=lcl_Plankton(BoxNumber)
+           ZI_Fn(BoxNumberXY,i)=lcl_Plankton(BoxNumber)
           else
-           ZI_Fn(i,BoxNumberXY)=lcl_Plankton(BoxNumber)*p_qnMic(i)
+           ZI_Fn(BoxNumberXY,i)=lcl_Plankton(BoxNumber)*p_qnMic(i)
           endif
           j = ppMicroZooPlankton(i,iiP)
           if ( j> 0) then
             lcl_Plankton => MicroZooPlankton(i,iiP)
-            ZI_Fp(i,BoxNumberXY)=lcl_Plankton(BoxNumber)
+            ZI_Fp(BoxNumberXY,i)=lcl_Plankton(BoxNumber)
           else
-           ZI_Fp(i,BoxNumberXY)=lcl_Plankton(BoxNumber)*p_qpMic(i)
+           ZI_Fp(BoxNumberXY,i)=lcl_Plankton(BoxNumber)*p_qpMic(i)
           endif
         endif
       enddo
@@ -220,25 +220,25 @@
         if (CalcMesoZooPlankton(i)) then
           lcl_Plankton => MesoZooPlankton(i,iiC)
           Zc=lcl_Plankton(BoxNumber); Zc=Zc * insw(Zc-1.0D-10)
-          ZE_Benc(i,BoxNumberXY)=Zc
+          ZE_Benc(BoxNumberXY,i)=Zc
           ctfZem2c(BoxNumberXY)=ctfZem2c(BoxNumberXY)+sum(Depth*lcl_Plankton)
           j = ppMesoZooPlankton(i,iiP)
           if ( j> 0) then
             lcl_Plankton => MesoZooPlankton(i,iiP)
-            ZE_Benp(i,BoxNumberXY)  = lcl_Plankton(BoxNumber)
+            ZE_Benp(BoxNumberXY,i)  = lcl_Plankton(BoxNumber)
             lcl_Plankton => MesoZooPlankton(i,iiN)
-            ZE_Benn(i,BoxNumberXY)  =  lcl_Plankton(BoxNumber)
+            ZE_Benn(BoxNumberXY,i)  =  lcl_Plankton(BoxNumber)
           else
-            ZE_Benn(i,BoxNumberXY) =  p_qnMec(i)* Zc
-            ZE_Benp(i,BoxNumberXY) =  p_qpMec(i)* Zc
+            ZE_Benn(BoxNumberXY,i) =  p_qnMec(i)* Zc
+            ZE_Benp(BoxNumberXY,i) =  p_qpMec(i)* Zc
           endif
         else
-          ZE_Benc(i,BoxNumberXY) = ZERO
-          ZE_Benn(i,BoxNumberXY) = ZERO
-          ZE_Benp(i,BoxNumberXY) = ZERO
+          ZE_Benc(BoxNumberXY,i) = ZERO
+          ZE_Benn(BoxNumberXY,i) = ZERO
+          ZE_Benp(BoxNumberXY,i) = ZERO
         endif
       end do
-      sediZE_Ben(:,BoxNumberXY)  =  sediMeZ(:,BoxNumber)
+      sediZE_Ben(BoxNumberXY,:)  =  sediMeZ(BoxNumber,:)
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Compute total detritus conc. used as food for filtereeders
@@ -316,14 +316,14 @@
      end select
      ! output:puP6Y3 , input:DONE,DONE
      rr=DONE
-     call PhaeocystisCalc_1l(j,iiP6, puP6Y3(i,:),rr,DONE)
+     call PhaeocystisCalc_1l(j,iiP6, puP6Y3(:,i),rr,DONE)
   end do
 
   efilP6Y3(:)=DONE
   if (CalcPhytoPlankton(iiP6)) then
     !Calculate filterlimitation due to presence of Phaeocystis Calc
     call PhaeocystisCalc_1l(CALC_LIMIT_FILTERCAP,iiP6, &
-          efilP6Y3, PI_Benc(iiP6,:),p_vum(iiY3))
+          efilP6Y3, PI_Benc(:,iiP6),p_vum(iiY3))
   endif
 
   end

@@ -103,10 +103,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !JM assign local variables to avoid pointer errors in insw_vector calls
-  jnetY1=jnetYIc(iiY1,:)
-  jnetY2=jnetYIc(iiY2,:)
-  jnetY4=jnetYIc(iiY4,:)
-  jnetY5=jnetYIc(iiY5,:)
+  jnetY1=jnetYIc(:,iiY1)
+  jnetY2=jnetYIc(:,iiY2)
+  jnetY4=jnetYIc(:,iiY4)
+  jnetY5=jnetYIc(:,iiY5)
 
   d=p_cturm
 

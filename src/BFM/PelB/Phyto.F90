@@ -236,32 +236,32 @@
   elseif ( p_chPs(phyto) > ZERO ) then
     silica_control=1
   endif
-  fl_xgrazing_PIc(phyto,:)=Source_D3_withgroup(ppphytoc, &
+  fl_xgrazing_PIc(:,phyto)=Source_D3_withgroup(ppphytoc, &
                 ppMesoZooPlankton,iiMesoZooPlankton,iiC,iiConsumption) + &
                Source_D3_withgroup(ppphytoc, &
                 ppMicroZooPlankton,iiMicroZooPlankton,iiC,iiConsumption) &
                 -getbotflux_3d(ppphytoc,Depth)
-   sx_grazing=fl_xgrazing_PIc(phyto,:)/(NZERO+phytoc)
+   sx_grazing=fl_xgrazing_PIc(:,phyto)/(NZERO+phytoc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient limitation (intracellular) N, P
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  iN1p = max( NZERO, ( qpPc(phyto,:)&
+  iN1p = max( NZERO, ( qpPc(:,phyto)&
                              - p_qplc(phyto))/( p_qpRc(phyto)- p_qplc(phyto)))
-  iNIn = max( NZERO, ( qnPc(phyto,:)&
+  iNIn = max( NZERO, ( qnPc(:,phyto)&
                             - p_qnlc(phyto))/( p_qnRc(phyto)- p_qnlc(phyto)))
   iNIs=DONE;
-  if ( silica_control >= 2 ) iNIs = max( NZERO, ( qsPc(phyto,:)&
+  if ( silica_control >= 2 ) iNIs = max( NZERO, ( qsPc(:,phyto)&
                             - p_qslc(phyto))/( p_qsRc(phyto)- p_qslc(phyto)))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Phytoplankton growth is limited by nitrogen and phosphorus
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     select case ( p_limnut)
-      case ( 0 ) ; iNPI(phyto,:)  =   (iN1p* iNIn)**(0.5D+00)
-      case ( 1 ) ; iNPI(phyto,:)  =   min(  iN1p,  iNIn)  ! Liebig rule
-      case ( 2 ) ; iNPI(phyto,:)  =   2.0D+00/( DONE/ iN1p+ DONE/ iNIn)
+      case ( 0 ) ; iNPI(:,phyto)  =   (iN1p* iNIn)**(0.5D+00)
+      case ( 1 ) ; iNPI(:,phyto)  =   min(  iN1p,  iNIn)  ! Liebig rule
+      case ( 2 ) ; iNPI(:,phyto)  =   2.0D+00/( DONE/ iN1p+ DONE/ iNIn)
     end select
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -274,12 +274,12 @@
     select case (silica_control)
       case(1)
          eN5s = min( eN5s,N5s/(N5s + p_chPs(phyto)))
-         tN=min(DONE,iNPI(phyto,:),eN5s)
+         tN=min(DONE,iNPI(:,phyto),eN5s)
       case(2,3)
-        tN=min(DONE,iNIs,iNPI(phyto,:))
+        tN=min(DONE,iNIs,iNPI(:,phyto))
       end select
   else
-      tN=iNPI(phyto,:)
+      tN=iNPI(:,phyto)
   endif
 
   ex_limit=2.0* p_thdo(phyto)* (DONE/( tN+ p_thdo(phyto)))
@@ -293,19 +293,19 @@
   ! Photosynthesis (Irradiance EIR is in uE m-2 s-1, Irr is mid-layer EIR)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  eiPI(phyto,:)=DONE
+  eiPI(:,phyto)=DONE
   if ( ChlLightFlag== 2) then
     Irr = ZERO !in case of a tidal flat production when dry_pel=0
     px_any= Depth*dry_pel*xEPS
     where (px_any.gt.ZERO) Irr = max( NZERO, EIR*( DONE- exp(-px_any))/ px_any)
-    eiPI(phyto,:) = max(ZERO,  &
+    eiPI(:,phyto) = max(ZERO,  &
         DONE- exp_limit(- qlPc(phyto, :)/ p_qchlc(phyto)/ p_Ke(phyto)* Irr))
   end if
 
   select case ( LightForcingFlag)
-    case ( 1 ) ;sumc=p_sum(phyto)* et* eiPI(phyto,:)
-    case ( 2 ) ;sumc=p_sum(phyto)* et* eiPI(phyto,:)*( SUNQ/HOURS_PER_DAY)
-    case ( 3 ) ;sumc=p_sum(phyto)* et* eiPI(phyto,:)* ThereIsLight
+    case ( 1 ) ;sumc=p_sum(phyto)* et* eiPI(:,phyto)
+    case ( 2 ) ;sumc=p_sum(phyto)* et* eiPI(:,phyto)*( SUNQ/HOURS_PER_DAY)
+    case ( 3 ) ;sumc=p_sum(phyto)* et* eiPI(:,phyto)* ThereIsLight
   end select
 
 
@@ -354,7 +354,7 @@
   !density dependent mortality:only used for phytoplankton which is not beeaten
   sdo  =   p_sd2(phyto)* phytoc *phytoc
   !mortality due too low chlorophyl content
-  sdo=sdo +p_sdmo(phyto)* exp(-(qlPc(phyto,:) +p_qlPlc(phyto))/p_qlPlc(phyto))
+  sdo=sdo +p_sdmo(phyto)* exp(-(qlPc(:,phyto) +p_qlPlc(phyto))/p_qlPlc(phyto))
   !low oxygen  dependent mortality
 
    rr3c=ZERO
@@ -370,12 +370,12 @@
      call PhaeocystisCalc(COLONY_DEGRADATION,phyto,px_any,sx_any,ZERO)
      ! from R3->R2, P6->R1n P6c->R1p, P56->R1c are calculated in this call
      call PhaeocystisCalc(CALC_LOC_DET_FLUX,phyto,px_any,sx_any,ZERO)
-     sdoPI(phyto,:)=sx_any
+     sdoPI(:,phyto)=sx_any
 
      call PhaeocystisCalc(CALC_MORTALITY_CELLS_IN_COLONY,phyto, &
                                             sx_any,et,1.0D+00)
      call LimitChange_vector(POSITIVE,sx_any,cx_any,max_change_per_step)
-     sdo=sdo+sdoPI(phyto,:)+sx_any
+     sdo=sdo+sdoPI(:,phyto)+sx_any
    else
 ! if p_iRI(phyto)==1 we deal with "normal phytoplankton"
 ! which under go at nutrient stress autolyis which may be caused by viral lysis.
@@ -396,8 +396,8 @@
   ! in case of P6 sdo stands for mortality rate  of cells in colony:
   ! this leads only to flux of P6 to R3c
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  if (phyto.ne.iiP6) sdoPI(phyto,:)=sdo
-  rx_any=sdoPI(phyto,:)*phytoc
+  if (phyto.ne.iiP6) sdoPI(:,phyto)=sdo
+  rx_any=sdoPI(:,phyto)*phytoc
   rr1c  =  p_pe_R1c* rx_any
   rr6c  =  (DONE-p_pe_R1c)* rx_any
 
@@ -407,7 +407,7 @@
 
   srt  =   sra+ srs     ! total specific respiration
   set  =   sea+ ses     ! total specific excretion
-  slc  =   sea+ sra+ sdoPI(phyto,:)  ! specific loss terms
+  slc  =   sea+ sra+ sdoPI(:,phyto)  ! specific loss terms
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Correct for mortality : in order to model an effective
@@ -448,7 +448,7 @@
   eo  =(DONE-px_any)+px_any*( DONE-exp(-(O2o+p_qon_nitri*N3n)/p_clO2o(phyto)))
 
   rufc  =   max(  NZERO, ( sumc- slc)* phytoc)  ! net production
-  sugPI(phyto,:)  =   rufc/( NZERO+ phytoc)
+  sugPI(:,phyto)  =   rufc/( NZERO+ phytoc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient Uptake: calculate maximal uptake of N,P
@@ -474,7 +474,7 @@
   ! nutrient affinity defined by the p_qu[nps] parameters.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  px_any=fr_lim_PI_n(phyto,:)
+  px_any=fr_lim_PI_n(:,phyto)
   !----------------potential N-uptake-------------------------------
   lim_qu= DONE
   ! max pot. uptake of N4
@@ -493,7 +493,7 @@
   rumun=max(ZERO,p_qun(phyto)*Nun* phytoc*et *lim_qu*cquR1n )
   call DoubleLimitChange_vector(POSITIVE,rumun,Nun,px_any,max_change_per_step)
   !----------------potential P-uptake-------------------------------
-  px_any=fr_lim_PI_p(phyto,:)
+  px_any=fr_lim_PI_p(:,phyto)
   lim_qu=DONE
   call PhaeocystisCalc(CALC_REL_PHOSPHATE_UPTAKE,phyto,lim_qu,N1p, &
                                                                p_qup(phyto))
@@ -524,8 +524,8 @@
      qnoc=p_xqn(phyto)*p_qnRc(phyto)
      qpoc=p_xqp(phyto)*p_qpRc(phyto)
      if ( silica_control>= 2) qsoc=p_xqs(phyto)*p_qsRc(phyto)
-!    px_any=min(qnPc(phyto,:)/p_qnRc(phyto),qpPc(phyto,:)/p_qpRc(phyto))
-!    if ( silica_control>= 2) px_any=min(px_any,qsPc(phyto,:)/p_qsRc(phyto))
+!    px_any=min(qnPc(:,phyto)/p_qnRc(phyto),qpPc(:,phyto)/p_qpRc(phyto))
+!    if ( silica_control>= 2) px_any=min(px_any,qsPc(:,phyto)/p_qsRc(phyto))
 !    qnoc=p_qnRc(phyto)*min(max(p_qnlc(phyto)/p_qnRc(phyto), &
 !                                       (px_any+p_xqn(phyto))*0.5),p_xqn(phyto))
 !    qpoc=p_qpRc(phyto)*min(max(p_qplc(phyto)/p_qpRc(phyto), &
@@ -559,7 +559,7 @@
   ! P uptake brom 3 sources: phosphate, organic P, from buffer in cell.
   !For Phaeocystis it means that P which is outside the cell but in the colony
   ! is not seen as part of the buffer.
-  cx_any = phytoc*qpPc(phyto,:)- phytoc*p_qplc(phyto)
+  cx_any = phytoc*qpPc(:,phyto)- phytoc*p_qplc(phyto)
   rbufp = max(ZERO,rufc)* qpoc
   call LimitChange_vector(POSITIVE,rbufp,cx_any, max_rate_per_step)
   ex_sw=insw_vector(cx_any)
@@ -627,7 +627,7 @@
   ! Apparent Net prim prod. (mgC /m3/d)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  sunPI(phyto,:)  =   runc/( NZERO+ phytoc)
+  sunPI(:,phyto)  =   runc/( NZERO+ phytoc)
   sx_main=srs+ses
   sx_act=max(sx_main,sumc)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -643,10 +643,10 @@
   !during the day and therefor the loss terms are correctd for daylength,
   !implictily assuming that grazing during the night is the same during the day.
   rupn= &
-      max(ZERO,ru_xCol_n+qnoc*(sunPI(phyto,:)-(sx_grazing+sx_main)/dl)*phytoc)
-  qx_any=qnoc- qnPc(phyto,:)
+      max(ZERO,ru_xCol_n+qnoc*(sunPI(:,phyto)-(sx_grazing+sx_main)/dl)*phytoc)
+  qx_any=qnoc- qnPc(:,phyto)
   ex_sw=insw_vector(qx_any)
-  misn=(sx_act*qx_any-qnPc(phyto,:)*sx_main*(DONE-ex_sw))*phytoc
+  misn=(sx_act*qx_any-qnPc(:,phyto)*sx_main*(DONE-ex_sw))*phytoc
   luxn=sx_act*(p_xqn(phyto)*p_qnRc(phyto)-qnoc)*phytoc
   runn  =   min( rumn,rupn+misn )  ! actual uptake of NI
 
@@ -685,11 +685,11 @@
                                                            flChydrate,ZERO)
 
   rupp= &
-     max(ZERO,ru_xCol_p+qpoc *(sunPI(phyto,:)-(sx_grazing+sx_main)/dl)*phytoc)
+     max(ZERO,ru_xCol_p+qpoc *(sunPI(:,phyto)-(sx_grazing+sx_main)/dl)*phytoc)
   !Nutrient uptake always >=0, corrrection of content via rn_xlux_p
-  qx_any=qpoc - qpPc(phyto,:)
+  qx_any=qpoc - qpPc(:,phyto)
   ex_sw=insw_vector(qx_any)
-  misp=(sx_any*qx_any-qpPc(phyto,:) *sx_main*(DONE-ex_sw))*phytoc
+  misp=(sx_any*qx_any-qpPc(:,phyto) *sx_main*(DONE-ex_sw))*phytoc
   luxp=sx_any*(p_xqp(phyto)*p_qpRc(phyto)-qpoc)*phytoc
 
   runp  =   min( rump,rupp+ misp)  ! actual uptake
@@ -714,14 +714,14 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Excretion of N and P to PON and POP
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rx_any=sdoPI(phyto,:)*qnPc(phyto,:)*phytoc
+  rx_any=sdoPI(:,phyto)*qnPc(:,phyto)*phytoc
   s=phyton-p_qnlc(phyto)*low_phytoc
   ! extreme cases no flux at lower below :
   call LimitChange_vector(POSITIVE,rx_any,s,max_change_per_step)
   rr1n  =   p_pe_R1n* rx_any
   rr6n  =   rx_any- rr1n
 
-  rx_any=sdoPI(phyto,:)*qpPc(phyto,:)*phytoc
+  rx_any=sdoPI(:,phyto)*qpPc(:,phyto)*phytoc
   s=phytop-p_qplc(phyto)*low_phytoc
   ! extreme cases no flux at lower below :
   call LimitChange_vector(POSITIVE,rx_any,s,max_change_per_step)
@@ -737,10 +737,10 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Losses of Si
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    rr6s  =   sdoPI(phyto,:)* phytos  ! Lysis, particulate
+    rr6s  =   sdoPI(:,phyto)* phytos  ! Lysis, particulate
 
     ! Collect first all fluxes of P-->silica
-    flPIR6s(phyto,:)  =   flPIR6s(phyto,:)+ rr6s
+    flPIR6s(:,phyto)  =   flPIR6s(:,phyto)+ rr6s
     select case (silica_control)
 
     case (1)
@@ -754,12 +754,12 @@
 
       ! Si uptake based on C uptake, in qx_any maximum quotum
       rups= &
-          max(ZERO,qsoc*(sunPI(phyto,:)-(sx_grazing+sx_main)/dl))*phytoc
+          max(ZERO,qsoc*(sunPI(:,phyto)-(sx_grazing+sx_main)/dl))*phytoc
       ! miss is used to correct for too much silica in the cells,
       ! in q_ra diff between max and acutual
-      qx_any=qsoc- qsPc(phyto,:)
+      qx_any=qsoc- qsPc(:,phyto)
       ex_sw=insw_vector(qx_any)
-      miss= (sx_act*qx_any-qsPc(phyto,:)*sx_main*(DONE-ex_sw))*phytoc
+      miss= (sx_act*qx_any-qsPc(:,phyto)*sx_main*(DONE-ex_sw))*phytoc
       luxs=sx_act*(p_xqs(phyto)*p_qsRc(phyto)-qsoc)*phytoc
       runs  =  min( rums,rups+miss ) ! actual uptake
       ex_sw=insw_vector(runs)
@@ -782,7 +782,7 @@
     ! incase of extreme limitation:
     ! DONE/NZERO:keep x_stress_degradation below the maximum real number...
     px_any=max(ZERO,DONE- &
-          (qx_any+qnPc(phyto,:)-p_qnlc(phyto))/ (p_lqnlc(phyto)-p_qnlc(phyto)))
+          (qx_any+qnPc(:,phyto)-p_qnlc(phyto))/ (p_lqnlc(phyto)-p_qnlc(phyto)))
     sx_stress_degradation=p_sdchl_l(phyto)*px_any
     cx_any=DONE
     call LimitChange_vector(POSITIVE,sx_stress_degradation, &
@@ -793,8 +793,8 @@
     ! growth rate.
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     where (Irr> ZERO)
-      rho_Chl = p_qchlc(phyto)* p_qchlc(phyto)* eiPI(phyto,:) &
-          /qlPc(phyto,:)* p_Ke(phyto)/ Irr* x_light_limitation
+      rho_Chl = p_qchlc(phyto)* p_qchlc(phyto)* eiPI(:,phyto) &
+          /qlPc(:,phyto)* p_Ke(phyto)/ Irr* x_light_limitation
     elsewhere
        rho_Chl=ZERO
     endwhere
@@ -828,12 +828,12 @@
 !   rr1n=rr1n+p_pe_R1n * rx_any
 !   ! calulate loss of C due to stress degradation due oxygen radicals mgC/m2/d)
 !   rx_any =rx_any/min(p_xqn(phyto)*p_qnRc(phyto), &
-!                              max(p_qnlc(phyto),qnPc(phyto,:)))
+!                              max(p_qnlc(phyto),qnPc(:,phyto)))
 !   ! distribute degradation produces over R1c and R6c
 !   rr6c=rr6c+(DONE-p_pe_R1c) * rx_any
 !   rr1c=rr1c+p_pe_R1c * rx_any
 !   ! calulate loss of C due to stress degradation due oxygen radicals mgC/m2/d)
-!   rx_any=rx_any*qpPc(phyto,:)
+!   rx_any=rx_any*qpPc(:,phyto)
 !   ! distribute degradation produces over R1c and R6c
 !   rr6p=rr6p+(DONE-p_pe_R1p) * rx_any
 !   rr1p=rr1p+p_pe_R1p * rx_any
@@ -870,9 +870,9 @@
 
   select case (phyto.eq.iiP6)
     case (.true.)
-   ! for phaeo the colony mortality is included in sdoPI(phyto,:). The total
+   ! for phaeo the colony mortality is included in sdoPI(:,phyto). The total
    ! mortality in sdo,the difference is the mortality of cells in the colony.
-      px_any=sdoPI(phyto,:)/(NZERO+sdo)
+      px_any=sdoPI(:,phyto)/(NZERO+sdo)
       !rr1 and rr6c are produced by mortality of the cell.
       rx_any=(rr1c+rr6c)*(DONE-px_any)+rr3c
       call flux_vector( iiPel, ppphytoc,ppR3c, rx_any )  ! source/sink.c
@@ -884,18 +884,18 @@
   call flux_vector( iiPel, ppphytoc,ppR6c, rr6c*px_any )  ! source/sink.c
   call flux_vector( iiPel, ppphytoc,ppR2c, rr2c)  ! source/sink.c
   rx_any=rr2c* &
-    max(ZERO,min(DONE,qnPc(phyto,:)-p_qnlc(phyto))/(p_qnRc(phyto)-p_qnlc(phyto))*p_qnR2c)
+    max(ZERO,min(DONE,qnPc(:,phyto)-p_qnlc(phyto))/(p_qnRc(phyto)-p_qnlc(phyto))*p_qnR2c)
   call flux_vector( iiPel, ppphyton,ppR2n, rx_any)  ! source/sink.c
   call FindNaNInRates(iiPel,ppphytoc,'After phyto->R6c')
 
-  flPIR6n(phyto,:)=flPIR6n(phyto,:) + rr6n*px_any !fluxes define in PelChem
-  flPIR6p(phyto,:)=flPIR6p(phyto,:) + rr6p*px_any
-  flPIR1n(phyto,:)=flPIR1n(phyto,:) + rr1n*px_any+reUn
-  flPIR1p(phyto,:)=flPIR1p(phyto,:) + rr1p*px_any
+  flPIR6n(:,phyto)=flPIR6n(:,phyto) + rr6n*px_any !fluxes define in PelChem
+  flPIR6p(:,phyto)=flPIR6p(:,phyto) + rr6p*px_any
+  flPIR1n(:,phyto)=flPIR1n(:,phyto) + rr1n*px_any+reUn
+  flPIR1p(:,phyto)=flPIR1p(:,phyto) + rr1p*px_any
 
   rx_any=(sumc-sra)*phytoc-(flChydrate-ses*phytoc)
   rnetPTc=rnetPTc+rx_any
-  jnetPIc(phyto,1)=jnetPIc(phyto,1)+sum(rx_any*Depth)
+  jnetPIc(1,phyto)=jnetPIc(1,phyto)+sum(rx_any*Depth)
 ! End of computation section for process PhytoDynamics
 
 

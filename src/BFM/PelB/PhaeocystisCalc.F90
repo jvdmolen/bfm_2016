@@ -148,18 +148,18 @@
 !write(LOGUNIT,*)'phaeocalc 1,MW_C,nrCols,NZERO',MW_C,nrCols,NZERO
 
       where (phytoc>low_phaeo.and.Colsize> low_colsize) Content= &
-          ColSize*PI_dw(phyto,:)+(R3c+R3c/MW_C*(2.0*MW_H+MW_O))/(NZERO+nrCols)
+          ColSize*PI_dw(:,phyto)+(R3c+R3c/MW_C*(2.0*MW_H+MW_O))/(NZERO+nrCols)
 !write(LOGUNIT,*)'phaeocalc 2'
       call CalcSinking(NO_BOXES,Radius,Content,ETW,ESW,rx_any)
 !write(LOGUNIT,*)'phaeocalc 3'
 
-      ex_any=min((qpPc(phyto,:)- p_qplc(phyto))/(p_qpRc(phyto)-p_qplc(phyto)), &
-         (qnPc(phyto,:)- p_lqnlc(phyto))/(p_qnRc(phyto)- p_lqnlc(phyto)))
+      ex_any=min((qpPc(:,phyto)- p_qplc(phyto))/(p_qpRc(phyto)-p_qplc(phyto)), &
+         (qnPc(:,phyto)- p_lqnlc(phyto))/(p_qnRc(phyto)- p_lqnlc(phyto)))
 !write(LOGUNIT,*)'phaeocalc 4'
 
       ex_any=2.0* p_thdo(phyto)* (DONE/( ex_any+ p_thdo(phyto)))
-!JM      px_any= exp_limit(- qlPc(phyto,:)/ p_qchlc(phyto)/ p_Ke(phyto)* EIR)
-      exp_arg=- qlPc(phyto,:)/ p_qchlc(phyto)/ p_Ke(phyto)* EIR
+!JM      px_any= exp_limit(- qlPc(:,phyto)/ p_qchlc(phyto)/ p_Ke(phyto)* EIR)
+      exp_arg=- qlPc(:,phyto)/ p_qchlc(phyto)/ p_Ke(phyto)* EIR
       px_any=exp_limit(exp_arg)
       ! More light  more buancy less sedimentation
       ! More nutrient limitation less buoancy more sedimentation
@@ -244,18 +244,18 @@
 !        ! under phosphate limitation phae-detritus stick to gether and
 !        ! bacteria cannot penetrate well in the material--.
 !        ! Hence at complete lim all detr->R6c
-!        ex_any=max(NZERO,min(DONE,(qnPc(phyto,:)-p_qnlc(phyto))/ &
+!        ex_any=max(NZERO,min(DONE,(qnPc(:,phyto)-p_qnlc(phyto))/ &
 !                                       (p_qnRc(phyto)-p_qnlc(phyto))))
 !        pe_R1c=p_pe_R1c*ex_any;pe_R1n=p_pe_R1n*ex_any;pe_R1p=p_pe_R1p*ex_any
 !        flR3R2c(:)=flR3R2c(:)+l_flR3R2c*pe_R1c/p_pe_R1c
 !        l_flR3R2c=l_flR3R2c*(DONE-pe_R1c)/p_pe_R1c
        endif
-       cx_any=max(ZERO,phyton-qnPc(phyto,:)*phytoc)
-       flPIR1n(phyto,:)=flPIR1n(phyto,:) + sdo* pe_R1n* cx_any
-       flPIR6n(phyto,:)=flPIR6n(phyto,:) + sdo* (DONE-pe_R1n)* cx_any
-       cx_any=max(ZERO,phytop-qpPc(phyto,:)*phytoc)
-       flPIR1p(phyto,:)=flPIR1p(phyto,:) + sdo* pe_R1p* cx_any
-       flPIR6p(phyto,:)=flPIR6p(phyto,:) + sdo* (DONE-pe_R1p)* cx_any
+       cx_any=max(ZERO,phyton-qnPc(:,phyto)*phytoc)
+       flPIR1n(:,phyto)=flPIR1n(:,phyto) + sdo* pe_R1n* cx_any
+       flPIR6n(:,phyto)=flPIR6n(:,phyto) + sdo* (DONE-pe_R1n)* cx_any
+       cx_any=max(ZERO,phytop-qpPc(:,phyto)*phytoc)
+       flPIR1p(:,phyto)=flPIR1p(:,phyto) + sdo* pe_R1p* cx_any
+       flPIR6p(:,phyto)=flPIR6p(:,phyto) + sdo* (DONE-pe_R1p)* cx_any
        call flux_vector(iiPel,ppR3c,ppR1c,sdo* pe_R1c* R3c)
        call flux_vector(iiPel,ppR3c,ppR6c,sdo*(DONE-pe_R1c)*R3c)
        rx_any=ZERO;ColSize=DONE
@@ -288,8 +288,8 @@
 
 !     !only activity when input( =sum) is larger zero
 
-        rumn(:)  = p_qun(iiP6)* (N4n+c3n(:)+cun)  !* phytoc*fr_lim_PI_n(phyto,:)
-        rump(:)  = p_qup(iiP6)* (N1p(:)+cup)  !*fr_lim_PI_p(phyto,:)
+        rumn(:)  = p_qun(iiP6)* (N4n+c3n(:)+cun)  !* phytoc*fr_lim_PI_n(:,phyto)
+        rump(:)  = p_qup(iiP6)* (N1p(:)+cup)  !*fr_lim_PI_p(:,phyto)
 
         where (runc >NZERO)
           optimal_growth=min(DONE,min(rumn/(p_xqn(phyto)*p_qnRc(phyto)), &

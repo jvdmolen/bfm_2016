@@ -7,7 +7,7 @@
 !    into diagnostic variables defined as flux-variables in GlobalDefsBFM.model 
 !
 ! !INTERFACE:
-      subroutine make_flux_output(mode, nr0,zlev,nlev,dt,out,llcalc)
+      subroutine make_flux_output(mode, nr0,zlev,nlev,dt,output,llcalc)
 !
 ! !DESCRIPTION:
 !     The information provided in the flux definition as given in GlobalDefsBFM.model
@@ -43,7 +43,7 @@
       integer,intent(IN)                  ::zlev
       integer,intent(IN)                  ::nlev
       real(RLEN),intent(IN)               ::dt
-      real(RLEN),intent(INOUT),dimension(zlev:nlev)  :: out
+      real(RLEN),intent(INOUT),dimension(zlev:nlev)  :: output
       logical,intent(OUT)                 :: llcalc
 !
 ! !REVISION HISTORY:
@@ -161,16 +161,16 @@
 
       select case ( flx_option(nr) )
         case(0,10,11,12,13,20) !notmal 3d or 2d flux, vertical flux
-          out(1:klev)=hulp(1:klev);
+          output(1:klev)=hulp(1:klev);
         case(1) !Specific rate
-          out(1:klev)=1.0D-80
+          output(1:klev)=1.0D-80
           k=0
           if ( flx_CalcIn(nr) == iiBen) then
              do i=flx_calc_nr(nr-1)+1,flx_calc_nr(nr)
                if ( k.ne. flx_states(i) ) then
                   k=flx_states(i)
 !JM                  out(1:klev)=out(1:klev) + D2STATE(k,:)
-                  out(1:klev)=out(1:klev) + D2STATE(:,k)
+                  output(1:klev)=output(1:klev) + D2STATE(:,k)
                endif
               enddo
           else 
@@ -178,16 +178,16 @@
                if ( k.ne. flx_states(i) ) then
                  k=flx_states(i)
 !JM                 out(1:klev)=out(1:klev) + D3STATE(k,:)
-                 out(1:klev)=out(1:klev) + D3STATE(:,k)
+                 output(1:klev)=output(1:klev) + D3STATE(:,k)
                endif
              enddo
           endif
-          out(1:klev)=hulp(1:klev)/out(1:klev)
+          output(1:klev)=hulp(1:klev)/output(1:klev)
         case(2) ! summing the column :perm2
           ! d3 -->d2 var.
           hulp(1:klev)=hulp(1:klev) *Depth(1:klev)
           if (NO_BOXES_X==1 .and. NO_BOXES_Y==1 ) then
-            out(1)=sum(hulp(1:klev))
+            output(1)=sum(hulp(1:klev))
           else
             DO BoxNumberY=1,NO_BOXES_Y
               DO BoxNumberX=1,NO_BOXES_X
@@ -197,12 +197,12 @@
                    r=r+hulp(BoxNumber) 
                  enddo
                  BoxNumberXY=D2toD1(BoxNumberX,BoxNumberY)
-                 out(BoxNumberXY)=r
+                 output(BoxNumberXY)=r
               enddo
             enddo
           endif
         case default ! do nothing
-          out(1:klev)=hulp(1:klev)
+          output(1:klev)=hulp(1:klev)
       end select
       llcalc=.true.
       return

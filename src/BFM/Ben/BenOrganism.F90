@@ -127,7 +127,7 @@
   integer  :: i,j
   real(RLEN)                         ::scalar
   real(RLEN),dimension(NO_BOXES_XY,iiBenBacteria)  :: avail_H
-  logical,dimension(iiBenPhyto,NO_BOXES_XY)  :: xBPavailable
+  logical,dimension(NO_BOXES_XY,iiBenPhyto)  :: xBPavailable
   real(RLEN),dimension(NO_BOXES_XY)  :: clm,clmp
   real(RLEN),dimension(NO_BOXES_XY)  :: cm,cmp
   real(RLEN),dimension(NO_BOXES_XY)  :: cmm
@@ -164,12 +164,12 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: rx_any,px_any,cx_any,sx_any
   real(RLEN),dimension(NO_BOXES_XY)  :: rx_any_m,mx_any ! any depth/distance
   real(RLEN),dimension(NO_BOXES_XY)  :: x_foodinD1m_c,px_foodinD1
-  real(RLEN),dimension(iiSuspensionFeeders,NO_BOXES_XY)  :: pYF
-  real(RLEN),dimension(iiBenOrganisms,NO_BOXES_XY)  :: pYY
-  real(RLEN),dimension(iiBenBacteria,NO_BOXES_XY)  :: pYH
-  real(RLEN),dimension(iiBenPhyto,NO_BOXES_XY)  :: pc
-  real(RLEN),dimension(iiBenPhyto,NO_BOXES_XY)  :: ruPIc
-  real(RLEN),dimension(iiBenPhyto,NO_BOXES_XY)  :: rq6l
+  real(RLEN),dimension(NO_BOXES_XY,iiSuspensionFeeders)  :: pYF
+  real(RLEN),dimension(NO_BOXES_XY,iiBenOrganisms)  :: pYY
+  real(RLEN),dimension(NO_BOXES_XY,iiBenBacteria)  :: pYH
+  real(RLEN),dimension(NO_BOXES_XY,iiBenPhyto)  :: pc
+  real(RLEN),dimension(NO_BOXES_XY,iiBenPhyto)  :: ruPIc
+  real(RLEN),dimension(NO_BOXES_XY,iiBenPhyto)  :: rq6l
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -256,9 +256,9 @@
     cm  =   p_cm(i); if (p_xsenso(i).ge.1)cm=min(cm,D1m)
     food_src  = max(ZERO,BenOrganisms(i,iiC))
     px_any=max(ZERO,min(cmp,cm)-max(clmp,clm))/(cm-clm)*p_Yn(y,i)
-    pYY(i,:)= px_any*p_Yn(y,i)* MM_vector( food_src* px_any,  p_clu(y))
-    food_YIc  =  food_YIc + food_src*pYY(i,:)/xfood_m
-    x_foodinD1m_c   =  x_foodinD1m_c  + food_src*pYY(i,:)/xfood_m &
+    pYY(:,i)= px_any*p_Yn(y,i)* MM_vector( food_src* px_any,  p_clu(y))
+    food_YIc  =  food_YIc + food_src*pYY(:,i)/xfood_m
+    x_foodinD1m_c   =  x_foodinD1m_c  + food_src*pYY(:,i)/xfood_m &
                              *max(ZERO,min(cmp,D1m)-max(clmp,ZERO))/(cm-clm)
   enddo
   food  =   food_YIc+ food
@@ -266,9 +266,9 @@
   food_FFc=ZERO
   do i = 1 , ( iiSuspensionFeeders)
     cx_any  = max(ZERO,SuspensionFeeders(i,iiC))
-    pYF(i,:)=p_Sn(y,i)* MM_vector(  cx_any*p_Sn(y,i),  p_clu(y))
-    food_FFc  =   food_FFc+ cx_any/xfood_m*pYF(i,:)
-    x_foodinD1m_c  =    x_foodinD1m_c+ cx_any/xfood_m*pYF(i,:)
+    pYF(:,i)=p_Sn(y,i)* MM_vector(  cx_any*p_Sn(y,i),  p_clu(y))
+    food_FFc  =   food_FFc+ cx_any/xfood_m*pYF(:,i)
+    x_foodinD1m_c  =    x_foodinD1m_c+ cx_any/xfood_m*pYF(:,i)
   end do
   food  =   food_FFc+ food
 
@@ -294,10 +294,10 @@
         else
           px_any=max(ZERO,min(cmp,cm)-max(clmp,clm))/(cm-clm)
         endif
-        pYH(i,:)  =px_any/xfood_m*p_Hn(y,i)*MM_vector(cx_any*px_any, scalar )
-        food_HIc  =   food_HIc +cx_any* pYH(i,:)
+        pYH(:,i)  =px_any/xfood_m*p_Hn(y,i)*MM_vector(cx_any*px_any, scalar )
+        food_HIc  =   food_HIc +cx_any* pYH(:,i)
         x_foodinD1m_c=x_foodinD1m_c +  &
-          cx_any*pYH(i,:)*max(ZERO,min(cmp,D1m)-max(clmp,ZERO))/(cm-clm)
+          cx_any*pYH(:,i)*max(ZERO,min(cmp,D1m)-max(clmp,ZERO))/(cm-clm)
       endif
     endif
   end do
@@ -313,12 +313,12 @@
   do i = 1 ,  iiBenPhyto
     if (CalcBenPhyto(i)) then
       cx_any  =   BenPhyto(i,iiC)
-      xBPavailable(i,:)= cx_any > 1.0D-6.and.p_Pn(y,i)>NZERO
-      where (xBPavailable(i,:))
+      xBPavailable(:,i)= cx_any > 1.0D-6.and.p_Pn(y,i)>NZERO
+      where (xBPavailable(:,i))
          px_any= CalculateBenPhyto_vector(iiC,INTEGRAL,clmp,cmp)
-         pc(i,:) =p_Pn(y,i)*MM_vector(px_any*p_Pn(y,i)*cx_any,  p_clu(y))
-         food_PIc  =   food_PIc + px_any*cx_any*pc(i,:)/xfood_m
-         x_foodinD1m_c  =    x_foodinD1m_c + px_any*cx_any*pc(i,:)/xfood_m
+         pc(:,i) =p_Pn(y,i)*MM_vector(px_any*p_Pn(y,i)*cx_any,  p_clu(y))
+         food_PIc  =   food_PIc + px_any*cx_any*pc(:,i)/xfood_m
+         x_foodinD1m_c  =    x_foodinD1m_c + px_any*cx_any*pc(:,i)/xfood_m
       endwhere
     endif
   end do
@@ -391,7 +391,7 @@
       (px_any*rro*MW_C/(NZERO+yc)-p_sra(y))/((DONE-p_pue(y))*p_pur(y))))
 
   sug  =max(ZERO,( sug_y* yc/xfood_m)/ ( NZERO + food))
-  jugYIc(y,:)=sug_y*yc
+  jugYIc(:,y)=sug_y*yc
 
   ! Net uptake:
   sun    =   sug*( DONE- p_pue(y))
@@ -415,7 +415,7 @@
   ! Benthic organisms:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   do i = 1 , iiBenOrganisms
-    choice = pYY(i,:)
+    choice = pYY(:,i)
     cx_any  = BenOrganisms(i,iiC)
     qnc  = max(ZERO,BenOrganisms(i,iiN))/ (NZERO+cx_any)
     qpc  = max(ZERO,BenOrganisms(i,iiP))/ (NZERO+cx_any)
@@ -439,7 +439,7 @@
     rugc  =   rugc+ ruYIc
     rugn  =   rugn+ ruYIn
     rugp  =   rugp+ ruYIp
-    jmYIc(i,:)=jmYIc(i,:)+ruYIc
+    jmYIc(:,i)=jmYIc(:,i)+ruYIc
 
     rq6c  =   cx_any* se_u* choice
     rq6n  =   rq6c * qnc * pudiln
@@ -452,14 +452,14 @@
   end do
 
   do i = 1, iiSuspensionFeeders
-    choice = pYF(i,:)
+    choice = pYF(:,i)
     cx_any  = SuspensionFeeders(i,iiC)
     qnc =max(ZERO, SuspensionFeeders(i,iiN)/ (NZERO+cx_any))
     qpc =max(ZERO, SuspensionFeeders(i,iiP)/ (NZERO+cx_any))
     ruYIc  = cx_any* sug* choice
     ruYIn  = qnc* ruYIc
     ruYIp  = qpc* ruYIc
-    jmY3c(i,:)=jmY3c(i,:)+ruYIc
+    jmY3c(:,i)=jmY3c(:,i)+ruYIc
 
     call flux_vector( iiBen, ppSuspensionFeeders(i,iiC),ppyc, ruYIc )
     call flux_vector( iiBen, ppSuspensionFeeders(i,iiN),ppyn, ruYIn )
@@ -484,7 +484,7 @@
 
   do i = 1,iiBenBacteria
     if (CalcBenBacteria(i)) then
-      choice  = pYH(i,:)
+      choice  = pYH(:,i)
       cx_any=BenBacteria(i,iiC)
       qnc =max(ZERO, BenBacteria(i,iiN)/ (NZERO+cx_any))
       qpc =max(ZERO, BenBacteria(i,iiP)/ (NZERO+cx_any))
@@ -519,9 +519,9 @@
 
   rx_any=ZERO;choice=ZERO;choicel=ZERO
   do i =1,iiBenPhyto
-    where (xBPavailable(i,:))
-      choice =  pc(i,:)* CalculateBenPhyto_vector(iiC,INTEGRAL,clmp,cmp)
-      choicel=  pc(i,:)* CalculateBenPhyto_vector(iiL,INTEGRAL,clmp,cmp)
+    where (xBPavailable(:,i))
+      choice =  pc(:,i)* CalculateBenPhyto_vector(iiC,INTEGRAL,clmp,cmp)
+      choicel=  pc(:,i)* CalculateBenPhyto_vector(iiL,INTEGRAL,clmp,cmp)
       cx_any=BenPhyto(i,iiC)
       qnc =max(ZERO, BenPhyto(i,iiN)/ (NZERO+cx_any))*choicel/(NZERO+choice)
       qpc =max(ZERO, BenPhyto(i,iiP)/ (NZERO+cx_any))*choicel/(NZERO+choice)
@@ -532,18 +532,18 @@
     call LimitChange_vector(POSITIVE,rx_any,cx_any, &
                                        max_change_per_step,px_any)
     choice=choice*px_any
-    where (xBPavailable(i,:))
-      ruPIc(i,:)=   rx_any*px_any
-      ruPIn     =   ruPIc(i,:)*qnc
-      ruPIp     =   ruPIc(i,:)*qpc
-      rq6s      =   ruPIc(i,:)*qsc
-      rq6l(i,:) =   ruPIc(i,:)*qlc
+    where (xBPavailable(:,i))
+      ruPIc(:,i)=   rx_any*px_any
+      ruPIn     =   ruPIc(:,i)*qnc
+      ruPIp     =   ruPIc(:,i)*qpc
+      rq6s      =   ruPIc(:,i)*qsc
+      rq6l(:,i) =   ruPIc(:,i)*qlc
     elsewhere
-     ruPIc(i,:)=ZERO;ruPIn=ZERO;ruPIp=ZERO;rq6l(i,:)=ZERO;rq6s=ZERO
+     ruPIc(:,i)=ZERO;ruPIn=ZERO;ruPIp=ZERO;rq6l(:,i)=ZERO;rq6s=ZERO
     endwhere
-    jPIQ6s(i,:)=jPIQ6s(i,:)+ rq6s
+    jPIQ6s(:,i)=jPIQ6s(:,i)+ rq6s
 
-    rugc  =   rugc+ ruPIc(i,:)
+    rugc  =   rugc+ ruPIc(:,i)
     rugn  =   rugn+ ruPIn
     rugp  =   rugp+ ruPIp
 
@@ -556,11 +556,11 @@
     rqt6p  =   rqt6p+ rq6p
     rqt6s  =   rqt6s+ rq6s
 
-    call flux_vector( iiBen, ppBenPhyto(i,iiC),ppyc, ruPIc(i,:) )
+    call flux_vector( iiBen, ppBenPhyto(i,iiC),ppyc, ruPIc(:,i) )
     call flux_vector( iiBen, ppBenPhyto(i,iiN),ppyn, ruPIn )
     call flux_vector( iiBen, ppBenPhyto(i,iiP),ppyp, ruPIp )
     j=ppBenPhyto(i,iiL)
-    call flux_vector( iiBen, j,j, -rq6l(i,:) )
+    call flux_vector( iiBen, j,j, -rq6l(:,i) )
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -601,8 +601,8 @@
   ! Calculation of respiration:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  jrrYIc(y,:)=p_sr(y)* max(ZERO,yc)* et
-  rrc  =jrrYIc(y,:)   + (p_pur(y)*( rugc- rqt6c)  &
+  jrrYIc(:,y)=p_sr(y)* max(ZERO,yc)* et
+  rrc  =jrrYIc(:,y)   + (p_pur(y)*( rugc- rqt6c)  &
                                        +p_sra(y)*yc)*insw_vector(sug)
   if (y==iiY2.or.y==iiY4) jO2Y2o=jO2Y2o+pUptake_ox*rrc/MW_C
 
@@ -622,7 +622,7 @@
   runn  =   max(  ZERO,  rugn- rqt6n)
   runp  =   max(  ZERO,  rugp- rqt6p)
 
-  jnetYIc(y,:)=runc
+  jnetYIc(:,y)=runc
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculation of nutrient release and correction of C:N:P
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -688,17 +688,17 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rx_any_m=ZERO
   do i = 1,iiBenPhyto
-    where (xBPavailable(i,:))
+    where (xBPavailable(:,i))
       cx_any  =   NZERO+BenPhyto(i,iiC)
       mx_any= CalculateBenPhyto_vector(iiC,AVERAGE,clmp,cmp)
-      rx_any_m=-(mx_any-Dfm(:))* ruPIc(i,:)/cx_any
+      rx_any_m=-(mx_any-Dfm(:))* ruPIc(:,i)/cx_any
     endwhere
     call LimitChange_vector(NEGATIVE,rx_any_m,Dfm,max_change_per_step)
     call flux_vector(iiBen, ppDfm,ppDfm,rx_any_m)
-    where (xBPavailable(i,:))
+    where (xBPavailable(:,i))
       cx_any  =   NZERO+BenPhyto(i,iiL)
       mx_any= CalculateBenPhyto_vector(iiL,AVERAGE,clmp,cmp)
-      rx_any_m=-(mx_any-Dcm(:))* rq6l(i,:)/cx_any
+      rx_any_m=-(mx_any-Dcm(:))* rq6l(:,i)/cx_any
     endwhere
     call LimitChange_vector(NEGATIVE,rx_any_m,Dcm,max_change_per_step)
     call flux_vector(iiBen, ppDcm,ppDcm,rx_any_m)

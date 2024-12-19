@@ -56,9 +56,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /BenQ1Transport_parameters/  p_p, p_slQ1,p_shQ1,p_pxtr
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  allocate(jQIBTx(1:iiBenLabileDetritus,1:NO_BOXES_XY),stat=status)
+  allocate(jQIBTx(1:NO_BOXES_XY,1:iiBenLabileDetritus),stat=status)
   if (status /= 0) call error_msg_prn(ALLOC,"BenQ1Transport","jQiBTx")
-  allocate(jBTQIx(1:iiBenLabileDetritus,1:NO_BOXES_XY),stat=status)
+  allocate(jBTQIx(1:NO_BOXES_XY,1:iiBenLabileDetritus),stat=status)
   if (status /= 0) call error_msg_prn(ALLOC,"BenQ1Transport","jBTQix")
   allocate(Q1x(1:NO_BOXES_XY),stat=status)
   if (status /= 0) call error_msg_prn(ALLOC,"BenQ1Transport","Q1x")

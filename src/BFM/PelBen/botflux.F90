@@ -74,7 +74,7 @@
               r=Depth3D(k)
               if ( r.gt.ZERO) then
                 do i=1,NO_D3_BOX_STATES
-                  call flux(k,iiPel,i,i, PELBOTTOM(i,j)/r)
+                  call flux(k,iiPel,i,i, PELBOTTOM(j,i)/r)
                 enddo
               endif
             endif
@@ -98,7 +98,7 @@
                 l=k+NO_BOXES_Z-1 
                 r=NZERO+sum(D3STATE(k:l,i)*Depth3D(k:l))
             end select
-            r=abs(PELBOTTOM(i,j)/r)
+            r=abs(PELBOTTOM(j,i)/r)
             if ( r>s ) then     
               tgoal=var_names(i)
               write(LOGUNIT,*)  &
@@ -148,13 +148,13 @@
       if (present(Depth_vector)) then
         do i=1,NO_BOXES_XY
           j=PelBoxAbove(i)
-          PELBOTTOM(State,j)=PELBOTTOM(State,j) +&
+          PELBOTTOM(j,State)=PELBOTTOM(j,State) +&
                               Rate_vector(i)/Depth_vector(i)
         enddo
       else
         do i=1,NO_BOXES_XY
           j=PelBoxAbove(i);
-          PELBOTTOM(State,j)=PELBOTTOM(State,j)+Rate_vector(i)
+          PELBOTTOM(j,State)=PELBOTTOM(j,State)+Rate_vector(i)
         enddo
       endif
       end subroutine openbotflux_vector
@@ -204,20 +204,20 @@ write(LOGUNIT,*) 'wrong use of routine:SourceSys and GoalSys equal'
           call flux_vector(iiBen,Source,Source,-Rate_vector)
           do i=1,NO_BOXES_XY
              j=PelBoxAbove(i)
-             PELBOTTOM(Goal,j)=PELBOTTOM(Goal,j)+ Rate_vector(i)
+             PELBOTTOM(j,Goal)=PELBOTTOM(j,Goal)+ Rate_vector(i)
           enddo
         case(iiPel)
           if (present(Depth_vector)) then
             do i=1,NO_BOXES_XY
               j=PelBoxAbove(i)
-              PELBOTTOM(Source,j)=PELBOTTOM(Source,j) &
+              PELBOTTOM(j,Source)=PELBOTTOM(j,Source) &
                              - Rate_vector(i)/Depth_vector(i)
             enddo
             call flux_vector(iiBen,Goal,Goal,+Rate_vector/Depth_vector)
           else
             do i=1,NO_BOXES_XY
               j=PelBoxAbove(i)
-              PELBOTTOM(Source,j)=PELBOTTOM(Source,j)- Rate_vector(i)
+              PELBOTTOM(j,Source)=PELBOTTOM(j,Source)- Rate_vector(i)
             enddo
             call flux_vector(iiBen,Goal,Goal,+Rate_vector)
           endif
@@ -254,14 +254,14 @@ write(LOGUNIT,*) 'wrong use of routine:SourceSys and GoalSys equal'
         case(iiBen)
           call flux(BenBox,iiBen,Source,Source,-Rate)
           j=PelBoxAbove(BenBox)
-          PELBOTTOM(Goal,j)=PELBOTTOM(Goal,j)+ Rate
+          PELBOTTOM(j,Goal)=PELBOTTOM(j,Goal)+ Rate
         case(iiPel)
           j=PelBoxAbove(BenBox)
           if (present(Depth)) then
-            PELBOTTOM(Source,j)=PELBOTTOM(Source,j) - Rate/Depth
+            PELBOTTOM(j,Source)=PELBOTTOM(j,Source) - Rate/Depth
             call flux(BenBox,iiBen,Goal,Goal,+Rate/Depth)
           else
-            PELBOTTOM(Source,j)=PELBOTTOM(Source,j) - Rate
+            PELBOTTOM(j,Source)=PELBOTTOM(j,Source) - Rate
             call flux(BenBox,iiBen,Goal,Goal,+Rate)
           endif
       end select
@@ -293,9 +293,9 @@ write(LOGUNIT,*) 'wrong use of routine:SourceSys and GoalSys equal'
       endif
       j=PelBoxAbove(BenBox)
       if (present(Depth)) then
-         PELBOTTOM(State,j)=PELBOTTOM(State,j) + Rate/Depth
+         PELBOTTOM(j,State)=PELBOTTOM(j,State) + Rate/Depth
       else
-         PELBOTTOM(State,j)=PELBOTTOM(State,j) + Rate
+         PELBOTTOM(j,State)=PELBOTTOM(j,State) + Rate
       endif
       end subroutine openbotflux
 
@@ -309,7 +309,7 @@ write(LOGUNIT,*) 'wrong use of routine:SourceSys and GoalSys equal'
       do j=1,NO_BOXES_XY
         k=PelBoxAbove(j)
         r=Depth3D(k)
-        if (r.gt.ZERO) getbotflux_3D(k)=PELBOTTOM(mode,j)/r
+        if (r.gt.ZERO) getbotflux_3D(k)=PELBOTTOM(j,mode)/r
       enddo 
       end function getbotflux_3D
 !EOP

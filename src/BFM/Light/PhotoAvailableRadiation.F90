@@ -179,12 +179,12 @@
   select case ( D3STATETYPE( i))
 
     case ( NOTRANSPORT )
-      EPLi(phyto,:)  =   PhytoPlankton(phyto,iiL)
+      EPLi(:,phyto)  =   PhytoPlankton(phyto,iiL)
 
 
 
     case default
-      EPLi(phyto,:)  =   PhytoPlankton(phyto,iiL)/ phytoc
+      EPLi(:,phyto)  =   PhytoPlankton(phyto,iiL)/ phytoc
 
 
 
@@ -199,9 +199,9 @@
   exfac  =   exp( - xd)
 
 
-  pIRR0  =   EIR(:)/ EPLi(phyto,:)
-  pirr0_noon  =   noon_light/ EPLi(phyto,:)
-  pirr0_afternoon  =   afternoon_light/ EPLi(phyto,:)
+  pIRR0  =   EIR(:)/ EPLi(:,phyto)
+  pirr0_noon  =   noon_light/ EPLi(:,phyto)
+  pirr0_afternoon  =   afternoon_light/ EPLi(:,phyto)
 
   pIRRZ  =   pIRR0* exfac
   pirrz_noon  =   pirr0_noon* exfac
@@ -329,13 +329,13 @@
 
     case ( 1 )
       !rectangular integration:
-      eiPI(phyto,:)  =   min(  1.0D+00,  corr_mean)
+      eiPI(:,phyto)  =   min(  1.0D+00,  corr_mean)
 
 
 
     case ( 3 )
       !   Simpson integration is used as default:
-      eiPI(phyto,:)  =  ( corr_irra+ 4.0D+00* corr_irrb)/ 6.0D+00
+      eiPI(:,phyto)  =  ( corr_irra+ 4.0D+00* corr_irrb)/ 6.0D+00
 
 
   end select
