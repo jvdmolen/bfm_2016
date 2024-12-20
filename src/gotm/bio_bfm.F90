@@ -413,6 +413,7 @@ IMPLICIT NONE
                   PELBOTTOM, PELSURFACE, &
                   jK3G4n,jK23K13n,jK34K24n,flN3O4n,jK23G4n
 use mem, only: ERHO
+use bfm_output,only:var_ave
 !JM #IFDEF INCLUDE_MACROPHYT
 !JM #ENDIF
 !JM #IFDEF INCLUDE_DAAN
@@ -442,7 +443,7 @@ use mem, only: ERHO
 !-----------------------------------------------------------------------
 !BOC
 
-LEVEL1 'do_bio_bfm'
+!LEVEL1 'do_bio_bfm'
 
    !---------------------------------------------
    ! Compute BFM terms
@@ -452,14 +453,14 @@ LEVEL1 'do_bio_bfm'
 !JM    call change_fish_predation()
 !JM #ENDIF
    call SiltDynamics
-LEVEL1 'ecologydynamics'
+!LEVEL1 'ecologydynamics'
 !LEVEL1 'ERHO',ERHO
 !stop
    call EcologyDynamics
-LEVEL1 'benthicsilt'
+!LEVEL1 'benthicsilt'
 !stop
    call BenthicSiltDist(0,0.0D+00)
-LEVEL1 'get_d3_model_flag'
+!LEVEL1 'get_d3_model_flag'
 !stop
    call get_d3_model_flag_from_getm(d3_model_flag)
    Nloss=_ZERO_;Hloss =_ZERO_;
@@ -476,7 +477,7 @@ LEVEL1 'get_d3_model_flag'
       endif
    endif
    start=.false.
-LEVEL1 'surface fluxes',bio_setup
+!LEVEL1 'surface fluxes',bio_setup
 !stop
    !---------------------------------------------
    ! Surface fluxes
@@ -556,7 +557,8 @@ LEVEL1 'surface fluxes',bio_setup
         if ( k > 0 ) bfl(k) = PELBOTTOM(k,1)*topm3psec
       enddo
    endif
-LEVEL1 'end do_bio_bfm'
+!LEVEL1 'end do_bio_bfm'
+!LEVEL1 'var_ave',var_ave
 !stop
    end subroutine do_bio_bfm
 !EOC
@@ -617,9 +619,10 @@ LEVEL1 'end do_bio_bfm'
    use mem, only: NO_BOXES_Z,   &
                   NO_D3_BOX_STATES, OCDepth,Depth,              &
                   D3DIAGNOS,iiPELSINKREF
-   use bio_var,only:var_names
+   use bfm_output,only:var_names,var_ave
    use constants,  only: SEC_PER_DAY
    use mem_globalfun,only: insw_vector
+use global_mem,only:LOGUNIT
 
    IMPLICIT NONE
 !
@@ -632,6 +635,7 @@ LEVEL1 'end do_bio_bfm'
    REALTYPE                    ::r
    character(len=22)           ::onem,pnem
 
+!write(LOGUNIT,*)'start assign_adv_rates, var_ave',var_ave
    !---------------------------------------------
    ! Transfer sinking velocities (m/d -> m/s)
    !---------------------------------------------
@@ -685,6 +689,7 @@ LEVEL1 'end do_bio_bfm'
        llws(j)=.false.
      endif
    enddo
+!write(LOGUNIT,*)'mid assign_adv_rates, var_ave',var_ave
    if (first) then
      ldep=0;k=0
      do j=1,NO_D3_BOX_STATES
@@ -712,6 +717,8 @@ LEVEL1 'end do_bio_bfm'
      endif
    endif
 
+!write(LOGUNIT,*)'end assign_adv_rates, var_ave',var_ave
+!stop
    return
 
    end subroutine assign_adv_rates
@@ -762,7 +769,8 @@ LEVEL1 'end do_bio_bfm'
 ! !USES:
        use bio_var,only:bio_setup,numc_diag,diag,ccb,ppb,ddb,benvar_type,diagb,&
                     numc,numbc,numbc_diag, &
-                    cc_before_transport,stBenFluxS,stBenFluxE,var_ids
+                    cc_before_transport
+       use bfm_output,only:stBenFluxS,stBenFluxE,var_ids
        use mem,only:flx_option
 #ifdef INCLUDE_DIAGNOS_PRF
       use bio_var,only:numbc_prf,diagb_prf,nprf
@@ -877,7 +885,7 @@ LEVEL1 'end do_bio_bfm'
                                        error, msg,counter )
 !
 ! !USES:
-       use bio_var,only:var_names
+       use bfm_output,only:var_names
        use gotm_error_msg, only:set_warning_for_getm
        IMPLICIT NONE
 !

@@ -13,12 +13,12 @@
 !
 ! !USES:
 !  default: all is private.
-     use bio_var, only: stPelStateS,stPelDiagS,stPelFluxS,stBenStateS,stBenDiagS, &
-                        stBenFluxS,stPelStateE,stPelDiagE,stPelFluxE,stBenStateE, &
-                        stBenDiagE,stBenFluxE,stSYSE
-#ifdef INCLUDE_DIAGNOS_PRF
-     use bio_var, only: stPRFDiagS,stPRFFluxS,stPRFDiagE,stPRFFluxE
-#endif
+!     use bio_var, only: stPelStateS,stPelDiagS,stPelFluxS,stBenStateS,stBenDiagS, &
+!                        stBenFluxS,stPelStateE,stPelDiagE,stPelFluxE,stBenStateE, &
+!                        stBenDiagE,stBenFluxE,stSYSE
+!#ifdef INCLUDE_DIAGNOS_PRF
+!     use bio_var, only: stPRFDiagS,stPRFFluxS,stPRFDiagE,stPRFFluxE
+!#endif
 
 !
 ! !PUBLIC MEMBER FUNCTIONS
@@ -40,25 +40,25 @@
 
      logical      :: write_results
      ! Start and End markers for variable and diagnostics storage
-!JM     integer      :: stPelStateS
-!JM     integer      :: stPelDiagS
-!JM     integer      :: stPelFluxS
-!JM     integer      :: stBenStateS
-!JM     integer      :: stBenDiagS
-!JM     integer      :: stBenFluxS
-!JM     integer      :: stPelStateE
-!JM     integer      :: stPelDiagE
-!JM     integer      :: stPelFluxE
-!JM     integer      :: stBenStateE
-!JM     integer      :: stBenDiagE
-!JM     integer      :: stBenFluxE
-!JM     integer      :: stSYSE
-!JM#ifdef INCLUDE_DIAGNOS_PRF
-!JM     integer      :: stPRFDiagS
-!JM     integer      :: stPRFFluxS
-!JM     integer      :: stPRFDiagE
-!JM     integer      :: stPRFFluxE
-!JM#endif
+     integer      :: stPelStateS
+     integer      :: stPelDiagS
+     integer      :: stPelFluxS
+     integer      :: stBenStateS
+     integer      :: stBenDiagS
+     integer      :: stBenFluxS
+     integer      :: stPelStateE
+     integer      :: stPelDiagE
+     integer      :: stPelFluxE
+     integer      :: stBenStateE
+     integer      :: stBenDiagE
+     integer      :: stBenFluxE
+     integer      :: stSYSE
+#ifdef INCLUDE_DIAGNOS_PRF
+     integer      :: stPRFDiagS
+     integer      :: stPRFFluxS
+     integer      :: stPRFDiagE
+     integer      :: stPRFFluxE
+#endif
 
 
 
@@ -130,17 +130,19 @@
 
       select case (mode)
         case(0)   ! initialization
-LEVEL1 'bfm output case 0',bio_setup,stPelStateS,stPelFluxE
+!LEVEL1 'bfm output case 0',bio_setup,stPelStateS,stPelFluxE
+!LEVEL1 'var_ave',var_ave
+!stop
           i=count(var_ave(stPelStateS:stPelFluxE))
-LEVEL1 'i',i
+!LEVEL1 'i',i
           if ( (i> 0) .and. bio_setup/=2) then
-LEVEL1 'allocating'
+!LEVEL1 'allocating'
             allocate(cc_ave(0:nlev,1:i),stat=rc)
-LEVEL1 'rc',rc
+!LEVEL1 'rc',rc
             if (rc /= 0) stop 'init_bio(): Error allocating cc_ave)'
              cc_ave=0
           endif
-LEVEL1 allocated(cc_ave)
+!LEVEL1 allocated(cc_ave)
           i=count(var_ave(stBenStateS:stBenFluxE))
           if ( ( i> 0) .and. bio_setup>1) then
             allocate(ccb_ave(0:1,1:i),stat=rc)
@@ -157,7 +159,7 @@ LEVEL1 allocated(cc_ave)
 #endif
 
           ave_count=0.0
-LEVEL1 'bfm output case 0 end'
+!LEVEL1 'bfm output case 0 end'
 !JM: gaat fout, want var_ave is overal .false.
 !stop
         case(1)  ! prepare for printing
@@ -179,7 +181,12 @@ LEVEL1 'bfm output case 0 end'
            ave_count=0.0
         case(10) ! Start of new time-step
            ave_count=ave_count+1.0
+!LEVEL1 'case(10),stPelStateS,stPelStateE',stPelStateS,stPelStateE
+!LEVEL1 'var_ave',var_ave
         case(11) ! add pel value
+!LEVEL1 'case(11),stPelStateS,stPelStateE',stPelStateS,stPelStateE
+!LEVEL1 'var_ave',var_ave
+!stop
            k=0
            j=0
            if (stPelStateE==0 .or. bio_setup==2) return

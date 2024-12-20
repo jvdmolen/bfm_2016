@@ -25,7 +25,7 @@
           BoxNumberZ,BoxNumberX,BoxNumberY,BoxNumberXY,NO_D3_BOX_STATES, &
           PELBOTTOM,flux_vector,flux,PelBoxAbove
         USE BFM_ERROR_MSG, ONLY: set_warning_for_getm,BFM_ERROR
-        use bio_var, only: var_names,stPelStates,stBenStateS
+        use bfm_output, only: var_names,stPelStates,stBenStateS
         use constants,only: ANY,POSITIVE,INITIALIZE,ADD,NEGATIVE
 
       real(RLEN),private                       ::r

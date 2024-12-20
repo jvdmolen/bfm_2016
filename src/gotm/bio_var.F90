@@ -38,10 +38,11 @@
    integer, dimension(:,:), allocatable  :: particle_indx
    REALTYPE, dimension(:,:), allocatable :: particle_pos
 
-   integer, dimension(:), allocatable    :: var_ids
-   character(len=64), dimension(:), allocatable :: var_names
-   character(len=64), dimension(:), allocatable :: var_units
-   character(len=92), dimension(:), allocatable :: var_long
+!JM now in bfm_output
+!   integer, dimension(:), allocatable    :: var_ids
+!   character(len=64), dimension(:), allocatable :: var_names
+!   character(len=64), dimension(:), allocatable :: var_units
+!   character(len=92), dimension(:), allocatable :: var_long
 
    REALTYPE, parameter                   :: secs_pr_day=86400.0
 
@@ -55,11 +56,11 @@
    REALTYPE, dimension(:), allocatable   :: c1dimnumc
 
    REALTYPE             :: bathy_dep   !JM added
-   integer              :: reset_count
+!JM now in bfm_output   integer              :: reset_count
 
 #ifdef BFM_GOTM
    integer              :: sw_BenSilt=0
-   logical              :: write_results
+!JM now in bfm_output   logical              :: write_results
    logical              :: test_mode=.false.
    REALTYPE             :: dt=-1.0
    integer              :: julianday
@@ -72,25 +73,26 @@
    integer              :: numbc_prf
 #endif 
    ! Start and End markers for variable and diagnostics storage
-   integer      :: stPelStateS
-   integer      :: stPelDiagS
-   integer      :: stPelFluxS
-   integer      :: stBenStateS
-   integer      :: stBenDiagS
-   integer      :: stBenFluxS
-   integer      :: stPelStateE
-   integer      :: stPelDiagE
-   integer      :: stPelFluxE
-   integer      :: stBenStateE
-   integer      :: stBenDiagE
-   integer      :: stBenFluxE
-   integer      :: stSYSE
-#ifdef INCLUDE_DIAGNOS_PRF 
-   integer      :: stPRFDiagS
-   integer      :: stPRFFluxS
-   integer      :: stPRFDiagE
-   integer      :: stPRFFluxE
-#endif 
+!JM now in bfm_output
+!   integer      :: stPelStateS
+!   integer      :: stPelDiagS
+!   integer      :: stPelFluxS
+!   integer      :: stBenStateS
+!   integer      :: stBenDiagS
+!   integer      :: stBenFluxS
+!   integer      :: stPelStateE
+!   integer      :: stPelDiagE
+!   integer      :: stPelFluxE
+!   integer      :: stBenStateE
+!   integer      :: stBenDiagE
+!   integer      :: stBenFluxE
+!   integer      :: stSYSE
+!#ifdef INCLUDE_DIAGNOS_PRF 
+!   integer      :: stPRFDiagS
+!   integer      :: stPRFFluxS
+!   integer      :: stPRFDiagE
+!   integer      :: stPRFFluxE
+!#endif 
 
    ! parameter values for the attributes pelvar_type and benvar_type
    integer, parameter   :: SINKSOURCE=-1
@@ -117,10 +119,11 @@
    integer, dimension(:),      allocatable, target :: benvar_type
 
    ! store arrays for average computations (pelagic and benthic)
-   logical , dimension(:)  ,   allocatable           :: var_ave
-   REALTYPE, dimension(:,:),   allocatable, target   :: cc_ave
-   REALTYPE, dimension(:,:),   allocatable, target   :: ccb_ave
-   REALTYPE                                          :: ave_count
+!JM now in bfm_output
+!   logical , dimension(:)  ,   allocatable           :: var_ave
+!   REALTYPE, dimension(:,:),   allocatable, target   :: cc_ave
+!   REALTYPE, dimension(:,:),   allocatable, target   :: ccb_ave
+!   REALTYPE                                          :: ave_count
 
    ! store array for adv_messages
    REALTYPE                              :: adv_courant=0.0
@@ -129,7 +132,7 @@
    REALTYPE,dimension(:), allocatable    :: adv1d_number
 #ifdef INCLUDE_DIAGNOS_PRF 
    REALTYPE, dimension(:,:),   allocatable, target :: diagb_prf
-   REALTYPE, dimension(:,:),   allocatable, target :: ccb_ave_prf
+!JM now in bfm_output   REALTYPE, dimension(:,:),   allocatable, target :: ccb_ave_prf
 #endif 
 #endif 
 

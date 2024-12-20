@@ -18,10 +18,11 @@
 #endif
 #ifdef BFM_GOTM
    use global_mem,only:LOGUNIT,DONE
-   use bio_var,only: var_ids,var_ave,var_names,nlev,numc,numbc, &
+   use bio_var,only: nlev,numc,numbc, &
             calc_init_bennut_states,sw_BenSilt,NOTRANSPORT,ppb,ddb, &
             sfl_N3n,sfl_N4n,rel_max_sedi_rate,n_surface_fluxes, &
-            surface_flux_method,stPelStateS,stPelStateE, &
+            surface_flux_method
+   use bfm_output,only:var_ids,var_ave,var_names,stPelStateS,stPelStateE, &
             stBenStateS,stBenStateE,stPRFFluxE 
    use bio_bfm
 #endif

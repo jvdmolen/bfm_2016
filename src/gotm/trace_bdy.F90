@@ -14,6 +14,10 @@
 ! !USES:
 !  default: all is private.
    use bio_var
+   use bfm_output,only:var_ave,var_ids,var_names,var_units,var_long, &
+       stPelStateS,stPelStateE,stPelDiagS,stPelDiagE,stPelFluxS, &
+       stPelFluxE,stBenStateS,stBenStateE,stBenDiagS,stBenDiagE, &
+       stBenFluxS,stBenFluxE
    private
    integer                        :: ivar,err,rriver
    integer                        :: bdys(4)
@@ -218,9 +222,9 @@
         enddo
       enddo
 
-      var_ids=-1
+!JM      var_ids=-1
 !JM      var_ave=0
-      var_ave=.false.
+!JM      var_ave=.false.
 
     
      return

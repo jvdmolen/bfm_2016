@@ -23,8 +23,8 @@
 !
 ! !USES:
 
-     use bio_var, only: var_names
-     use bio_var, only: stPelStateS,stBenStateS
+     use bfm_output, only: var_names
+     use bfm_output, only: stPelStateS,stBenStateS
      use BFM_ERROR_MSG, ONLY: BFM_ERROR
      use global_mem, only: LOGUNIT,ALLTRANSPORT,ZERO
      use constants, only: RLEN, ZERO, SEC_PER_DAY

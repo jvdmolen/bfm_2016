@@ -21,7 +21,7 @@
   use mem,    ONLY: iiBen, iiPel,Source_D2_vector,Source_D3_vector, &
               NO_BOXES_XY,NO_BOXES,D2STATE,D3STATE
 !JM #ifdef BFM_GOTM
-  use bio_var,ONLY: var_names, stPelStateS,stBenStateS
+  use bfm_output,ONLY: var_names, stPelStateS,stBenStateS
 !JM #else
 !JM   use api_bfm,only: var_names, stPelStates,stBenStates
 !JM #endif
@@ -300,7 +300,7 @@ subroutine findsmall( vector,n,small,iout)
   use mem,    ONLY: iiBen, iiPel,Source_D2_vector,Source_D3_vector, &
               NO_BOXES_XY,NO_BOXES,D2STATE,D3STATE
 #ifdef BFM_GOTM
-  use bio_var,ONLY: var_names, stPelStates,stBenStates
+  use bfm_output,ONLY: var_names, stPelStates,stBenStates
 #else
   use api_bfm,only: var_names, stPelStates,stBenStates
 #endif

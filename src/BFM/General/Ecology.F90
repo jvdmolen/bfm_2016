@@ -31,7 +31,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   use bio,only: ActualN
-  use bio_var,Only:julianday,var_names,cc_before_transport
+  use bio_var,Only:julianday,cc_before_transport
+  use bfm_output,only:var_names
   use global_mem, ONLY:RLEN,LOGUNIT,ZERO,DONE,NZERO
   use mem,  ONLY: iiPel,iiBen, iiReset,flux,Depth,NO_BOXES,iiConsumption, &
                    LocalDelta, max_change_per_step,max_rate_per_step
@@ -109,7 +110,7 @@
   integer,save                     ::follow=0
   integer                          :: iout,i,j,k,l,mm
 
-write(LOGUNIT,*) 'subroutine ecologydynamics'
+!write(LOGUNIT,*) 'subroutine ecologydynamics'
 !stop
 
   call ResetSource_D2_vector(ppQ6s)

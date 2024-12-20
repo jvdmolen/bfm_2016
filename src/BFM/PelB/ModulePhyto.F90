@@ -247,7 +247,7 @@ open(NMLUNIT,file='Phyto.nml',status='old',action='read',err=100)
       flux_vector,ResetSource_D3_vector,CoupledtoBDc,sw_CalcPhyto,D3SINK
   use global_mem,only:LOGUNIT,ZERO
 #ifdef BFM_GOTM
-  use bio_var,only:var_names
+  use bfm_output,only:var_names
 #else
   use api_bfm,only: var_names
 #endif

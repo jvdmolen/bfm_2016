@@ -128,7 +128,7 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
-LEVEL1 'ode_solver'
+!LEVEL1 'ode_solver'
 
 ! Allocate global variables
    if (.NOT. allocated(cc0)) then
@@ -163,9 +163,9 @@ LEVEL1 'ode_solver'
 !#else
    dt_local=dt/SEC_PER_DAY
 !#endif
-LEVEL1 'calling solver',solver
-LEVEL1 'dt,SEC_PER_DAY',dt,SEC_PER_DAY
-LEVEL1 'dt_local,numc,nlev',dt_local,numc,nlev
+!LEVEL1 'calling solver',solver
+!LEVEL1 'dt,SEC_PER_DAY',dt,SEC_PER_DAY
+!LEVEL1 'dt_local,numc,nlev',dt_local,numc,nlev
 
    select case (solver)
       case (1)

@@ -43,11 +43,11 @@ subroutine set_var_info_bfm
 
 #ifdef BFM_GOTM
   use mem
-  use bio_var, only: var_names,var_long,var_units,stSYSE
-  use bio_var, only: stPelStateS,stPelDiagS,stPelFluxS,stBenStateS,stBenDiagS,stBenFluxS
-  use bio_var, only: stPelStateE,stPelDiagE,stPelFluxE,stBenStateE,stBenDiagE,stBenFluxE
+  use bfm_output, only: var_names,var_long,var_units,stSYSE
+  use bfm_output, only: stPelStateS,stPelDiagS,stPelFluxS,stBenStateS,stBenDiagS,stBenFluxS
+  use bfm_output, only: stPelStateE,stPelDiagE,stPelFluxE,stBenStateE,stBenDiagE,stBenFluxE
 #ifdef INCLUDE_DIAGNOS_PRF
-  use bio_var, only: stPRFDiagS,stPRFFluxS,stPRFDiagE,stPRFFluxE
+  use bfm_output, only: stPRFDiagS,stPRFFluxS,stPRFDiagE,stPRFFluxE
 #endif
 #else
   use api_bfm

@@ -62,6 +62,8 @@
    use output, only: out_fmt
    use util
 
+use bfm_output,only:var_ave
+
 !
 !  default: all is private.
    private
@@ -197,11 +199,11 @@
 !
 ! !INTERFACE:
    subroutine init_bio(namlst,fname,unit,nlev)
-   use bio_var,only:bio_setup,dt,numc,bio_model,par,var_names,var_units, &
-                   var_long, pelvar_type,pelvar_type_dyn,ALLTRANSPORT,SILTTRANSPORT, &
-                   stPelStateS,stBenStateS, stPelStateE,stBenStateE, &
+   use bio_var,only:bio_setup,dt,numc,bio_model,par, &
+                   pelvar_type,pelvar_type_dyn,ALLTRANSPORT,SILTTRANSPORT, &
                    zlev,particle_active,particle_indx,particle_pos
-   use bio_var,only:stPRFDiagS                  
+   use bfm_output,only:var_names,var_units,var_long, &
+                   stPRFDiagS,stPelStateS,stBenStateS, stPelStateE,stBenStateE                 
 !
 ! !DESCRIPTION:
 ! Here, the bio namelist {\tt bio.nml} is read and memory for the
@@ -560,9 +562,12 @@
    use bio_var,only: nlev,h_l,nuh_l,bio_model,bio_setup,cc,ccb,numc,numcc,dt, &
               pelvar_type, adv1d_courant,adv1d_number,ws,c1dimz,sfl,bfl, &
               posconc, adv_courant,adv_number,cc_before_transport,pp,dd, &
-                      ALLTRANSPORT,SILTTRANSPORT,llws,zlev,write_results,numbc
+                      ALLTRANSPORT,SILTTRANSPORT,llws,zlev,numbc
+#ifndef BFM_GOTM
+   use bio_var,only:write_results
+#endif
 #ifdef BFM_GOTM
-
+   use bfm_output,only:write_results
    use mem, only: track_error
    use gotm_error_msg, only:gotm_error,set_warning_for_getm , &
                             get_d3_model_flag_from_getm
@@ -603,7 +608,7 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
-LEVEL1 'do_bio',ll_write_results
+!LEVEL1 'do_bio',ll_write_results
 
    if (bio_calc) then
 !          call test_model_states(1,0,numbc,1,ccb)
@@ -617,7 +622,7 @@ LEVEL1 'do_bio',ll_write_results
  
 
 #ifdef BFM_GOTM
-LEVEL1 'get_flag'
+!LEVEL1 'get_flag'
       call get_d3_model_flag_from_getm(d3_model_flag)
       ! Somtimes it happens that a concentration become negative
       ! after calculations of the 3d-transport
@@ -639,17 +644,18 @@ LEVEL1 'get_flag'
           dt_eff=dt/float(split_factor)
 
 #ifdef BFM_GOTM
-LEVEL1 'mass_conv'
+!LEVEL1 'mass_conv'
           call test_mass_conservation(mass_test_after_odv,1,'', &
                                                   totsysn_old,totsysp_old)
 #endif
 
           if ( bio_setup >0 ) then  
-LEVEL1 'ode'
+!LEVEL1 'ode'
             call ode_solver(ode_method,numc,nlev,dt_eff,cc)
           endif
 #ifdef BFM_GOTM
-LEVEL1 'check negatives'
+!LEVEL1 'check negatives'
+!LEVEL1 'var_ave',var_ave
 !stop
           if (bio_model==6.and.nega_test_after_odv) then
             call test_on_all_negative_states (.true., llsumh2, &
@@ -660,7 +666,7 @@ LEVEL1 'check negatives'
               call set_warning_for_getm 
             endif
           endif
-LEVEL1 'mass conv'
+!LEVEL1 'mass conv'
 !stop
           call test_mass_conservation(mass_test_after_odv,4,'ode_solver', &
                                                    totsysn_old,totsysp_old)
@@ -677,9 +683,11 @@ LEVEL1 'mass conv'
         i=0;if (present(counter)) i=counter
         if (bio_model==6) then
 !         if ( allocated(cc_before_transport)) cc_before_transport=cc;
-LEVEL1 'call assignadvrates'
+!LEVEL1 'call assignadvrates'
+!LEVEL1 'var_ave',var_ave
           call assign_adv_rates(dt)
-LEVEL1 'advection diffusion start loop'
+!LEVEL1 'advection diffusion start loop'
+!LEVEL1 'var_ave',var_ave
           do j=1,numcc
             if (bio_setup /= 2 ) then
               ! inclusive SILTTRANSPORT
@@ -751,13 +759,14 @@ LEVEL1 'advection diffusion start loop'
               end if
             end if
           enddo
-LEVEL1 'advdiff end loop'
+!LEVEL1 'advdiff end loop'
+!LEVEL1 'var_ave',var_ave
           if ( kt.lt.0) then
             call gotm_error('do_bio', 'negative state value');
             return
           endif
           call CalcSiltResuspension()
-LEVEL1 'end advection diffusion for BFM'
+!LEVEL1 'end advection diffusion for BFM'
         elseif (bio_model==7) then
           do j=1,numcc
 !           do diffusion step
@@ -851,7 +860,8 @@ LEVEL1 'end advection diffusion for BFM'
       end if
 
    end if
-LEVEL1 'end do_bio'
+!LEVEL1 'end do_bio'
+!LEVEL1 'var_ave',var_ave
    return
    end subroutine do_bio
 !EOC
@@ -899,9 +909,13 @@ LEVEL1 'end do_bio'
 ! !USES:
    use bio_var,only:numc,numc_diag,numbc,numbc_diag,numc_flux,numbc_flux, &
          cc,nuh_l,h_l,t_l,c1dimz,c1dimnumc,ws, &
-         llws,bfl,sfl,posconc,var_ids,var_names,var_units,var_long
+         llws,bfl,sfl,posconc
+#ifndef BFM_GOTM
+   use bio_var,only:var_ids,var_names,var_units,var_long
+#endif
 #ifdef BFM_GOTM 
-   use bio_var,only:adv1d_courant,adv1d_number,pp,dd,pelvar_type,pelvar_type_dyn,var_ave
+   use bio_var,only:adv1d_courant,adv1d_number,pp,dd,pelvar_type,pelvar_type_dyn
+!   use bfm_output,only:var_ids,var_names,var_units,var_long,var_ave
 #ifdef INCLUDE_DIAGNOS_PRF
    use bio_var,only:numbc_prf
 #endif
@@ -952,7 +966,8 @@ LEVEL1 'end do_bio'
    if (rc /= 0) STOP 'init_bio: Error allocating (c1dimnumc)'
    c1dimnumc=_ZERO_
 
-   allocate(ws(1:numc,0:nlev),stat=rc)
+!JM   allocate(ws(1:numc,0:nlev),stat=rc)
+   allocate(ws(0:nlev,1:numc),stat=rc)
    if (rc /= 0) STOP 'init_bio: Error allocating (ws)'
    ws=_ZERO_
 
@@ -1011,23 +1026,24 @@ LEVEL1 'end do_bio'
    numsave=numsave+numbc_prf
 #endif
 
-   allocate(var_ave(1:numsave),stat=rc)
-   if (rc /= 0) stop 'init_bio(): Error allocating var_ave)'
-   var_ave=.false.
+!JM now in bfm_output
+!   allocate(var_ave(1:numsave),stat=rc)
+!   if (rc /= 0) stop 'init_bio(): Error allocating var_ave)'
+!   var_ave=.false.
 #endif
 
-   allocate(var_ids(1:numsave),stat=rc)
-   if (rc /= 0) stop 'init_bio(): Error allocating var_ids)'
-   var_ids=0;
-
-   allocate(var_names(1:numsave),stat=rc)
-   if (rc /= 0) stop 'init_bio(): Error allocating var_names)'
-
-   allocate(var_units(1:numsave),stat=rc)
-   if (rc /= 0) stop 'init_bio(): Error allocating var_units)'
-
-   allocate(var_long(1:numsave),stat=rc)
-   if (rc /= 0) stop 'init_bio(): Error allocating var_long)'
+!   allocate(var_ids(1:numsave),stat=rc)
+!   if (rc /= 0) stop 'init_bio(): Error allocating var_ids)'
+!   var_ids=0;
+!
+!   allocate(var_names(1:numsave),stat=rc)
+!   if (rc /= 0) stop 'init_bio(): Error allocating var_names)'
+!
+!   allocate(var_units(1:numsave),stat=rc)
+!   if (rc /= 0) stop 'init_bio(): Error allocating var_units)'
+!
+!   allocate(var_long(1:numsave),stat=rc)
+!   if (rc /= 0) stop 'init_bio(): Error allocating var_long)'
 
    return
    end subroutine allocate_memory

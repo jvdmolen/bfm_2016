@@ -30,7 +30,7 @@
 
   use global_mem, ONLY:RLEN,LOGUNIT
 #ifdef BFM_GOTM
-  use bio_var, only: var_names,var_ids,stPRFDiagE,var_ave,write_results
+  use bfm_output, only: var_names,var_ids,stPRFDiagE,var_ave,write_results
 #else
   use api_bfm,only: var_names,var_ids,stPRFDiagE,var_ave,write_results
 #endif
@@ -84,6 +84,8 @@
        put_in_list=.false.
    endif
 
+!write(LOGUNIT,*) 'end check_if_in_output, varnames(j)',var_names(j)
+!write(LOGUNIT,*) 'var_ave',var_ave
 
   end
 !BOP
