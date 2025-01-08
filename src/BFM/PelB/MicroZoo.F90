@@ -370,8 +370,8 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
     runc  =   max(  ZERO,  rugc-rea1c-rea6c-rrac)
-    runn  =   max(  ZERO,  rugn-rea1n-rea6n+ rrsc* qn_mz(zoo, :))
-    runp  =   max(  ZERO,  rugp-rea1p-rea6p+ rrsc* qp_mz(zoo, :))
+    runn  =   max(  ZERO,  rugn-rea1n-rea6n+ rrsc* qn_mz(:,zoo))
+    runp  =   max(  ZERO,  rugp-rea1p-rea6p+ rrsc* qp_mz(:,zoo))
 
     ! Carbon which will be excreted/respired when internal quota (N/C) are 
     ! below optimum. renc has te be renc >=rrsc
