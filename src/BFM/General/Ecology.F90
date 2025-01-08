@@ -368,8 +368,8 @@
   if ( mass_conservation_check ) then
     call CheckMassConservationNPSDynamics
 #ifdef INCLUDE_MACROPHYT
-!skip     if (CalcMacroPhyto.and.CalcPelagicFlag )  &
-!skip                                 call AddMacroPhytAddToMassConservationNP
+     if (CalcMacroPhyto.and.CalcPelagicFlag )  &
+                                 call AddMacroPhytAddToMassConservationNP
 #endif
      call CheckMassConservationCDynamics
   endif

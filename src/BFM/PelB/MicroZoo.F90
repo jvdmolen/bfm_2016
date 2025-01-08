@@ -308,7 +308,7 @@
         flR3R2c=flR3R2c+ruPIc/(NZERO+rumPIc(:,i)) * rumR3c
         call findnan(flR3R2c,NO_BOXES,iout)
         if ( iout>0) write(LOGUNIT,*) 'MicroZoo flR3R2=NAN', &
-                 iout,rumR3c(iout),ruPIc(iout),rumPIc(i,iout),put_u(iout)
+                 iout,rumR3c(iout),ruPIc(iout),rumPIc(iout,i),put_u(iout)
       endif
    else
      rx_any=ZERO

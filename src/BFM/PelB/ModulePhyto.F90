@@ -262,8 +262,8 @@ open(NMLUNIT,file='Phyto.nml',status='old',action='read',err=100)
      rzero=ZERO
      do i=1,iiPhytoPlankton
        m=0
-       sw_old_CalcPhyto(i)=sw_CalcPhyto(i,1)
-       k=sw_CalcPhyto(i,1)
+       sw_old_CalcPhyto(i)=sw_CalcPhyto(1,i)
+       k=sw_CalcPhyto(1,i)
        j=ppPhytoPlankton(i,iiC)
        if ( CalcPhytoCopy(i)) then
          scalar=sum(PhytoPlankton(i,iiC)*Depth)
@@ -280,7 +280,7 @@ open(NMLUNIT,file='Phyto.nml',status='old',action='read',err=100)
               'processes are excluded in the calculation:concentration<1.d-06'
             !set all modelled constituents for this functional group on
              call set_warning_for_getm
-             sw_CalcPhyto(i,1)=0
+             sw_CalcPhyto(1,i)=0
              m=1
              k=0
              CalcPhytoPlankton(i)=.false.
@@ -288,7 +288,7 @@ open(NMLUNIT,file='Phyto.nml',status='old',action='read',err=100)
          elseif( scalar.gt.1.0D-5) then
             k=1
             m=1
-            sw_CalcPhyto(i,1)=1
+            sw_CalcPhyto(1,i)=1
             CalcPhytoPlankton(i)=.true.
             write(LOGUNIT,*) 'Warning ',trim(var_names(j)), &
            'processes are (re)included in the calculation:concentration>1.d-05'

@@ -1185,7 +1185,7 @@
     allocate(KSIO3(1:NO_BOXES_XY), stat=status); KSIO3 = 0
     allocate(KQ1c(1:NO_BOXES_XY), stat=status); KQ1c = 0
     allocate(KQun(1:NO_BOXES_XY), stat=status); KQun = 0
-    allocate(sw_CalcPhyto(1:iiPhytoPlankton, 1:NO_BOXES_XY),stat=status)
+    allocate(sw_CalcPhyto( 1:NO_BOXES_XY,1:iiPhytoPlankton),stat=status)
     sw_CalcPhyto = 0
     allocate(PelBoxAbove(1:NO_BOXES_XY), stat=status); PelBoxAbove = 0
     allocate(KCO2(1:NO_BOXES_XY), stat=status); KCO2 = 0

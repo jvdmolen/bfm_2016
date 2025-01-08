@@ -374,7 +374,7 @@
    !---------------------------------------------
    do n=stPelStateS,stPelStateE
      if ( var_ids(n) > 0 ) & 
-       iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3STATE(n,:))
+       iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3STATE(:,n))
    end do
    !---------------------------------------------
    ! Store snapshot of pelagic diagnostics
@@ -383,7 +383,7 @@
    do n=stPelDiagS,stPelDiagE
       i=i+1
       if ( var_ids(n) > 0 .and. (.not.var_ave(n))) & 
-         iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3DIAGNOS(i,:))
+         iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3DIAGNOS(:,i))
    end do
    !---------------------------------------------
    ! Store snapshot of pelagic fluxes
@@ -403,7 +403,7 @@
    do n=stPelStateS,stPelFluxE
       if ( var_ids(n) > 0 .and.var_ave(n) ) then
          k=k+1
-         iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3ave(k,:))
+         iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3ave(:,k))
       endif
    end do
 
@@ -415,7 +415,7 @@
       do n=stBenStateS,stBenStateE
          i=i+1
          if ( var_ids(n) > 0 ) &
-            iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2STATE(i,:))
+            iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2STATE(:,i))
       end do
       !---------------------------------------------
       ! Store snapshot of benthic diagnostics
@@ -424,7 +424,7 @@
       do n=stBenDiagS,stBenDiagE
          i=i+1
          if ( var_ids(n) > 0 ) &
-            iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(i,:))
+            iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,i))
       end do
       !---------------------------------------------
       ! Store snapshot of benthic fluxes
@@ -444,7 +444,7 @@
       do n=stBenStateS,stBenFluxE
          if ( var_ids(n) > 0 .and. var_ave(n)) then
             k=k+1
-            iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2ave(k,:))
+            iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2ave(:,k))
          endif
       end do 
    end if

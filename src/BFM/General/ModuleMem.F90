@@ -1974,11 +1974,11 @@
                       destination='',i4)') D23, origin,destination
                     write(LOGUNIT,'(''flux='',(G16.8))') flux(i)
                     if ( iiSub== iiBen) then
-                      write(LOGUNIT,*) "state value origin:",D2STATE(origin,i)
-                      write(LOGUNIT,*) "state value destination:",D2STATE(destination,i)
+                      write(LOGUNIT,*) "state value origin:",D2STATE(i,origin)
+                      write(LOGUNIT,*) "state value destination:",D2STATE(i,destination)
                     else
-                      write(LOGUNIT,*) "state value origin:",D3STATE(origin,i)
-                      write(LOGUNIT,*) "state value destination:",D3STATE(destination,i)
+                      write(LOGUNIT,*) "state value origin:",D3STATE(i,origin)
+                      write(LOGUNIT,*) "state value destination:",D3STATE(i,destination)
                     endif
                   endif
                 enddo
@@ -2166,12 +2166,12 @@
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           select case (mode)
             case(iiConsumption)
-              Source_D3_vector=sum(D3SINK(:,iistate,:),DIM=1)*SEC_PER_DAY
+              Source_D3_vector=sum(D3SINK(:,iistate,:),DIM=2)*SEC_PER_DAY
             case(iiTotal)
-              Source_D3_vector=(sum(D3SOURCE(:,iistate,:),DIM=1)-&
-                          sum(D3SINK(:,iistate,:),DIM=1))*SEC_PER_DAY
+              Source_D3_vector=(sum(D3SOURCE(:,iistate,:),DIM=2)-&
+                          sum(D3SINK(:,iistate,:),DIM=2))*SEC_PER_DAY
             case(iiProduction)
-              Source_D3_vector=sum(D3SOURCE(:,iistate,:),DIM=1)*SEC_PER_DAY
+              Source_D3_vector=sum(D3SOURCE(:,iistate,:),DIM=2)*SEC_PER_DAY
           end select
         end function Source_D3_vector
 
@@ -2192,12 +2192,12 @@
           ! Array in sum is by sum seen as 2D-array: DIM=1 and NOT 2
           select case (mode)
             case(iiConsumption)
-              Source_D2_vector=sum(D2SINK(:,iistate,:),DIM=1)*SEC_PER_DAY
+              Source_D2_vector=sum(D2SINK(:,iistate,:),DIM=2)*SEC_PER_DAY
             case(iiTotal)
-              Source_D2_vector=(sum(D2SOURCE(:,iistate,:),DIM=1)-&
-                          sum(D2SINK(:,iistate,:),DIM=1))*SEC_PER_DAY
+              Source_D2_vector=(sum(D2SOURCE(:,iistate,:),DIM=2)-&
+                          sum(D2SINK(:,iistate,:),DIM=2))*SEC_PER_DAY
             case(iiProduction)
-              Source_D2_vector=sum(D2SOURCE(:,iistate,:),DIM=1)*SEC_PER_DAY
+              Source_D2_vector=sum(D2SOURCE(:,iistate,:),DIM=2)*SEC_PER_DAY
           end select
         end function Source_D2_vector
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

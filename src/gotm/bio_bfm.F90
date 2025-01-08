@@ -335,7 +335,7 @@ IMPLICIT NONE
    ESS(:)=R9x(:)
    nuh_l=nuh
    h_l=h
-!LEVEL2 'set_env_bio_bfm, ERHO',ERHO
+!LEVEL2 'set_env_bio_bfm, I_0',I_0
 !stop
    !---------------------------------------------
    ! Compute extinction coefficient
@@ -526,35 +526,35 @@ use bfm_output,only:var_ave
    bfl=_ZERO_;
    if ((bio_setup == 3 ) .and. ( .NOT.AssignPelBenFluxesInBFMFlag)) then
 
-      bfl(ppRZc) = PELBOTTOM(ppRZc,1)*topm3psec
-      bfl(ppR2c) = PELBOTTOM(ppR2c,1)*topm3psec
-      bfl(ppR6c) = PELBOTTOM(ppR6c,1)*topm3psec
-      bfl(ppR6n) = PELBOTTOM(ppR6n,1)*topm3psec
-      bfl(ppR6p) = PELBOTTOM(ppR6p,1)*topm3psec
-      bfl(ppR6s) = PELBOTTOM(ppR6s,1)*topm3psec
+      bfl(ppRZc) = PELBOTTOM(1,ppRZc)*topm3psec
+      bfl(ppR2c) = PELBOTTOM(1,ppR2c)*topm3psec
+      bfl(ppR6c) = PELBOTTOM(1,ppR6c)*topm3psec
+      bfl(ppR6n) = PELBOTTOM(1,ppR6n)*topm3psec
+      bfl(ppR6p) = PELBOTTOM(1,ppR6p)*topm3psec
+      bfl(ppR6s) = PELBOTTOM(1,ppR6s)*topm3psec
 
-      bfl(ppR1c) =  PELBOTTOM(ppR1c,1)*topm3psec
-      bfl(ppR1n) =  PELBOTTOM(ppR1n,1)*topm3psec
-      bfl(ppR1p) =  PELBOTTOM(ppR1p,1)*topm3psec
+      bfl(ppR1c) =  PELBOTTOM(1,ppR1c)*topm3psec
+      bfl(ppR1n) =  PELBOTTOM(1,ppR1n)*topm3psec
+      bfl(ppR1p) =  PELBOTTOM(1,ppR1p)*topm3psec
 
-      bfl(ppO2o) = PELBOTTOM(ppO2o,1)*topm3psec
-      bfl(ppN1p) = PELBOTTOM(ppN1p,1)*topm3psec
-      bfl(ppN3n) = PELBOTTOM(ppN3n,1)*topm3psec
-      bfl(ppN4n) = PELBOTTOM(ppN4n,1)*topm3psec
-      bfl(ppN5s) = PELBOTTOM(ppN5s,1)*topm3psec
-      bfl(ppN6r) = PELBOTTOM(ppN6r,1)*topm3psec
+      bfl(ppO2o) = PELBOTTOM(1,ppO2o)*topm3psec
+      bfl(ppN1p) = PELBOTTOM(1,ppN1p)*topm3psec
+      bfl(ppN3n) = PELBOTTOM(1,ppN3n)*topm3psec
+      bfl(ppN4n) = PELBOTTOM(1,ppN4n)*topm3psec
+      bfl(ppN5s) = PELBOTTOM(1,ppN5s)*topm3psec
+      bfl(ppN6r) = PELBOTTOM(1,ppN6r)*topm3psec
 
       do i=1,iiPhytoPlankton
         k=ppPhytoPlankton(i,iiC)
-        bfl(k) = PELBOTTOM(k,1)*topm3psec
+        bfl(k) = PELBOTTOM(1,k)*topm3psec
         k=ppPhytoPlankton(i,iiN)
-        bfl(k) = PELBOTTOM(k,1)*topm3psec
+        bfl(k) = PELBOTTOM(1,k)*topm3psec
         k=ppPhytoPlankton(i,iiP)
-        bfl(k) = PELBOTTOM(k,1)*topm3psec
+        bfl(k) = PELBOTTOM(1,k)*topm3psec
         k=ppPhytoPlankton(i,iiL)
-        bfl(k) = PELBOTTOM(k,1)*topm3psec
+        bfl(k) = PELBOTTOM(1,k)*topm3psec
         k=ppPhytoPlankton(i,iiS)
-        if ( k > 0 ) bfl(k) = PELBOTTOM(k,1)*topm3psec
+        if ( k > 0 ) bfl(k) = PELBOTTOM(1,k)*topm3psec
       enddo
    endif
 !LEVEL1 'end do_bio_bfm'

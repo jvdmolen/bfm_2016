@@ -1068,7 +1068,7 @@ switch -- $mode {
 	regsub -all {\(|\)} $name " " tmp
 	set root [ lindex $tmp 0 ]; set grpname [ lindex $tmp 1 ]
 	set memberlist [ searchforgroup $dim $grpname ]
-	PrintLine -block "#define ${root}(A,B) D$i${TYPE}(pp${root}(A),B)"
+	PrintLine -block "#define ${root}(B,A) D$i${TYPE}(B,pp${root}(A))"
 	PrintLine -print ""
       }
     }
@@ -1079,7 +1079,7 @@ switch -- $mode {
       regsub d $dim "" i
       set TYPE [ string toupper $type ]
       foreach name $VARS($dim,$type,name) {
-	PrintLine -block "#define ${name}(A) D$i${TYPE}(pp${name},A)"
+	PrintLine -block "#define ${name}(A) D$i${TYPE}(A,pp${name})"
 	PrintLine -print ""
       }
     }
@@ -1098,10 +1098,10 @@ switch -- $mode {
     }
     set n [ lindex $VARS(ex_diagnos,2d,index) $i ]
     set m [ llength $VARS($dim,$type,name) ]
-    PrintLine -block "#define PEL${SPEC}(A,B) D2DIAGNOS($n+A,B)"
+    PrintLine -block "#define PEL${SPEC}(B,A) D2DIAGNOS(B,$n+A)"
     PrintLine -print ""
     foreach name $VARS($dim,$type,name) {
-      PrintLine -block "#define j${spec}${name}(B) D2DIAGNOS($n+pp$name,B)"
+      PrintLine -block "#define j${spec}${name}(B) D2DIAGNOS(B,$n+pp$name)"
       PrintLine -print ""
     }
   }
@@ -1110,7 +1110,7 @@ switch -- $mode {
       regsub d $dim "" i
       set TYPE STATE
       foreach name $VARS($dim,group) {
-	PrintLine -block "#define ${name}(A,B) D$i${TYPE}(pp${name}(A,B),:)"
+	PrintLine -block "#define ${name}(A,B) D$i${TYPE}(:,pp${name}(A,B))"
 	PrintLine -print ""
       }
     }
@@ -1350,9 +1350,12 @@ switch -- $mode {
 	  if { $l >=0 } { set l ii } { set l "" }
 	}
         set tmp "ZERO"; if { [regexp intvar $type ] } { set tmp 0 }
+#JM	  3 { PrintLine -print "allocate(${base}(1:$l$indexname,\
+#JM				 1:NO_BOXES$i),stat=status); ${base} = $tmp"
+#JM	    }
 	switch -- $m {
-	  3 { PrintLine -print "allocate(${base}(1:$l$indexname,\
-				 1:NO_BOXES$i),stat=status); ${base} = $tmp"
+	  3 { PrintLine -print "allocate(${base}(\
+				 1:NO_BOXES$i,1:$l$indexname),stat=status); ${base} = $tmp"
 	    }
 	  2 { PrintLine -print "allocate(${name}(1:NO_BOXES$i),\
 				      stat=status); $name = $tmp"

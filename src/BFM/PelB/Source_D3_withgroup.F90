@@ -14,8 +14,8 @@
             integer,intent(IN)   ::n,iiC    ! Specification
             end function                    ! Specification
           end  interface   
-          real(RLEN) :: Source_D3_withgroup(size(D3SOURCE,DIM=3))
-          real(RLEN) :: fill(size(D3SOURCE,DIM=3))
+          real(RLEN) :: Source_D3_withgroup(size(D3SOURCE,DIM=1))
+          real(RLEN) :: fill(size(D3SOURCE,DIM=1))
           integer    :: i,j,l
 
           fill=ZERO;l=DONE;if ( mode ==iiTotal ) l=-l

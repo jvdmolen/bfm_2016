@@ -158,11 +158,11 @@
       allocate(dd(0:nlev,1:numc,1:numc))
 #endif
    end if
-!#ifdef BFM_GOTM
-!   dt_local=dt
-!#else
+#ifdef BFM_GOTM
+   dt_local=dt
+#else
    dt_local=dt/SEC_PER_DAY
-!#endif
+#endif
 !LEVEL1 'calling solver',solver
 !LEVEL1 'dt,SEC_PER_DAY',dt,SEC_PER_DAY
 !LEVEL1 'dt_local,numc,nlev',dt_local,numc,nlev
@@ -223,6 +223,7 @@
 ! \end{equation}
 !
 ! !USES:
+use mem, only: ppN1p
    IMPLICIT NONE
 !
 ! !INPUT PARAMETERS:
@@ -263,14 +264,21 @@
 
 #ifdef BFM_GOTM
    ! integrate pelagic variables 
+!STDERR "N1p cc before",cc(:,ppN1p)
    if (bio_setup/=2) then
-     cc(:,:) = cc(:,:) + dt*sum(pp(:,:,:)-dd(:,:,:),1)
+     cc(:,:) = cc(:,:) + dt*sum(pp(:,:,:)-dd(:,:,:),3)
    end if
    ! integrate benthic variables 
 !  rhs=ccb(ppY2p,1)
    if (bio_setup>1) then
-      ccb(:,:) = ccb(:,:) + dt*sum(ppb(:,:,:)-ddb(:,:,:),1)
+      ccb(:,:) = ccb(:,:) + dt*sum(ppb(:,:,:)-ddb(:,:,:),3)
    end if
+!STDERR "N1p cc after",cc(:,ppN1p)
+!STDERR "N1p sum",dt*sum(pp(:,ppN1p,:)-dd(:,ppN1p,:),2)
+!STDERR "dt",dt
+!STDERR "N1p pp",pp(1,ppN1p,:)
+!STDERR "N1p dd",dd(1,ppN1p,:)
+!stop
 !  call findnega(ccb(ppY2p,1),1,iout)
 !  if ( iout.gt.0) then
 !    STDERR  "solver 2:Negative value after ode_solver "
@@ -635,11 +643,11 @@
 
 #ifdef BFM_GOTM
    if (bio_setup/=2) then
-     cc = (cc+dt*sum(pp(:,1:numc,1:numc),1))/(1.+dt*sum(dd(:,1:numc,1:numc),1)/(1.0D-80+cc))
+     cc = (cc+dt*sum(pp(:,1:numc,1:numc),3))/(1.+dt*sum(dd(:,1:numc,1:numc),3)/(1.0D-80+cc))
    end if
    ! compute benthic variables 
     if (bio_setup>1) then
-      ccb = (ccb+dt*sum(ppb(:,:,:),1))/(1.+dt*sum(ddb(:,:,:),1)/(1.0D-80+ccb))
+      ccb = (ccb+dt*sum(ppb(:,:,:),3))/(1.+dt*sum(ddb(:,:,:),3)/(1.0D-80+ccb))
     end if
 #else
    do ci=1,nlev
@@ -1009,7 +1017,7 @@
            a(i,i)=0.
            do j=1,numc
               a(i,i)=a(i,i)+dd(ci,i,j)
-              if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/(1.0D-80+cc(j,ci))
+              if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/(1.0D-80+cc(ci,j))
            end do
            a(i,i)=dt*a(i,i)/(1.0D-80+cc(ci,i))
            a(i,i)=_ONE_+a(i,i)
@@ -1027,7 +1035,7 @@
            a(i,i)=0.
            do j=1,numbc
               a(i,i)=a(i,i)+ddb(ci,i,j)
-              if (i.ne.j) a(i,j)=-dt*ppb(ci,i,j)/(1.0D-80+ccb(j,ci))
+              if (i.ne.j) a(i,j)=-dt*ppb(ci,i,j)/(1.0D-80+ccb(ci,j))
            end do
            a(i,i)=dt*a(i,i)/(1.0D-80+ccb(ci,i))
            a(i,i)=_ONE_+a(i,i)
@@ -1133,7 +1141,7 @@
            a(i,i)=_ZERO_
            do j=1,numc
               a(i,i)=a(i,i)+dd(ci,i,j)
-              if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc0(j,ci)
+              if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc0(ci,j)
            end do
            a(i,i)=dt*a(i,i)/cc0(ci,i)
            a(i,i)=1.+a(i,i)
@@ -1151,7 +1159,7 @@
            a(i,i)=_ZERO_
            do j=1,numbc
               a(i,i)=a(i,i)+ddb(ci,i,j)
-              if (i.ne.j) a(i,j)=-dt*ppb(ci,i,j)/ccb0(j,ci)
+              if (i.ne.j) a(i,j)=-dt*ppb(ci,i,j)/ccb0(ci,j)
            end do
            a(i,i)=dt*a(i,i)/ccb0(ci,i)
            a(i,i)=1.+a(i,i)
@@ -1167,7 +1175,7 @@
          a(i,i)=0.
          do j=1,numc
             a(i,i)=a(i,i)+dd(ci,i,j)
-            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc(j,ci)
+            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc(ci,j)
          end do
          a(i,i)=dt*a(i,i)/cc(ci,i)
          a(i,i)=1.+a(i,i)
@@ -1200,7 +1208,7 @@
            a(i,i)=0.
            do j=1,numc
               a(i,i)=a(i,i)+dd(ci,i,j)
-              if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc(j,ci)
+              if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc(ci,j)
            end do
            a(i,i)=dt*a(i,i)/cc(ci,i)
            a(i,i)=1.+a(i,i)
@@ -1218,7 +1226,7 @@
            a(i,i)=0.
            do j=1,numbc
               a(i,i)=a(i,i)+ddb(ci,i,j)
-              if (i.ne.j) a(i,j)=-dt*ppb(ci,i,j)/ccb(j,ci)
+              if (i.ne.j) a(i,j)=-dt*ppb(ci,i,j)/ccb(ci,j)
            end do
            a(i,i)=dt*a(i,i)/ccb(ci,i)
            a(i,i)=1.+a(i,i)
@@ -1234,7 +1242,7 @@
          a(i,i)=0.
          do j=1,numc
             a(i,i)=a(i,i)+dd(ci,i,j)
-            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc1(j,ci)
+            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc1(ci,j)
          end do
          a(i,i)=dt*a(i,i)/cc1(ci,i)
          a(i,i)=1.+a(i,i)
@@ -1295,7 +1303,7 @@
          a(i,i)=0.
          do j=1,numc
             a(i,i)=a(i,i)+dd(ci,i,j)
-            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc(j,ci)
+            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc(ci,j)
          end do
          a(i,i)=dt*a(i,i)/cc(ci,i)
          a(i,i)=1.+a(i,i)
@@ -1311,7 +1319,7 @@
          a(i,i)=0.
          do j=1,numc
             a(i,i)=a(i,i)+dd1(ci,i,j)
-            if (i.ne.j) a(i,j)=-dt*pp1(ci,i,j)/cc1(j,ci)
+            if (i.ne.j) a(i,j)=-dt*pp1(ci,i,j)/cc1(ci,j)
          end do
          a(i,i)=dt*a(i,i)/cc1(ci,i)
          a(i,i)=1.+a(i,i)
@@ -1327,7 +1335,7 @@
          a(i,i)=0.
          do j=1,numc
             a(i,i)=a(i,i)+dd2(ci,i,j)
-            if (i.ne.j) a(i,j)=-dt*pp2(ci,i,j)/cc1(j,ci)
+            if (i.ne.j) a(i,j)=-dt*pp2(ci,i,j)/cc1(ci,j)
          end do
          a(i,i)=dt*a(i,i)/cc1(ci,i)
          a(i,i)=1.+a(i,i)
@@ -1346,7 +1354,7 @@
          a(i,i)=0.
          do j=1,numc
             a(i,i)=a(i,i)+dd(ci,i,j)
-            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc1(j,ci)
+            if (i.ne.j) a(i,j)=-dt*pp(ci,i,j)/cc1(ci,j)
          end do
          a(i,i)=dt*a(i,i)/cc1(ci,i)
          a(i,i)=1.+a(i,i)

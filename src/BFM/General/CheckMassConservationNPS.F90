@@ -152,9 +152,9 @@
          totPELn(BoxNumberXY)=totPELn(BoxNumberXY) +sum(s*d)
          jtotBENPELn(BoxNumberXY)=jtotBENPELn(BoxNumberXY)+fl(BoxNumberXY)
          if ( k==0) then
-           s=Source_D3_vector(0,l)*p_qnMic(i)
+           s=Source_D3_vector(l,0)*p_qnMic(i)
          else
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
          endif
          jtPELn(BoxNumberXY)=jtPELn(BoxNumberXY)+sum(s*d)
          k=ppMicroZooPlankton(i,iiP)
@@ -168,9 +168,9 @@
          totPELp(BoxNumberXY)=totPELp(BoxNumberXY) +sum(s*d)
          jtotBENPELp(BoxNumberXY)=jtotBENPELp(BoxNumberXY)+fl(BoxNumberXY)
          if ( k==0) then
-           s=Source_D3_vector(0,l)*p_qpMic(i)
+           s=Source_D3_vector(l,0)*p_qpMic(i)
          else
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
          endif
          jtPELp(BoxNumberXY)=jtPELp(BoxNumberXY)+sum(s*d)
       enddo
@@ -188,9 +188,9 @@
          totPELn(BoxNumberXY)=totPELn(BoxNumberXY) +sum(s*d)
          jtotBENPELn(BoxNumberXY)=jtotBENPELn(BoxNumberXY)+fl(BoxNumberXY)
          if ( k==0) then
-           s=Source_D3_vector(0,l)*p_qnMec(i)
+           s=Source_D3_vector(l,0)*p_qnMec(i)
          else
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
          endif
          jtPELn(BoxNumberXY)=jtPELn(BoxNumberXY)+sum(s*d)
          k=ppMesoZooPlankton(i,iiP)
@@ -204,9 +204,9 @@
          totPELp(BoxNumberXY)=totPELp(BoxNumberXY) +sum(s*d)
          jtotBENPELp(BoxNumberXY)=jtotBENPELp(BoxNumberXY)+fl(BoxNumberXY)
          if ( k==0) then
-           s=Source_D3_vector(0,l)*p_qpMec(i)
+           s=Source_D3_vector(l,0)*p_qpMec(i)
          else
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
          endif
          jtPELp(BoxNumberXY)=jtPELp(BoxNumberXY)+sum(s*d)
       enddo
@@ -214,14 +214,14 @@
          sc=> PhytoPlankton(i,iiN); s=sc(f:t)
          totPELn(BoxNumberXY)=totPELn(BoxNumberXY) +sum(s*d)
          k= ppPhytoPlankton(i,iiN)
-         s=Source_D3_vector(0,k)
+         s=Source_D3_vector(k,0)
          jtPELn(BoxNumberXY)=jtPELn(BoxNumberXY)+sum(s*d)
          fl=PELBOTTOM(:,k)
          jtotBENPELn(BoxNumberXY)=jtotBENPELn(BoxNumberXY)+fl(BoxNumberXY)
          sc=> PhytoPlankton(i,iiP); s=sc(f:t)
          totPELp(BoxNumberXY)=totPELp(BoxNumberXY) +sum(s*d)
          k= ppPhytoPlankton(i,iiP)
-         s=Source_D3_vector(0,k)
+         s=Source_D3_vector(k,0)
          jtPELp(BoxNumberXY)=jtPELp(BoxNumberXY)+sum(s*d)
          fl=PELBOTTOM(:,k)
          jtotBENPELp(BoxNumberXY)=jtotBENPELp(BoxNumberXY)+fl(BoxNumberXY)
@@ -230,7 +230,7 @@
            sc=> PhytoPlankton(i,iiS);s=sc(f:t)
            totPELs(BoxNumberXY)=totPELs(BoxNumberXY) +sum(s*d)
            fl=PELBOTTOM(:,k)
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
            jtPELs(BoxNumberXY)=jtPELs(BoxNumberXY)+sum(s*d)
            jtotBENPELs(BoxNumberXY)=jtotBENPELs(BoxNumberXY)+fl(BoxNumberXY)
          endif
@@ -240,7 +240,7 @@
          if ( k>0) then
            sc=> PelDetritus(i,iiN);s=sc(f:t)
            totPELn(BoxNumberXY)=totPELn(BoxNumberXY) +sum(s*d)
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
            jtPELn(BoxNumberXY)=jtPELn(BoxNumberXY)+sum(s*d)
            fl=PELBOTTOM(:,k)
            jtotBENPELn(BoxNumberXY)=jtotBENPELn(BoxNumberXY)+fl(BoxNumberXY)
@@ -249,7 +249,7 @@
          if ( k>0) then
            sc=> PelDetritus(i,iiP);s=sc(f:t)
            totPELp(BoxNumberXY)=totPELp(BoxNumberXY) +sum(s*d)
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
            jtPELp(BoxNumberXY)=jtPELp(BoxNumberXY)+sum(s*d)
            fl=PELBOTTOM(:,k)
            jtotBENPELp(BoxNumberXY)=jtotBENPELp(BoxNumberXY)+fl(BoxNumberXY)
@@ -258,7 +258,7 @@
          if ( k>0) then
            sc=> PelDetritus(i,iiS);s=sc(f:t)
            totPELs(BoxNumberXY)=totPELs(BoxNumberXY) +sum(s*d)
-           s=Source_D3_vector(0,k)
+           s=Source_D3_vector(k,0)
            jtPELs(BoxNumberXY)=jtPELs(BoxNumberXY)+sum(s*d)
            fl=PELBOTTOM(:,k)
            jtotBENPELs(BoxNumberXY)=jtotBENPELs(BoxNumberXY)+fl(BoxNumberXY)
@@ -315,11 +315,11 @@
          do i=1, iiBenPhyto
            rc => BenPhyto(i,iiN)
            totBENn(BoxNumberXY)=totBENn(BoxNumberXY)+rc(BoxNumberXY)
-           r=Source_D2_vector(0,ppBenPhyto(i,iiN))
+           r=Source_D2_vector(ppBenPhyto(i,iiN),0)
            jtBenn(BoxNumberXY)=jtBenn(BoxNumberXY)+r(BoxNUmberXY)
            rc => BenPhyto(i,iiP)
            totBENp(BoxNumberXY)=totBENp(BoxNumberXY)+rc(BoxNumberXY)
-           r=Source_D2_vector(0,ppBenPhyto(i,iiP))
+           r=Source_D2_vector(ppBenPhyto(i,iiP),0)
            jtBenp(BoxNumberXY)=jtBenp(BoxNumberXY)+r(BoxNUmberXY)
            j=ppBenPhyto(i,iiS)
            if ( j>0) then

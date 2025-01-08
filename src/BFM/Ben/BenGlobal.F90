@@ -139,7 +139,8 @@
      case(2)
      ! Post processing: this done after call to Ben routines
         do i=1,iiBenPhyto
-         call flux_vector(iiBen,ppBenPhyto(i,iiS),ppQ6s,jPIQ6s(i,:))
+!JM         call flux_vector(iiBen,ppBenPhyto(i,iiS),ppQ6s,jPIQ6s(i,:))
+         call flux_vector(iiBen,ppBenPhyto(i,iiS),ppQ6s,jPIQ6s(:,i))
         enddo
         call CalcLossHac()
     end select

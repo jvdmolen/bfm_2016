@@ -292,21 +292,24 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Photosynthesis (Irradiance EIR is in uE m-2 s-1, Irr is mid-layer EIR)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
+!write(LOGUNIT,*)'phyto: EIR',EIR(39)
   eiPI(:,phyto)=DONE
   if ( ChlLightFlag== 2) then
     Irr = ZERO !in case of a tidal flat production when dry_pel=0
     px_any= Depth*dry_pel*xEPS
     where (px_any.gt.ZERO) Irr = max( NZERO, EIR*( DONE- exp(-px_any))/ px_any)
     eiPI(:,phyto) = max(ZERO,  &
-        DONE- exp_limit(- qlPc(phyto, :)/ p_qchlc(phyto)/ p_Ke(phyto)* Irr))
+        DONE- exp_limit(- qlPc(:,phyto)/ p_qchlc(phyto)/ p_Ke(phyto)* Irr))
   end if
+!write(LOGUNIT,*)'phyto: Irr',Irr(39)
+!write(LOGUNIT,*)'phyto: eiPI',eiPI(39,phyto)
 
   select case ( LightForcingFlag)
     case ( 1 ) ;sumc=p_sum(phyto)* et* eiPI(:,phyto)
     case ( 2 ) ;sumc=p_sum(phyto)* et* eiPI(:,phyto)*( SUNQ/HOURS_PER_DAY)
     case ( 3 ) ;sumc=p_sum(phyto)* et* eiPI(:,phyto)* ThereIsLight
   end select
+!write(LOGUNIT,*)'phyto: sumc',sumc(39)
 
 
 #ifdef INCLUDE_PELCO2

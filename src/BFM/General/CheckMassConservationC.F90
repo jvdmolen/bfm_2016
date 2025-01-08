@@ -77,7 +77,7 @@
             sc=> PhytoPlankton(i,iiC); 
             totPELc(BoxNumberXY)=totPELc(BoxNumberXY) +sum(sc(f:t)*d)
             jtotbenpelc(BoxNumberXY)=jtotbenpelc(BoxNumberXY) &
-                                         +PELBOTTOM(j,BoxNumberXY)
+                                         +PELBOTTOM(BoxNumberXY,j)
          enddo
          do i=1,iiMesoZooPlankton
             j=ppMesoZooPlankton(i,iiC)
@@ -87,7 +87,7 @@
             sc=> MesoZooplankton(i,iiC)
             totPELc(BoxNumberXY)=totPELc(BoxNumberXY) +sum(sc(f:t)*d)
             jtotbenpelc(BoxNumberXY)=jtotbenpelc(BoxNumberXY)&
-                                 +PELBOTTOM(j,BoxNumberXY)
+                                 +PELBOTTOM(BoxNumberXY,j)
          enddo
          do i=1,iiMicroZooPlankton
             j=ppMicroZooPlankton(i,iiC)
@@ -97,14 +97,14 @@
             sc=> MicroZooplankton(i,iiC)
             totPELc(BoxNumberXY)=totPELc(BoxNumberXY) +sum(sc(f:t)*d)
             jtotbenpelc(BoxNumberXY)=jtotbenpelc(BoxNumberXY)&
-                                      +PELBOTTOM(j,BoxNumberXY)
+                                      +PELBOTTOM(BoxNumberXY,j)
          enddo
          do i=1, iiPelDetritus
            j= ppPelDetritus(i,iiC)
            sc=> PelDetritus(i,iiC)
            totPELc(BoxNumberXY)=totPELc(BoxNumberXY) +sum(sc(f:t)*d)
            jtotbenpelc(BoxNumberXY)=jtotbenpelc(BoxNumberXY)&
-                                   +PELBOTTOM(j,BoxNumberXY)
+                                   +PELBOTTOM(BoxNumberXY,j)
          enddo
 
          totPELc(BoxNumberXY)=totPELc(BoxNumberXY)+ sum(B1c(f:t)* d)

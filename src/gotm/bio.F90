@@ -786,7 +786,7 @@ use bfm_output,only:var_ave
 !           do advection step
 !JM            if ( bio_model /= 7 ) call adv_center(nlev,dt,h_l,h_l,ws(j,:),flux, &
 !JM                 flux,_ZERO_,_ZERO_,w_adv_discr,cc(j,:))
-            if ( bio_model /= 7 ) call adv_center(nlev,dt,h_l,h_l,ws(j,:),flux, &
+            if ( bio_model /= 7 ) call adv_center(nlev,dt,h_l,h_l,ws(:,j),flux, &
                  flux,_ZERO_,_ZERO_,w_adv_discr,cc(:,j))
 
 !           do diffusion step
