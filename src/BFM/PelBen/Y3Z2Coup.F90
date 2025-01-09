@@ -147,10 +147,10 @@
         call addbotflux(ANY,BoxNumberXY,iiBen,ppYy3p,iiPel, &
                                              ppZ2p,toZ2c_flux)
       else
-        toZ2c_flux=toZ2c*p_qnY3c+ruYy3n
-        call flux(BoxNumberXY,iiBen,ppYy3n,ppYy3n,-toZ2c_flux)
-        toZ2c_flux=toZ2c*p_qpY3c+ruYy3p
-        call flux(BoxNumberXY,iiBen,ppYy3p,ppYy3p,-toZ2c_flux)
+        toZ2c_flux=-toZ2c*p_qnY3c+ruYy3n
+        call flux(BoxNumberXY,iiBen,ppYy3n,ppYy3n,toZ2c_flux)
+        toZ2c_flux=-toZ2c*p_qpY3c+ruYy3p
+        call flux(BoxNumberXY,iiBen,ppYy3p,ppYy3p,toZ2c_flux)
       endif
      end DO
     

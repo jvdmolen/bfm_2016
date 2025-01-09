@@ -424,7 +424,7 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Flows of realized gross Production and respiration
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
 
   rugc=sumc * phytoc  ! gross production
   call sourcesink_flux_vector( iiPel, ppO3c,ppphytoc, rugc )  ! source/sink.c
@@ -433,7 +433,7 @@
   if ( iout.gt.0) then
     write(LOGUNIT,*)'phyto_nr,phytoc,phyton,phytop,sdo,iNIn,iN1p,qlPc,tN,xEps',&
          phyto,phytoc(iout), phyton(iout),phytop(iout), &
-         sdo(iout),iNIn(iout),iN1p(iout),qlPc(phyto,iout),tN(iout),xEps(iout) 
+         sdo(iout),iNIn(iout),iN1p(iout),qlPc(iout,phyto),tN(iout),xEps(iout) 
   endif
   call flux_vector( iiPel, ppO2o,ppO2o, rugc/ MW_C ) 
   rrtc  =   srt* phytoc  ! total actual respiration
@@ -506,7 +506,7 @@
       call findnan(rum1p,NO_BOXES,iout)
       if ( iout.gt.0) then
         write(LOGUNIT,*),'After LimitChange Nan in rum1p',rum1p(iout), &
-        lim_qu(iout),phytoc(iout),px_any(iout),fr_lim_PI_n(phyto,iout)
+        lim_qu(iout),phytoc(iout),px_any(iout),fr_lim_PI_n(iout,phyto)
       endif
 !---------------------------------------------------------------------------Y
 

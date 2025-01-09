@@ -447,7 +447,7 @@
 
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         ! Calculate flux at the lower boundary
-        ! 0=no flux, 1= only fluxes_downwards (sink), 2,=full_flux
+        ! 1=no flux, 2= only fluxes_downwards (sink), 3,=full_flux
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         select case (p_flux_at_deep_end)  
            case(1); jflux=ZERO
