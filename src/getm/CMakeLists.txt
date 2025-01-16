@@ -33,7 +33,7 @@ target_link_libraries(coupling_getm_bfm global_mod variables_bio_3d bio gotm_fin
 add_library(coupling_getm_bfm_rivers
             coupling_getm_bfm_rivers.F90
            )
-target_link_libraries(coupling_getm_bfm_rivers basis_fun global_mod variables_bio_3d)
+target_link_libraries(coupling_getm_bfm_rivers general_fun global_mod variables_bio_3d)
 
 add_library(restart_bfm
             output_restart_bio.F90

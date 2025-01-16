@@ -61,7 +61,7 @@
        ppG3h,ppG13h,ppG23h
 !JM     use mem,only: ppQ6c,ppQ6n,ppQ6p,ppQ6s,ppQ16c,ppQ16n,ppQ16p,ppQ16s, &
 !JM                   ppD6m,ppD7m,ppD8m,ppD9m,ppD1m,ppDtm
-     use mem,only: ppQ6c,ppQ6n,ppQ6p,ppQ6s,ppQ16c,ppQ16n,ppQ16p,ppQ16s, &
+     use mem,only: ppQ6c,ppQ6n,ppQ6p,ppQ6s, & !JM not in bfm2016 ppQ16c,ppQ16n,ppQ16p,ppQ16s, &
                    ppD1m!AN ,ppDtm
      use mem,only: ppHNn,ppHnp
      use mem,only: ppD1m,ppD2m,ppP6c,ppPCc
@@ -402,43 +402,43 @@
                 endif
               enddo
             enddo
-            if (flagb(ppQ16c)==0) then
-              do i=imin,imax
-                do j=jmin,jmax
-                  if (az(i,j).ge.1) then
-!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(i,j,:,ppD6m)))
-                    ccb1d(:)=min(p_d_tot,p_clDxm)
-                    ccb1d(:)=ccb3d(i,j,:,ppQ6c)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
-                                   *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
-                    ccb3d(i,j,:,ppQ16c)=ccb3d(i,j,:,ppQ6c)-ccb1d(:)  
-                    ccb3d(i,j,:,ppQ6c)=ccb1d(:)  
-!                   ccb3d(ppD6m,i,j,:)=ccb3d(ppD6m,i,j,:)-ccb3d(ppD1m,i,j,:)
-!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(ppD7m,i,j,:)))
-                    ccb1d(:)=min(p_d_tot,p_clDxm)
-                    ccb1d(:)=ccb3d(i,j,:,ppQ6n)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
-                                     *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
-                    ccb3d(i,j,:,ppQ16n)=ccb3d(i,j,:,ppQ6n)-ccb1d(:)  
-                    ccb3d(i,j,:,ppQ6n)=ccb1d(:)  
-!                   ccb3d(ppD7m,i,j,:)=ccb3d(ppD7m,i,j,:)-ccb3d(ppD1m,i,j,:)
-!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(ppD8m,i,j,:)))
-                    ccb1d(:)=min(p_d_tot,p_clDxm)
-                    ccb1d(:)=ccb3d(i,j,:,ppQ6p)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
-                                    *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
-                    ccb3d(i,j,:,ppQ16p)=ccb3d(i,j,:,ppQ6p)-ccb1d(:)  
-                    ccb3d(i,j,:,ppQ6p)=ccb1d(:)  
-!                   ccb3d(ppD8m,i,j,:)=ccb3d(ppD8m,i,j,:)-ccb3d(ppD1m,i,j,:)
-!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(ppD9m,i,j,:)))
-                    ccb1d(:)=min(p_d_tot,p_clDxm)
-                    ccb1d(:)=ccb3d(i,j,:,ppQ6s)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
-                                     *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
-                    ccb3d(i,j,:,ppQ16s)=ccb3d(i,j,:,ppQ6s)-ccb1d(:)  
-                    ccb3d(i,j,:,ppQ6s)=ccb1d(:)  
-!                   ccb3d(ppD9m,i,j,:)=ccb3d(ppD9m,i,j,:)-ccb3d(ppD1m,i,j,:)
-                  endif
-                enddo
-              enddo
-              flagb(ppQ16c)=1;flagb(ppQ16n)=1;flagb(ppQ16p)=1;flagb(ppQ16s)=1;
-            endif
+!%JM not in bfm2016            if (flagb(ppQ16c)==0) then
+!%JM              do i=imin,imax
+!%JM                do j=jmin,jmax
+!%JM                  if (az(i,j).ge.1) then
+!%JM!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(i,j,:,ppD6m)))
+!%JM                    ccb1d(:)=min(p_d_tot,p_clDxm)
+!%JM                    ccb1d(:)=ccb3d(i,j,:,ppQ6c)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
+!%JM                                   *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
+!%JM                    ccb3d(i,j,:,ppQ16c)=ccb3d(i,j,:,ppQ6c)-ccb1d(:)  
+!%JM                    ccb3d(i,j,:,ppQ6c)=ccb1d(:)  
+!%JM!                   ccb3d(ppD6m,i,j,:)=ccb3d(ppD6m,i,j,:)-ccb3d(ppD1m,i,j,:)
+!%JM!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(ppD7m,i,j,:)))
+!%JM                    ccb1d(:)=min(p_d_tot,p_clDxm)
+!%JM                    ccb1d(:)=ccb3d(i,j,:,ppQ6n)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
+!%JM                                     *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
+!%JM                    ccb3d(i,j,:,ppQ16n)=ccb3d(i,j,:,ppQ6n)-ccb1d(:)  
+!%JM                    ccb3d(i,j,:,ppQ6n)=ccb1d(:)  
+!%JM!                   ccb3d(ppD7m,i,j,:)=ccb3d(ppD7m,i,j,:)-ccb3d(ppD1m,i,j,:)
+!%JM!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(ppD8m,i,j,:)))
+!%JM                    ccb1d(:)=min(p_d_tot,p_clDxm)
+!%JM                    ccb1d(:)=ccb3d(i,j,:,ppQ6p)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
+!%JM                                    *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
+!%JM                    ccb3d(i,j,:,ppQ16p)=ccb3d(i,j,:,ppQ6p)-ccb1d(:)  
+!%JM                    ccb3d(i,j,:,ppQ6p)=ccb1d(:)  
+!%JM!                   ccb3d(ppD8m,i,j,:)=ccb3d(ppD8m,i,j,:)-ccb3d(ppD1m,i,j,:)
+!%JM!JM                    ccb1d(:)=min(p_d_tot,max(p_clDxm,ccb3d(ppD9m,i,j,:)))
+!%JM                    ccb1d(:)=min(p_d_tot,p_clDxm)
+!%JM                    ccb1d(:)=ccb3d(i,j,:,ppQ6s)/(_ONE_-exp(-p_d_tot/ccb1d(:))) &
+!%JM                                     *(_ONE_-exp(-ccb3d(i,j,:,ppD1m)/ccb1d(:)))
+!%JM                    ccb3d(i,j,:,ppQ16s)=ccb3d(i,j,:,ppQ6s)-ccb1d(:)  
+!%JM                    ccb3d(i,j,:,ppQ6s)=ccb1d(:)  
+!%JM!                   ccb3d(ppD9m,i,j,:)=ccb3d(ppD9m,i,j,:)-ccb3d(ppD1m,i,j,:)
+!%JM                  endif
+!%JM                enddo
+!%JM              enddo
+!%JM              flagb(ppQ16c)=1;flagb(ppQ16n)=1;flagb(ppQ16p)=1;flagb(ppQ16s)=1;
+!%JM            endif
 !AN            if (flagb(ppDtm)==0) then
 !AN              do i=imin,imax
 !AN                do j=jmin,jmax
