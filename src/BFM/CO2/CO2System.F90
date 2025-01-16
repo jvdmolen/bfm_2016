@@ -47,7 +47,7 @@
   real(RLEN),public  :: ta
   integer,public     :: way
 
-  integer,parameter   :: STATIC=1
+  integer,parameter   :: ISTATIC=1
   integer,parameter   :: DYNAMIC=2
   real(RLEN),parameter:: HplusBASIS=2225.0
   real(RLEN),parameter:: DICBasis=25212.0
@@ -339,7 +339,7 @@
 !       Calculate Carbonate Alkalinity
         ta = (tmp1 + 2.0 * tmp2)*ldic + 10**(-14)/hp
         Cac    = ta*mkg_to_mmm3
-     elseif ( mode == STATIC .or.( way==1.and.error >0) ) then
+     elseif ( mode == ISTATIC .or.( way==1.and.error >0) ) then
       if (Ac.gt.2.0*Dic_in) then 
         pH_out=15.0
         CO2=0.000001
