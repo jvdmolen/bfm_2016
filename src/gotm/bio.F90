@@ -243,7 +243,7 @@ use bfm_output,only:var_ave
 !-----------------------------------------------------------------------
 !BOC
 
-   LEVEL1 'init_bio'
+   LEVEL1 'init_bio, namelist file:',fname
 
    bio_setup=1
    if ( bio_model == 7 ) then
@@ -252,7 +252,9 @@ use bfm_output,only:var_ave
 
 !  Open and read the namelist
    test_ben_on_zero_depth=.false.
+LEVEL1 'opening namelist file: ',fname
    open(namlst,file=fname,action='read',status='old',err=98)
+LEVEL1 'namelist file opened: ',fname
    read(namlst,nml=bio_nml,err=99)
    close(namlst)
    ! force pelagic setup if not using BFM
