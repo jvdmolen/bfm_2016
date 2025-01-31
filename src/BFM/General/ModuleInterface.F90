@@ -404,8 +404,8 @@
   real(RLEN),intent(IN)                  :: temp(0:kmax)
   real(RLEN),intent(IN)                  :: salt(0:kmax)
   real(RLEN),intent(IN)                  :: rho(0:kmax)
-  real(RLEN),intent(IN)                  :: cc_old(1:numc,0:kmax)
-  real(RLEN),intent(INOUT)               :: cc_inout(1:numc,0:kmax)
+  real(RLEN),intent(IN)                  :: cc_old(0:kmax,1:numc)
+  real(RLEN),intent(INOUT)               :: cc_inout(0:kmax,1:numc)
   integer,intent(OUT)                    :: error
   end SUBROUTINE CalcBndyConcentration
   end interface
@@ -418,8 +418,8 @@
   integer,intent(IN)         :: kmax
   integer,intent(IN)         :: numc
   real(RLEN),intent(IN)      :: ETW(1:kmax)
-  real(RLEN),intent(IN)      :: cc_old_river(1:numc,1:kmax)
-  real(RLEN),intent(INOUT)   :: cc_river(1:numc,1:kmax)
+  real(RLEN),intent(IN)      :: cc_old_river(1:kmax,1:numc)
+  real(RLEN),intent(INOUT)   :: cc_river(1:kmax,1:numc)
   end SUBROUTINE CalcRiverConcentration
   end INTERFACE
 

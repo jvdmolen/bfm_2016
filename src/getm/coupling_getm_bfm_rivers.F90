@@ -302,8 +302,10 @@
              end select
            enddo
            select case (counter_ave(ig,jg))
-             case (0)     ; ccb3d_out(k,ig,jg,1)=r
-             case default ; ccb3d_out(k,ig,jg,1)=ccb3d_out(k,ig,jg,1)+r
+!JM             case (0)     ; ccb3d_out(k,ig,jg,1)=r
+!JM             case default ; ccb3d_out(k,ig,jg,1)=ccb3d_out(k,ig,jg,1)+r
+             case (0)     ; ccb3d_out(ig,jg,1,k)=r
+             case default ; ccb3d_out(ig,jg,1,k)=ccb3d_out(ig,jg,1,k)+r
            end select
          endif
        endif

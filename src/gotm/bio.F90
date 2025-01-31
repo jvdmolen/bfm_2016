@@ -611,6 +611,7 @@ LEVEL1 'namelist file opened: ',fname
 !-----------------------------------------------------------------------
 !BOC
 !LEVEL1 'do_bio',ll_write_results
+!LEVEL1 'cc(20,4)',cc(20,4)
 
    if (bio_calc) then
 !          call test_model_states(1,0,numbc,1,ccb)

@@ -331,7 +331,8 @@
             do i=imin,imax
               do j=jmin,jmax
                 n=count(ccb3d(i,j,1,1:numbc)<  bio_missing+_ONE_)
-                if (az(i,j) .ge. 1.and. n >l ) then
+!JM                if (az(i,j) .ge. 1.and. n >l ) then      ! goes wrong for Dcm=(0,-9999)
+                if (az(i,j) .ge. 1.and. n >0 ) then
                   write(msg, &
                     '(A,'' i='',I3,'' ('',I3'') j='',I3,'' (''I3,'')'')') &
                   'missing intial benthic data  gridpoint',i+ioff,i,j+joff,j
