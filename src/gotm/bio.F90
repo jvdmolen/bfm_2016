@@ -865,6 +865,7 @@ LEVEL1 'namelist file opened: ',fname
    end if
 !LEVEL1 'end do_bio'
 !LEVEL1 'var_ave',var_ave
+!stop
    return
    end subroutine do_bio
 !EOC

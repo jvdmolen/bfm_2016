@@ -98,6 +98,9 @@
 !write(LOGUNIT,*)'jout check',jout
 !stop
       if ( jout>0) then
+write(LOGUNIT,*)'findextremes',mode,iiSys,ppState,message,nan_check
+write(logunit,*)'PEL mode,r3',mode,r3
+write(logunit,*)'ppState,jout',ppState,jout
          write(logunit,'(A)') message
          write(logunit,'(A,A,A,I2)') &
                 'in rate ',trim(var_names(stPelStateS+ppState-1)),' layer:',jout
@@ -106,6 +109,8 @@
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
               trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(jout,ppState)
          call set_warning_for_getm
+!write(logunit,*)'Stopping execution, PEL, FindNanInRates'
+!stop
       endif
 !endif
 !write(LOGUNIT,*)'after jout check',mode,iiSys,ppState,message
@@ -121,6 +126,9 @@
         case(3) ;call findnega(s2,NO_BOXES_XY,jout)
       end select
       if ( jout>0) then
+write(LOGUNIT,*)'findextremes',mode,iiSys,ppState,message,nan_check
+write(logunit,*)'BEN mode,r2',mode,r2
+write(logunit,*)'ppState,jout',ppState,jout
          write(logunit,'(A)') message
          write(logunit,'(A,A,A,I2)') &
                'in rate ',trim(var_names(stBenStateS+ppState-1)),' layer:',jout
@@ -129,6 +137,8 @@
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
               trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(jout,ppState)
          call set_warning_for_getm
+!write(logunit,*)'Stopping execution, BEN, FindNanInRates'
+!stop
       endif
    end select
 !write(LOGUNIT,*)'end findestremes',mode,iiSys,ppState,message
@@ -175,8 +185,9 @@
 
           do i=1,n
             if (isnan(vector(i))) then
-                write(LOGUNIT,*) '-------------case:NaN----------'
+                write(LOGUNIT,*) '-------------findnan case:NaN----------'
                 call set_warning_for_getm
+!write(logunit,*)'Stopping execution, findnan'
                 iout=i
                 return
             endif
@@ -202,6 +213,7 @@ subroutine findsmall( vector,n,small,iout)
             if (abs(vector(i))<small) then
                 write(LOGUNIT,*) '-------------case:< 1.0-e8----------'
                 call set_warning_for_getm
+!write(logunit,*)'Stopping execution, findsmall'
                 iout=i
                 return
             endif
@@ -232,6 +244,7 @@ subroutine findsmall( vector,n,small,iout)
             write(msg,'(G10.2)') large
             write(LOGUNIT,*) '-------------case:>',msg,'----------'
             call set_warning_for_getm
+!write(logunit,*)'Stopping execution, findlarge'
             iout=i
             return
         endif
@@ -256,6 +269,7 @@ subroutine findsmall( vector,n,small,iout)
             if (vector(i)<ZERO) then
                 write(LOGUNIT,*) '-------------case:<0 ----------'
                 call set_warning_for_getm
+!write(logunit,*)'Stopping execution, findnega'
                 iout=i
                 return
             endif
@@ -349,6 +363,8 @@ subroutine findsmall( vector,n,small,iout)
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
               trim(var_names(stPelStateS+ppState-1)),jout,D3STATE(jout,ppSTATE)
          call set_warning_for_getm
+write(logunit,*)'Stopping execution, PEL, FindInfInRates'
+
       endif
     case (iiBen)
       r2=Source_D2_vector(ppState,0)
@@ -360,6 +376,7 @@ subroutine findsmall( vector,n,small,iout)
          write(logunit,'(A,''('',I2,'')='',G13.6)') &
               trim(var_names(stBenStateS+ppState-1)),jout,D2STATE(jout,ppSTATE)
          call set_warning_for_getm
+write(logunit,*)'Stopping execution, Ben, FindInfInRates'
       endif
    end select
   end subroutine FindInfInRates
@@ -377,9 +394,10 @@ subroutine findsmall( vector,n,small,iout)
 
       do i=1,n
         call isinf(vector(i),jout)
-        if (iout>0) then
+        if (jout>0) then
             write(LOGUNIT,*) '-------------case:Inf----------'
             call set_warning_for_getm
+write(logunit,*)'Stopping execution, findinf'
             iout=jout
             return
         endif

@@ -181,8 +181,16 @@
       iloc = imin;if (ioff_l.eq.0) iloc = imin+ifill_from
       jloc = jmin;if (joff_l.eq.0) jloc = jmin+jfill_from
 ! il:ih  array range of data  which are red from array in netcdf file
-      il = max(imin+ioff_l+iread_from,1); if ( ioff_l > 0 ) il=il-ifill_from
-      jl = max(jmin+joff_l+jread_from,1); if ( joff_l > 0 ) jl=jl-jfill_from
+LEVEL1 "imin,ioff_l,iread_from,il,ifill_from",imin,ioff_l,iread_from,il,ifill_from
+LEVEL1 "jmin,joff_l,jread_from,jl,jfill_from",jmin,joff_l,jread_from,jl,jfill_from
+      il = max(imin+ioff_l+iread_from,1)
+LEVEL1 "il",il
+      if ( ioff_l > 0 ) il=il-ifill_from
+LEVEL1 "il",il
+      jl = max(jmin+joff_l+jread_from,1)
+LEVEL1 "jl",jl
+      if ( joff_l > 0 ) jl=jl-jfill_from
+LEVEL1 "jl",jl
       ih = min(il+imax-iloc,xlen)
       jh = min(jl+jmax-jloc,ylen)
       ilen = ih-il+iloc
@@ -199,7 +207,7 @@
       STDERR "read_restart_ncdf ilen,jlen",ilen,jlen
       STDERR "read_restart_ncdf iread_from,jread_from",iread_from,jread_from
       STDERR "read_restart_ncdf ifill_from,jfill_from",ifill_from,jfill_from
-
+!stop
    end if
    start(1) = il ; edges(1) = ih-il+1
    start(2) = jl ; edges(2) = jh-jl+1
@@ -303,9 +311,9 @@
       if (status .NE. NF90_NOERR) then
          LEVEL3 "read_restart_ncdf(): setting ssun=0"
          ssun=_ZERO_
-         where (au .eq. 0)
-            ssun=10.2
-         end where
+!         where (au .eq. 0)  !JM tried this to read old restart files, helped but more problems
+!            ssun=10.2
+!         end where
       else
          call update_2d_halo(ssun,ssun,au,imin,jmin,imax,jmax,U_TAG)
          call wait_halo(U_TAG)
@@ -316,9 +324,9 @@
       if (status .NE. NF90_NOERR) then
          LEVEL3 "read_restart_ncdf(): setting ssvn=0"
          ssvn=_ZERO_
-         where (av .eq. 0)
-            ssvn=10.2
-         end where
+!         where (av .eq. 0)  !JM tried this to read old restart files, helped but more problems
+!            ssvn=10.2
+!         end where
       else
          call update_2d_halo(ssvn,ssvn,av,imin,jmin,imax,jmax,V_TAG)
          call wait_halo(V_TAG)

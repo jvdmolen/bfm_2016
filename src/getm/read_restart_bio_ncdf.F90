@@ -93,8 +93,13 @@
          status = nf90_get_var(ncid,id_var_start_3d,start_id)
        iout=start_id-1+nr
        status=nf90_inquire_variable(ncid,iout,name=name)
+!JM       status = &
+!JM          nf90_get_var(ncid,iout,ffp(iloc:ilen,jloc:jlen,0:kmax),start,edges)
+!LEVEL1 "read_restart_bio_ncdf read pelabic"
+!LEVEL1 "start",start
+!LEVEL1 "edges",edges
        status = &
-          nf90_get_var(ncid,iout,ffp(iloc:ilen,jloc:jlen,0:kmax),start,edges)
+          nf90_get_var(ncid,iout,ffp(iloc:ilen,jloc:jlen,0:kmax),start(1:3),edges(1:3))
        if (status .NE. NF90_NOERR) then
           LEVEL3 "read_restart_bio_ncdf(): setting",name,"=0"
           ffp=_ZERO_
@@ -109,8 +114,13 @@
          status = nf90_get_var(ncid,id_var_start_2d,start_id)
        iout=start_id-1+nr
        status=nf90_inquire_variable(ncid,iout,name=name)
+!JM       status = &
+!JM          nf90_get_var(ncid,iout,ffb(iloc:ilen,jloc:jlen),start,edges)
+!LEVEL1 "read_restart_bio_ncdf read benthic"
+!LEVEL1 "start",start
+!LEVEL1 "edges",edges
        status = &
-          nf90_get_var(ncid,iout,ffb(iloc:ilen,jloc:jlen),start,edges)
+          nf90_get_var(ncid,iout,ffb(iloc:ilen,jloc:jlen),start(1:3),edges(1:3))
        if (status .NE. NF90_NOERR) then
           LEVEL3 "read_restart_bio_ncdf(): setting",name,"=0"
           ffb=_ZERO_

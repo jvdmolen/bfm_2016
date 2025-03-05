@@ -69,7 +69,7 @@
 !
 !-----------------------------------------------------------------------
 !BOC
-
+LEVEL1 'bfm_error_msg.F90: set_warning_for_getm, nothing done'
   return
    end subroutine set_warning_for_getm
 !-----------------------------------------------------------------------

@@ -951,8 +951,7 @@ use global_mem,only:LOGUNIT
             elseif ( r > 1.0D-10) then
               onem=var_names(statenr); i=len_trim(onem)
               call set_warning_for_getm()
-              write(msg,'(A,'': Negative values after '' &
-                    ,A,''averaging n>=1 shift='',F10.3,''%'')') &
+              write(msg,'(A,'': Negative values after '' ,A,''averaging n>=1 shift='',F10.3,''%'')') &
                     onem(1:i),after,r
                 i=len_trim(msg)
                 STDERR msg(1:i)
@@ -1005,8 +1004,7 @@ use global_mem,only:LOGUNIT
               counter=counter+n
             elseif ( n > 0 ) then
               onem=var_names(statenr); i=len_trim(onem)
-              write(msg,'(A,'': Negative values after '' &
-                    ,A,'' n='',I2,'' shift='',F10.3,''%'')') &
+              write(msg,'(A,'': Negative values after '' ,A,'' n='',I2,'' shift='',F10.3,''%'')') &
                     onem(1:i),after,n,r
             endif
          endif
@@ -1323,7 +1321,8 @@ use global_mem,only:LOGUNIT
 
    integer                     ::i3d,j3d,i2d,j2d
    integer,save                ::l=0,k,m,n
-   real                        ::value,rk
+   real                        ::rk
+   REALTYPE                    ::value
 
    test_mode=test_3d.ne.0.or.test_2d.ne.0
    if (l==0.and.test_mode)  &

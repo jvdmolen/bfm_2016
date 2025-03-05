@@ -946,7 +946,6 @@
 #ifdef DEBUG
    write(debug,*) 'do_3d_bdy_ncdf (NetCDF) climatology=',climatology
 #endif
-
    if ( climatology ) then
       if (time_len .eq. 12) then
          this = month

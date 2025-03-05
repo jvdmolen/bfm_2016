@@ -90,7 +90,7 @@
 !
 !-----------------------------------------------------------------------
 !BOC
-   LEVEL1 'set_d3_model_flag_for_gotm val=',val
+!   LEVEL1 'set_d3_model_flag_for_gotm val=',val
    if ( val) then
      LEVEL1 'Error messages to finish in GOTM will be handeld in GETM '
    endif
@@ -167,6 +167,7 @@
 !
 !-----------------------------------------------------------------------
 !BOC
+!LEVEL1 'gotm_error_msg.F90: set_warning_for_getm: setting warning flag'
    warning=.true.
 
   return

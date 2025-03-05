@@ -121,6 +121,9 @@
   if ( iout>0) then
          write(LOGUNIT,*) 'Ecology at start(1):NAN in R2c layer',iout
          call set_warning_for_getm
+write(LOGUNIT,*)'R2c',R2c
+stop
+!stop
   endif
   call findnega(H1n,NO_BOXES_XY,iout)
   if ( iout>0) then
@@ -136,11 +139,15 @@
   if ( iout>0) then
          write(LOGUNIT,*) 'Ecology after Pelagic(1):NAN in Hnc layer',iout
          call set_warning_for_getm
+write(LOGUNIT,*)'Hnc',Hnc
+stop
   endif
   call findnan(K3n,NO_BOXES_XY,iout)
   if ( iout>0) then
          write(LOGUNIT,*) 'Ecology after Pelagic(1):NAN in K3n'
          call set_warning_for_getm
+write(LOGUNIT,*)'K3n',K3n
+stop
   endif
 
 #ifdef DEBUG
@@ -191,6 +198,8 @@
   if ( iout>0) then
          write(logunit,*) 'Ecology at start:Nan in K14n layer',iout,K14n(iout)
          call set_warning_for_getm
+write(LOGUNIT,*)'K14n',K14n
+stop
   endif
 
 !write(LOGUNIT,*)'ecology before reset flux interface'
@@ -291,11 +300,15 @@
         call BenthicSystemDynamics
 !write(LOGUNIT,*) 'after benthicsystemdynamics'
 !stop
-        call FindNanInRates(iiPel,ppK3n,'Ecology:full benthic system')
+!write(LOGUNIT,*) 'Ecology, calling findnaninrates, iiBen,ppK3n',iiBen,ppK3n
+!JM        call FindNanInRates(iiPel,ppK3n,'Ecology:full benthic system')
+        call FindNanInRates(iiBen,ppK3n,'Ecology:full benthic system')
 
         !Diagenetic model
                 call BenthicNutrient3Dynamics
-                call FindNanInRates(iiPel,ppK3n,'Ecology:full benthic nutrients')
+!JM                call FindNanInRates(iiPel,ppK3n,'Ecology:full benthic nutrients')
+!write(LOGUNIT,*) 'Ecology, calling findnaninrates, iiBen,ppK3n',iiBen,ppK3n
+                call FindNanInRates(iiBen,ppK3n,'Ecology:full benthic nutrients')
 
 !write(LOGUNIT,*) 'after benthicsnutrient3Ddynamics'
 !stop
@@ -313,8 +326,9 @@
           call Y3Z2CoupDynamics
 !write(LOGUNIT,*) 'after Y3Z2'
 !stop
-
+!write(LOGUNIT,*) 'Ecology, calling findnaninrates, iiPel,ppR3c',iiPel,ppR3c
           call FindNanInRates(iiPel,ppR3c,'Ecology:after Y3Y2Dyn')
+!write(LOGUNIT,*) 'Ecology, calling findnaninrates, iiPel,ppR2c',iiPel,ppR2c
           call FindNanInRates(iiPel,ppR2c,'Ecology:after Y3Y2Dyn')
 
           ! Resuspension and of detritus   (fluxes beteween R6 and Q6)
@@ -331,6 +345,7 @@
   endif
 !write(LOGUNIT,*) 'after allbenthiccalls'
 !stop
+!write(LOGUNIT,*) 'Ecology, calling findnaninrates, iiPel,ppN1p',iiPel,ppN1p
   call FindLargeInRates(iiPel,ppN1p,'Ecology:before PSF(3)')
   if ( CalcPelagicFlag) then
     call PelagicSystemDynamics(3)
@@ -380,7 +395,8 @@
   endif
 ! call print_structure(2,-ppK4n,1)
 
-  call FindNanInRates(iiPel,ppK3n,'Ecology: at end')
+!JM  call FindNanInRates(iiPel,ppK3n,'Ecology: at end')
+  call FindNanInRates(iiBen,ppK3n,'Ecology: at end')
 
 !write(LOGUNIT,*)'end ecology'
 !stop

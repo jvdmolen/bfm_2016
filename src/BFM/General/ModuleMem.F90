@@ -1970,8 +1970,6 @@
                     write(LOGUNIT,'(''Error flux_vector: negative flux at level:'',I4)') i
                     write(LOGUNIT,'(''In '',A,'':origin='',i4,'' destination='',i4)') &
                       D23, origin,destination
-                    write(LOGUNIT,'(''In '',A,'':origin='',i4,'' &
-                      destination='',i4)') D23, origin,destination
                     write(LOGUNIT,'(''flux='',(G16.8))') flux(i)
                     if ( iiSub== iiBen) then
                       write(LOGUNIT,*) "state value origin:",D2STATE(i,origin)
