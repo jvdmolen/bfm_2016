@@ -25,7 +25,7 @@
     use domain, ONLY:H,imin,imax,jmin,jmax
     use exceptions, only:getm_error
 
-    character(len=80),private                 :: msg,sub
+    character(len=80),private                 :: msg="",sub
 ! !PUBLIC DATA MEMBERS:
    character(len=64),allocatable,dimension(:) :: tracked_river_name
    character(len=64)                          :: tracer_type

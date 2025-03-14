@@ -600,7 +600,7 @@ LEVEL1 'namelist file opened: ',fname
    logical, save             :: set_C_zero=.true.
 #endif
 #ifdef BFM_GOTM
-   character(len=160)                 :: msg
+   character(len=160)                 :: msg=""
    REALTYPE                  :: hh
    integer                   :: k,i,mm,nn,llmax(nlev),mm0,nn0,ii0
    integer                   :: kt=0

@@ -93,7 +93,7 @@ use mem,only:ppR2c
   integer,intent(IN)::mode
   integer           ::i,ic,ip,in,il,is,j   ,iout
   real(RLEN)        ::rzero=0.0D+00,hold,r0
-  character(len=10)  ::msg
+  character(len=10)  ::msg=""
   real(RLEN),dimension(NO_BOXES)    :: rx_any,sx_any,px_any !,c_xprevious_c,c_xprevious_p
 
 !write(LOGUNIT,*)'start pelagicsystemdynamics',mode

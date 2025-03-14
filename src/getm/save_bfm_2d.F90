@@ -41,7 +41,7 @@
       integer                            :: f2_dims(2) 
       integer                            :: xlen,ylen
       REALTYPE                           :: fv,mv
-      character(len=80)                  :: msg
+      character(len=80)                  :: msg=""
 #ifdef DEBUG
       STDERR 'save_bfm_2d varname=',varname
 #endif

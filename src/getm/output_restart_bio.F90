@@ -24,7 +24,7 @@
     use coupling_getm_bfm,only:check_reset_tracking,read_poro,&
                   set_2d_grid_parameters, start_tracking_in_jul,init_pel_co2
 
-    character(len=80),private                 :: msg,sub
+    character(len=80),private                 :: msg="",sub
     REALTYPE,parameter                        :: pretty_small=1.0D-20
 
     public restart_file_bio

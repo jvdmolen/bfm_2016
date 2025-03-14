@@ -126,7 +126,7 @@
       integer                     ::k
       integer                     ::rc
       logical                     ::llcalc
-      character(len=90)           ::msg
+      character(len=90)           ::msg=""
 
       select case (mode)
         case(0)   ! initialization

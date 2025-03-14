@@ -34,7 +34,7 @@
           ii2dTrack, nr_2d_track,fix_2d_track_bot,ii2dptTrack, & 
           ii3daptTrack
 
-      character(len=80)                :: message
+      character(len=80)                :: message=""
       integer,dimension(:),allocatable :: check_ben_to_pel
 !  
 !

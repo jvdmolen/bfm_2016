@@ -106,7 +106,7 @@
     character(len=20)   ::file='D2MacroPhyto.nml'
     logical             ::yes=.false.
     logical             ::test_on_macrophyt
-    character(len=80)   ::msg
+    character(len=80)   ::msg=""
     character(len=20)   ::hlp
 
     namelist/InitialMacroPhyto/n,iyear,ntype,farm_name, &

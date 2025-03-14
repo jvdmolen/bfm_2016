@@ -1043,7 +1043,7 @@ use global_mem,only:LOGUNIT
        integer,intent(OUT)                     :: enderror
 ! !LOCAL VARIABLES:
         integer              ::j,i
-        character(len=180)   ::msg
+        character(len=180)   ::msg=""
         integer              :: counter
         integer              :: error
            error=0;enderror=0;

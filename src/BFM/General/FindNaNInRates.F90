@@ -236,7 +236,7 @@ subroutine findsmall( vector,n,small,iout)
       integer,intent(OUT)              :: iout
 
       integer      ::i
-      character(len=10)  ::msg
+      character(len=10)  ::msg=""
 
 
         i=imaxloc(n,abs(vector))
@@ -285,7 +285,7 @@ subroutine findsmall( vector,n,small,iout)
       implicit none
       REAL(RLEN),intent(IN)            :: x
       integer,intent(OUT)              :: iout
-      character(len=80)                :: mess
+      character(len=80)                :: mess=""
 
       iout=0
       write(mess,'(''x='',G13.6)') X

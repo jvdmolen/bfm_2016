@@ -31,7 +31,7 @@
       real(RLEN),private                       ::r
       integer,private                          ::i,j,k,l
       character(len=20),private                ::t,tsource,tgoal
-      character(len=80),private                ::msg
+      character(len=80),private                ::msg=""
       real(RLEN),public,pointer                ::BENBOUND(:,:)
      
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
