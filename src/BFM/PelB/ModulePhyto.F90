@@ -276,10 +276,10 @@ open(NMLUNIT,file='Phyto.nml',status='old',action='read',err=100)
            l=CoupledtoBDc(i)
            if (scalar.lt.1.0D-6.and.(l==0.or.l>iiPhytoPlankton) &
                                         .and.TestStatus(i)==1)then
-              write(LOGUNIT,*) 'Warning ',trim(var_names(j)), &
-              'processes are excluded in the calculation:concentration<1.d-06'
+!JM              write(LOGUNIT,*) 'Warning ',trim(var_names(j)), &
+!JM              'processes are excluded in the calculation:concentration<1.d-06'
             !set all modelled constituents for this functional group on
-             call set_warning_for_getm
+!JM             call set_warning_for_getm
              sw_CalcPhyto(1,i)=0
              m=1
              k=0

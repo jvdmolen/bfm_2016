@@ -170,9 +170,9 @@
     j=sum(insw_vector(-(O2o-p_clO2o)));
     if ( j.gt.0) then
       i=sum(insw_vector((flN3O4n)));
-      write(LOGUNIT,'(A,I2,A,F6.2,A,I2,A)') '  pelagic denitrification in',i, &
-       ' , low oxygen (<',p_clO2o,') in ',j,' layer(s)'
-      call set_warning_for_getm
+!JM      write(LOGUNIT,'(A,I2,A,F6.2,A,I2,A)') '  pelagic denitrification in',i, &
+!JM       ' , low oxygen (<',p_clO2o,') in ',j,' layer(s)'
+!JM      call set_warning_for_getm
     endif
   endif
 
