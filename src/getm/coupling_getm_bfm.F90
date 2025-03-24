@@ -425,22 +425,27 @@
             ! add value for average output 
                select case(mode)
                case(1)
-                    cc3d_out(ig,jg,0:nlev,k) = cc3d_out(ig,jg,0:nlev,k)+cc(j,0:nlev)
+!JM                    cc3d_out(ig,jg,0:nlev,k) = cc3d_out(ig,jg,0:nlev,k)+cc(j,0:nlev)
+                    cc3d_out(ig,jg,0:nlev,k) = cc3d_out(ig,jg,0:nlev,k)+cc(0:nlev,j)
                case(2)
-                    cc3d_out(ig,jg,0:nlev,k) = cc3d_out(ig,jg,:,k)+diag(j,0:nlev)
+!JM                    cc3d_out(ig,jg,0:nlev,k) = cc3d_out(ig,jg,:,k)+diag(j,0:nlev)
+                    cc3d_out(ig,jg,0:nlev,k) = cc3d_out(ig,jg,:,k)+diag(0:nlev,j)
                case(3)
                    call make_flux_output(1,j,0,nlev,dt,c1dimz,llcalc)
                    if (llcalc) cc3d_out(ig,jg,0:nlev,k) = cc3d_out(ig,jg,0:nlev,k)+ c1dimz(0:nlev)
                case(4)
-                    ccb3d_out(ig,jg,0:1,k) = ccb3d_out(ig,jg,0:1,k)+ccb(j,0:1)
+!JM                    ccb3d_out(ig,jg,0:1,k) = ccb3d_out(ig,jg,0:1,k)+ccb(j,0:1)
+                    ccb3d_out(ig,jg,0:1,k) = ccb3d_out(ig,jg,0:1,k)+ccb(0:1,j)
                case(5)
-                    ccb3d_out(ig,jg,0:1,k) = ccb3d_out(ig,jg,0:1,k)+diagb(j,0:1)
+!JM                    ccb3d_out(ig,jg,0:1,k) = ccb3d_out(ig,jg,0:1,k)+diagb(j,0:1)
+                    ccb3d_out(ig,jg,0:1,k) = ccb3d_out(ig,jg,0:1,k)+diagb(0:1,j)
                case(6)
                    call make_flux_output(2,j,0,nlev,dt,c1dimz,llcalc)
                    if (llcalc) ccb3d_out(ig,jg,0:1,k) = ccb3d_out(ig,jg,0:1,k)+ c1dimz(0:1)
 #ifdef INCLUDE_DIAGNOS_PRF
                case(7)
-                    ccb3d_prf(ig,jg,0:nlev,k) = ccb3d_prf(ig,jg,0:nlev,k)+diagb_prf(j,0:nlev)
+!JM                    ccb3d_prf(ig,jg,0:nlev,k) = ccb3d_prf(ig,jg,0:nlev,k)+diagb_prf(j,0:nlev)
+                    ccb3d_prf(ig,jg,0:nlev,k) = ccb3d_prf(ig,jg,0:nlev,k)+diagb_prf(0:nlev,j)
 #endif
                end select
             else
@@ -448,14 +453,17 @@
             ! when counter_ave ==0 . 
                select case(mode)
                case(1)
-                    cc3d_out(ig,jg,0:nlev,k) = cc(j,0:nlev)
+!JM                    cc3d_out(ig,jg,0:nlev,k) = cc(j,0:nlev)
+                    cc3d_out(ig,jg,0:nlev,k) = cc(0:nlev,j)
                case(2)
-                    cc3d_out(ig,jg,0:nlev,k) = diag(j,0:nlev)
+!JM                    cc3d_out(ig,jg,0:nlev,k) = diag(j,0:nlev)
+                    cc3d_out(ig,jg,0:nlev,k) = diag(0:nlev,j)
                case(3)
                    call make_flux_output(1,j,0,nlev,dt,c1dimz,llcalc)
                    if ( llcalc) cc3d_out(ig,jg,0:nlev,k) = c1dimz(0:nlev)
                case(4)
-                    ccb3d_out(ig,jg,0:1,k) = ccb(j,0:1)
+!JM                    ccb3d_out(ig,jg,0:1,k) = ccb(j,0:1)
+                    ccb3d_out(ig,jg,0:1,k) = ccb(0:1,j)
 !                  ccb3d_out(k,ig,jg,0:1) = reshape(ccb(0:1,j), (/numbc,2/), order=(/2,1/))
                case(5)
                  !
@@ -463,13 +471,15 @@
                     print *, "ccb3d_out dimensions:", size(ccb3d_out, 1), size(ccb3d_out, 2), size(ccb3d_out, 3), size(ccb3d_out, 4)
                     print *, "diagb dimensions:", size(diagb, 1), size(diagb, 2)
 
-                    ccb3d_out(ig,jg,0:1,k) = diagb(j,0:1)
+!JM                    ccb3d_out(ig,jg,0:1,k) = diagb(j,0:1)
+                    ccb3d_out(ig,jg,0:1,k) = diagb(0:1,j)
                case(6)
                    call make_flux_output(2,j,0,nlev,dt,c1dimz,llcalc)
                    if ( llcalc) ccb3d_out(ig,jg,0:1,k) = c1dimz(0:1)
 #ifdef INCLUDE_DIAGNOS_PRF
                case(7)
-                    ccb3d_prf(ig,jg,0:nlev,k) = diagb_prf(j,0:nlev)
+!JM                    ccb3d_prf(ig,jg,0:nlev,k) = diagb_prf(j,0:nlev)
+                    ccb3d_prf(ig,jg,0:nlev,k) = diagb_prf(0:nlev,j)
 #endif
                end select
             endif
