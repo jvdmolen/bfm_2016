@@ -125,7 +125,7 @@
         do i=1,NO_BOXES_XY
            if (Rate_vector(i)<ZERO) then
              write(LOGUNIT,*)  &
-                'Error: In ',i,' a ',trim(t),' Rate is found'
+                'openbotflux_vector: Error: In ',i,' a ',trim(t),' Rate is found'
            endif
         enddo
       elseif (maxval(Rate_vector)>ZERO.and.mode==NEGATIVE) then
@@ -133,7 +133,7 @@
         do i=1,NO_BOXES_XY
            if (Rate_vector(i)>ZERO) then
              write(LOGUNIT,*)  &
-                'Error: In ',i,' a ',trim(t),' Rate is found'
+                'openbotflux_vector: Error: In ',i,' a ',trim(t),' Rate is found'
            endif
         enddo
       endif
@@ -178,7 +178,7 @@
       if (l*r<ZERO )  then
         do i=1,NO_BOXES_XY
           if (l*Rate_vector(i)<ZERO) then
-write(LOGUNIT,*) 'Error: In ',i,' a ',trim(t),' Rate is found'
+write(LOGUNIT,*) 'addbotflux_vector: Error: In ',i,' a ',trim(t),' Rate is found'
           write(msg,*) 'Error: In ',i,' a ',trim(t),' Rate is found'
           call BFM_ERROR("addbotflux_vector",trim(msg))
           endif
@@ -190,8 +190,8 @@ write(LOGUNIT,*) 'Error: In ',i,' a ',trim(t),' Rate is found'
         else
           tgoal  =var_names(Goal)
         endif
-write(LOGUNIT,*) 'Flux from ',trim(tsource),' to ',trim(tgoal)
-        write(msg,*) 'Flux from ',trim(tsource),' to ',trim(tgoal)
+write(LOGUNIT,*) 'addbotflux_vector: Flux from ',trim(tsource),' to ',trim(tgoal)
+        write(msg,*) 'addbotflux_vector: Flux from ',trim(tsource),' to ',trim(tgoal)
         call BFM_ERROR("addbotflux_vector",trim(msg))
       endif
 if (SourceSys.eq.GoalSys) &
@@ -244,7 +244,7 @@ write(LOGUNIT,*) 'wrong use of routine:SourceSys and GoalSys equal'
         write(msg,*) 'Error: a ',trim(t),' Rate is found'
         tsource=var_names(Source+(SourceSys/iiBen)*(stBenStateS-1))
         tgoal  =var_names(Goal+(GoalSys/iiBen)*(stBenStateS-1))
-        write(LOGUNIT,*) 'Flux from ',trim(tsource),' to ',trim(tgoal)
+        write(LOGUNIT,*) 'addbotflux: Flux from ',trim(tsource),' to ',trim(tgoal)
         call BFM_ERROR('addbotflux',trim(msg));
       endif
       if (SourceSys.eq.GoalSys) &

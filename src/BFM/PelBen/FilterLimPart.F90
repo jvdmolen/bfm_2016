@@ -81,6 +81,14 @@
     phyto=phyto+lcl_Plankton(BoxNumber)
     lcl_Plankton=>PhytoPlankton(iiP5,iiC);   
     phyto=phyto+lcl_Plankton(BoxNumber)
-    part=parphyt*phyto +ESS(BoxNumber)*parsil
+!JM    part=parphyt*phyto +ESS(BoxNumber)*parsil
+!JM don't let the model die in very rare case when ESS<0
+    part=parphyt*phyto +max(ZERO,ESS(BoxNumber))*parsil
     efilPART=2.0*OCP/(2.0*OCP+part)
+!if (efilPART<0) then
+!write(LOGUNIT,*)'efilPART',efilPART
+!write(LOGUNIT,*)'part',part
+!write(LOGUNIT,*)'phyto',phyto
+!write(LOGUNIT,*)'ESS',ESS(BoxNumber)
+!endif
 end
