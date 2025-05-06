@@ -486,11 +486,11 @@
 !JM  se_uZER6p  =   suf*min(p_puePI(y),DONE-p_peZ_R1p)
 !JM  se_uZER1p  =   suf*p_puePI(y)-se_uZIR6p
   se_uZER6c  =   suf*min(p_pueZE(y),DONE-p_peZ_R1c)
-  se_uZER1c  =   suf*p_pueZE(y)-se_uZIR6c
+  se_uZER1c  =   suf*p_pueZE(y)-se_uZER6c
   se_uZER6n  =   suf*min(p_pueZE(y),DONE-p_peZ_R1n)
-  se_uZER1n  =   suf*p_pueZE(y)-se_uZIR6n
+  se_uZER1n  =   suf*p_pueZE(y)-se_uZER6n
   se_uZER6p  =   suf*min(p_pueZE(y),DONE-p_peZ_R1p)
-  se_uZER1p  =   suf*p_pueZE(y)-se_uZIR6p
+  se_uZER1p  =   suf*p_pueZE(y)-se_uZER6p
   se_uR6  =   suf*p_pueR6(y)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

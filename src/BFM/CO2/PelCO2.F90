@@ -120,6 +120,8 @@
              write(LOGUNIT,*) 'N3n',N3n(BoxNumber)
              write(LOGUNIT,*) 'N4n',N4n(BoxNumber)
              write(LOGUNIT,*) 'rho',ERHO(BoxNumber)
+             write(LOGUNIT,*) 'pCO2',pCO2(BoxNumber)
+             write(LOGUNIT,*) 'pH',pH(BoxNumber)
 !             k=1
            endif
            error= CalcCO2System(MethodCalcCO2, &
@@ -145,7 +147,7 @@ write(LOGUNIT,*)'O3h',O3h(BoxNumber)
   ENDDO
  if (j>0) then
    write(LOGUNIT,*) 'For this column ',j,' times pH was outside bounds (4-11)'
-stop
+!stop
    call set_warning_for_getm()
  endif
 

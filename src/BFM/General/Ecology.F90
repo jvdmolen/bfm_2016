@@ -122,7 +122,7 @@
          write(LOGUNIT,*) 'Ecology at start(1):NAN in R2c layer',iout
          call set_warning_for_getm
 write(LOGUNIT,*)'R2c',R2c
-stop
+!stop   JM don't stop on Laplace: it hangs. just let it crash
 !stop
   endif
   call findnega(H1n,NO_BOXES_XY,iout)
@@ -140,14 +140,14 @@ stop
          write(LOGUNIT,*) 'Ecology after Pelagic(1):NAN in Hnc layer',iout
          call set_warning_for_getm
 write(LOGUNIT,*)'Hnc',Hnc
-stop
+!stop
   endif
   call findnan(K3n,NO_BOXES_XY,iout)
   if ( iout>0) then
          write(LOGUNIT,*) 'Ecology after Pelagic(1):NAN in K3n'
          call set_warning_for_getm
 write(LOGUNIT,*)'K3n',K3n
-stop
+!stop
   endif
 
 #ifdef DEBUG
