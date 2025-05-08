@@ -338,6 +338,11 @@
                                         corr_not,NO_BOXES_XY,  puPIY3(:,i))
      food_PIc(:,i)=cx_any*puPIY3(:,i)
      food_PT(:)  = food_PT(:)+ food_PIc(:,i)
+!write(LOGUNIT,*) 'i,food_PT:',i,food_PT(:)
+!write(LOGUNIT,*) 'cx_any',cx_any
+!write(LOGUNIT,*) 'puPIY3(:,i)',puPIY3(:,i)
+!write(LOGUNIT,*) 'limit_PIc(:,i)',limit_PIc(:,i)
+!write(LOGUNIT,*) 'p_puPI(y,i)',p_puPI(y,i)
      select  case  (i)
        case (iiP1,iiP5)
          !take up only R2 is proportion to (resuspended Benthic) diatom
@@ -514,8 +519,14 @@
   ! calculate max uptake  of food/m2. Compare uptake pressure
   ! with food in whole water column and limit if necessary
   fluc=food_PT *suf *Depth_Ben ! pot. uptaken food  mgC/m2
+!write(LOGUNIT,*) 'fluc1',fluc
+!write(LOGUNIT,*) 'food_PT:',food_PT(:)
   call LimitChange_vector(POSITIVE,fluc,ctfPm2c,max_change_per_step, &
                                                          lim_tot_column)
+!write(LOGUNIT,*) 'fluc2',fluc
+!write(LOGUNIT,*) 'ctfPm2c',ctfPm2c
+!write(LOGUNIT,*) 'max_change_per_step',max_change_per_step
+
 
   k=CALC_GRAZING_FILTERFEEDER;if (y.eq.iiYy3)k=CALC_GRAZING_YOUNG_FILTERFEEDER
   do i=1,iiPhytoPlankton
@@ -529,6 +540,19 @@
     jPIY3c(:,i) = jPIY3c(:,i) + ruc
     j= ppPhytoPlankton(i,iiC)
     call addbotflux_vector(POSITIVE,iiPel,j,iiBen,ppyc,ruc)
+!if (i==2) then
+!if (minval(ruc).le.0.0) then
+!write(LOGUNIT,*) 'FilterFeeder: ruc',ruc
+!write(LOGUNIT,*) 'i',i
+!write(LOGUNIT,*) 'PI_Benc:',PI_Benc(:,i)
+!write(LOGUNIT,*) 'suf:',suf
+!write(LOGUNIT,*) 'choice:',choice
+!write(LOGUNIT,*) 'food_PIc:',food_PIc(:,i)
+!write(LOGUNIT,*) 'lim_tot_column,px_limit,corr_max:',lim_tot_column,px_limit,corr_max
+!write(LOGUNIT,*) 'fluc:',fluc
+!write(LOGUNIT,*) 'Depth_Ben:',Depth_Ben
+!endif
+!endif
     ruPIc  = ruPIc  +  ruc
     rePIR6c  = rePIR6c  +  PI_Benc(:,i)* se_uPIR6c* choice
     rePIR1c  = rePIR1c  +  PI_Benc(:,i)* se_uPIR1c* choice

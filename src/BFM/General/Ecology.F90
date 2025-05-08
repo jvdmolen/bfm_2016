@@ -72,6 +72,7 @@
 
 
  use mem,  ONLY: Output2d_1,Output2d_2,Output2d_3, Output2d_4
+ use mem_Param, ONLY: CalcPhytoPlankton
 !
 !
 ! !AUTHORS
@@ -111,6 +112,7 @@
   integer                          :: iout,i,j,k,l,mm
 
 !write(LOGUNIT,*) 'subroutine ecologydynamics'
+!write(LOGUNIT,*)'CalcPhytoPlankton',CalcPhytoPlankton(:)
 !stop
 
   call ResetSource_D2_vector(ppQ6s)
@@ -237,8 +239,11 @@ stop
 !JM a pointer error occurs in this call. Don't understand what's going wrong. Skip for now!!!!!!!!!
   call FindLargeInRates(iiPel,ppN1p,'Ecology:after Pelagic_1')
 !write(LOGUNIT,*)'CO2dynamics'
+!write(LOGUNIT,*)'CalcPhytoPlankton',CalcPhytoPlankton(:)
 !stop
   call CO2Dynamics(1)
+!write(LOGUNIT,*)'after CO2dynamics'
+!write(LOGUNIT,*)'CalcPhytoPlankton',CalcPhytoPlankton(:)
   call findnan(R6c,NO_BOXES,iout)
   if ( iout>0) then
          write(LOGUNIT,*) 'Ecology after Pelagic(1):NAN in R6c layer',iout
@@ -254,10 +259,13 @@ stop
 
   if ( CalcPelagicFlag) then
 !write(LOGUNIT,*) 'calcpelagicflag'
+!write(LOGUNIT,*)'CalcPhytoPlankton',CalcPhytoPlankton(:)
 !stop
     !test which phyton groups are presenta on this grid point
-    call test_Phyto_status
+!JM DON'T DO THIS, this is a dirty fix that doesn't recover, and permanently changes the behaviour of entire subdomains
+!JM    call test_Phyto_status 
 !write(LOGUNIT,*) 'aftertest'
+!write(LOGUNIT,*)'CalcPhytoPlankton',CalcPhytoPlankton(:)
 !stop
     ! Calculate Pelagic processes inclusive change in DIC
     call PelagicSystemDynamics(2)
@@ -399,6 +407,7 @@ stop
   call FindNanInRates(iiBen,ppK3n,'Ecology: at end')
 
 !write(LOGUNIT,*)'end ecology'
+!write(LOGUNIT,*)'CalcPhytoPlankton',CalcPhytoPlankton(:)
 !stop
   end
 !BOP
