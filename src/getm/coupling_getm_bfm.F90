@@ -1298,7 +1298,7 @@
 !EOP
 !-------------------------------------------------------------------------
 !BOC
-
+!LEVEL1 "iistate",iistate
       j=0;l=10000;iicheck=0
       do i=from,to
        j=j+1
@@ -1338,6 +1338,11 @@
                          do z=1,kmax
                            cc3d_out(m,n,z,k)=&
                              cc3d_out(m,n,z,k)+cut(m,n,z) *dyu(m,n)
+!if (m.eq.2 .and. n.eq.2 .and. z.eq.25) then
+!LEVEL1 "m,n,z,k",m,n,z,k
+!LEVEL1 "cut, dyu",cut(m,n,z),dyu(m,n)
+!LEVEL1 "cc3d_out",cc3d_out(m,n,z,k)
+!endif
                          enddo
                        endif
                      enddo
@@ -1359,6 +1364,11 @@
                        if (az(m,n).ge.1)  then
                          do z=1,kmax
                             cc3d_out(m,n,z,k)=cc3d_out(m,n,z,k)+cvt(m,n,z) *dxv(m,n)
+!if (m.eq.2 .and. n.eq.2 .and. z.eq.25) then
+!LEVEL1 "m,n,z,k",m,n,z,k
+!LEVEL1 "cvt, dxu",cvt(m,n,z),dxv(m,n)
+!LEVEL1 "cc3d_out",cc3d_out(m,n,z,k)
+!endif
                          enddo
                        endif
                      enddo
@@ -1384,6 +1394,10 @@
       ! iicheck=1 : sum(s) on states* uv_fluxes present
       ! iicheck=2 : sum(s) on uv_fluxes ( water transport) present
       if ( mode ==0.and.iicheck==1.and.l==0 ) iicheck=2
+!if (iistate .ne. 0) then
+!LEVEL1 "end make_uv_flux_output"
+!stop 
+!endif
 #else
       iicheck=0
 #endif

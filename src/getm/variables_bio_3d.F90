@@ -44,7 +44,8 @@
    REALTYPE,public,allocatable     :: adv3d_number(:,:,:)
    integer,public,allocatable      :: sw_CalcPhyto_2d(:,:,:)
    integer,public,allocatable      :: d3_pelvar_type(:)
-   REALTYPE, public, dimension(:,:,:), allocatable       :: cut,cvt    !JM added
+!JM   REALTYPE, public, dimension(:,:,:), allocatable       :: cut,cvt    !JM added
+   REALTYPE, public, dimension(I3DFIELD), target      :: cut,cvt    !JM added
 
 #endif
 

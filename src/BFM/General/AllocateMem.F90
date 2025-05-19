@@ -1195,15 +1195,15 @@
   ! Start the allocation of vars for calculation of combined fluxes for output
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    allocate(flx_calc_nr(0:46),stat=status)
-    allocate(flx_CalcIn(1:46),stat=status)
-    allocate(flx_option(1:46),stat=status)
-    allocate(flx_t(1:398),stat=status)
-    allocate(flx_SS(1:398),stat=status)
-    allocate(flx_states(1:398),stat=status)
-    allocate(flx_ostates(1:398),stat=status)
+    allocate(flx_calc_nr(0:58),stat=status)
+    allocate(flx_CalcIn(1:58),stat=status)
+    allocate(flx_option(1:58),stat=status)
+    allocate(flx_t(1:440),stat=status)
+    allocate(flx_SS(1:440),stat=status)
+    allocate(flx_states(1:440),stat=status)
+    allocate(flx_ostates(1:440),stat=status)
     flx_calc_nr(0)=0
-    flx_cal_ben_start=10
+    flx_cal_ben_start=22
 
 
     ! ruPTc=P.c <- O3c        (flux):
@@ -1391,634 +1391,712 @@
     flx_t(127)=+1.00;flx_SS(127)=1; flx_states(127)=ppP6c
     flx_ostates(127)=ppR3c
 
+    ! qqutZIc=Z.c        (u):
+    flx_calc_nr(11)= 132; flx_CalcIn(11)=iiPel; flx_option(11)=30
+    flx_t(128)=+1.00;flx_SS(128)=1; flx_states(128)=ppZ3c;flx_ostates(128)=0
+    flx_t(129)=+1.00;flx_SS(129)=1; flx_states(129)=ppZ4c;flx_ostates(129)=0
+    flx_t(130)=+1.00;flx_SS(130)=1; flx_states(130)=ppZ2c;flx_ostates(130)=0
+    flx_t(131)=+1.00;flx_SS(131)=1; flx_states(131)=ppZ5c;flx_ostates(131)=0
+    flx_t(132)=+1.00;flx_SS(132)=1; flx_states(132)=ppZ6c;flx_ostates(132)=0
+
+    ! qqutPIc=P.c        (u):
+    flx_calc_nr(12)= 139; flx_CalcIn(12)=iiPel; flx_option(12)=30
+    flx_t(133)=+1.00;flx_SS(133)=1; flx_states(133)=ppP1c;flx_ostates(133)=0
+    flx_t(134)=+1.00;flx_SS(134)=1; flx_states(134)=ppP2c;flx_ostates(134)=0
+    flx_t(135)=+1.00;flx_SS(135)=1; flx_states(135)=ppP3c;flx_ostates(135)=0
+    flx_t(136)=+1.00;flx_SS(136)=1; flx_states(136)=ppP4c;flx_ostates(136)=0
+    flx_t(137)=+1.00;flx_SS(137)=1; flx_states(137)=ppP5c;flx_ostates(137)=0
+    flx_t(138)=+1.00;flx_SS(138)=1; flx_states(138)=ppP6c;flx_ostates(138)=0
+    flx_t(139)=+1.00;flx_SS(139)=1; flx_states(139)=ppPcc;flx_ostates(139)=0
+
+    ! qqutRc=R1c+R2c+R3c+R6c+RZc        (u):
+    flx_calc_nr(13)= 144; flx_CalcIn(13)=iiPel; flx_option(13)=30
+    flx_t(140)=+1.00;flx_SS(140)=1; flx_states(140)=ppR1c;flx_ostates(140)=0
+    flx_t(141)=+1.00;flx_SS(141)=1; flx_states(141)=ppR2c;flx_ostates(141)=0
+    flx_t(142)=+1.00;flx_SS(142)=1; flx_states(142)=ppR3c;flx_ostates(142)=0
+    flx_t(143)=+1.00;flx_SS(143)=1; flx_states(143)=ppR6c;flx_ostates(143)=0
+    flx_t(144)=+1.00;flx_SS(144)=1; flx_states(144)=ppRZc;flx_ostates(144)=0
+
+    ! qqutDIc=O3c        (u):
+    flx_calc_nr(14)= 145; flx_CalcIn(14)=iiPel; flx_option(14)=30
+    flx_t(145)=+1.00;flx_SS(145)=1; flx_states(145)=ppO3c;flx_ostates(145)=0
+
+    ! qqutBc=B1c+Bac        (u):
+    flx_calc_nr(15)= 147; flx_CalcIn(15)=iiPel; flx_option(15)=30
+    flx_t(146)=+1.00;flx_SS(146)=1; flx_states(146)=ppB1c;flx_ostates(146)=0
+    flx_t(147)=+1.00;flx_SS(147)=1; flx_states(147)=ppBac;flx_ostates(147)=0
+
+    ! qqut_w=1        (u):
+    flx_calc_nr(16)= 148; flx_CalcIn(16)=iiPel; flx_option(16)=30
+    flx_t(148)=+1.00;flx_SS(148)=1; flx_states(148)=0;flx_ostates(148)=0
+
+    ! qqvtZIc=Z.c        (v):
+    flx_calc_nr(17)= 153; flx_CalcIn(17)=iiPel; flx_option(17)=40
+    flx_t(149)=+1.00;flx_SS(149)=1; flx_states(149)=ppZ3c;flx_ostates(149)=0
+    flx_t(150)=+1.00;flx_SS(150)=1; flx_states(150)=ppZ4c;flx_ostates(150)=0
+    flx_t(151)=+1.00;flx_SS(151)=1; flx_states(151)=ppZ2c;flx_ostates(151)=0
+    flx_t(152)=+1.00;flx_SS(152)=1; flx_states(152)=ppZ5c;flx_ostates(152)=0
+    flx_t(153)=+1.00;flx_SS(153)=1; flx_states(153)=ppZ6c;flx_ostates(153)=0
+
+    ! qqvtPIc=P.c        (v):
+    flx_calc_nr(18)= 160; flx_CalcIn(18)=iiPel; flx_option(18)=40
+    flx_t(154)=+1.00;flx_SS(154)=1; flx_states(154)=ppP1c;flx_ostates(154)=0
+    flx_t(155)=+1.00;flx_SS(155)=1; flx_states(155)=ppP2c;flx_ostates(155)=0
+    flx_t(156)=+1.00;flx_SS(156)=1; flx_states(156)=ppP3c;flx_ostates(156)=0
+    flx_t(157)=+1.00;flx_SS(157)=1; flx_states(157)=ppP4c;flx_ostates(157)=0
+    flx_t(158)=+1.00;flx_SS(158)=1; flx_states(158)=ppP5c;flx_ostates(158)=0
+    flx_t(159)=+1.00;flx_SS(159)=1; flx_states(159)=ppP6c;flx_ostates(159)=0
+    flx_t(160)=+1.00;flx_SS(160)=1; flx_states(160)=ppPcc;flx_ostates(160)=0
+
+    ! qqvtRc=R1c+R2c+R3c+R6c+RZc        (v):
+    flx_calc_nr(19)= 165; flx_CalcIn(19)=iiPel; flx_option(19)=40
+    flx_t(161)=+1.00;flx_SS(161)=1; flx_states(161)=ppR1c;flx_ostates(161)=0
+    flx_t(162)=+1.00;flx_SS(162)=1; flx_states(162)=ppR2c;flx_ostates(162)=0
+    flx_t(163)=+1.00;flx_SS(163)=1; flx_states(163)=ppR3c;flx_ostates(163)=0
+    flx_t(164)=+1.00;flx_SS(164)=1; flx_states(164)=ppR6c;flx_ostates(164)=0
+    flx_t(165)=+1.00;flx_SS(165)=1; flx_states(165)=ppRZc;flx_ostates(165)=0
+
+    ! qqvtDIc=O3c        (v):
+    flx_calc_nr(20)= 166; flx_CalcIn(20)=iiPel; flx_option(20)=40
+    flx_t(166)=+1.00;flx_SS(166)=1; flx_states(166)=ppO3c;flx_ostates(166)=0
+
+    ! qqvtBc=B1c+Bac        (v):
+    flx_calc_nr(21)= 168; flx_CalcIn(21)=iiPel; flx_option(21)=40
+    flx_t(167)=+1.00;flx_SS(167)=1; flx_states(167)=ppB1c;flx_ostates(167)=0
+    flx_t(168)=+1.00;flx_SS(168)=1; flx_states(168)=ppBac;flx_ostates(168)=0
+
+    ! qqvt_w=1        (v):
+    flx_calc_nr(22)= 169; flx_CalcIn(22)=iiPel; flx_option(22)=40
+    flx_t(169)=+1.00;flx_SS(169)=1; flx_states(169)=0;flx_ostates(169)=0
+
 
     ! grsPPm2=(P.c<-O3c)        (flux perm2):
-    flx_calc_nr(11)= 134; flx_CalcIn(11)=iiPel; flx_option(11)=2
-    flx_t(128)=+1.00;flx_SS(128)=0; flx_states(128)=ppP1c
-    flx_ostates(128)=ppO3c
-    flx_t(129)=+1.00;flx_SS(129)=0; flx_states(129)=ppP2c
-    flx_ostates(129)=ppO3c
-    flx_t(130)=+1.00;flx_SS(130)=0; flx_states(130)=ppP3c
-    flx_ostates(130)=ppO3c
-    flx_t(131)=+1.00;flx_SS(131)=0; flx_states(131)=ppP4c
-    flx_ostates(131)=ppO3c
-    flx_t(132)=+1.00;flx_SS(132)=0; flx_states(132)=ppP5c
-    flx_ostates(132)=ppO3c
-    flx_t(133)=+1.00;flx_SS(133)=0; flx_states(133)=ppP6c
-    flx_ostates(133)=ppO3c
-    flx_t(134)=+1.00;flx_SS(134)=0; flx_states(134)=ppPcc
-    flx_ostates(134)=ppO3c
+    flx_calc_nr(23)= 176; flx_CalcIn(23)=iiPel; flx_option(23)=2
+    flx_t(170)=+1.00;flx_SS(170)=0; flx_states(170)=ppP1c
+    flx_ostates(170)=ppO3c
+    flx_t(171)=+1.00;flx_SS(171)=0; flx_states(171)=ppP2c
+    flx_ostates(171)=ppO3c
+    flx_t(172)=+1.00;flx_SS(172)=0; flx_states(172)=ppP3c
+    flx_ostates(172)=ppO3c
+    flx_t(173)=+1.00;flx_SS(173)=0; flx_states(173)=ppP4c
+    flx_ostates(173)=ppO3c
+    flx_t(174)=+1.00;flx_SS(174)=0; flx_states(174)=ppP5c
+    flx_ostates(174)=ppO3c
+    flx_t(175)=+1.00;flx_SS(175)=0; flx_states(175)=ppP6c
+    flx_ostates(175)=ppO3c
+    flx_t(176)=+1.00;flx_SS(176)=0; flx_states(176)=ppPcc
+    flx_ostates(176)=ppO3c
 
     ! netPPm2=(P.c<-O3c)-(P.c->O3c)        (flux perm2):
-    flx_calc_nr(12)= 148; flx_CalcIn(12)=iiPel; flx_option(12)=2
-    flx_t(135)=+1.00;flx_SS(135)=0; flx_states(135)=ppP1c
-    flx_ostates(135)=ppO3c
-    flx_t(136)=-1.00;flx_SS(136)=1; flx_states(136)=ppP1c
-    flx_ostates(136)=ppO3c
-    flx_t(137)=+1.00;flx_SS(137)=0; flx_states(137)=ppP2c
-    flx_ostates(137)=ppO3c
-    flx_t(138)=-1.00;flx_SS(138)=1; flx_states(138)=ppP2c
-    flx_ostates(138)=ppO3c
-    flx_t(139)=+1.00;flx_SS(139)=0; flx_states(139)=ppP3c
-    flx_ostates(139)=ppO3c
-    flx_t(140)=-1.00;flx_SS(140)=1; flx_states(140)=ppP3c
-    flx_ostates(140)=ppO3c
-    flx_t(141)=+1.00;flx_SS(141)=0; flx_states(141)=ppP4c
-    flx_ostates(141)=ppO3c
-    flx_t(142)=-1.00;flx_SS(142)=1; flx_states(142)=ppP4c
-    flx_ostates(142)=ppO3c
-    flx_t(143)=+1.00;flx_SS(143)=0; flx_states(143)=ppP5c
-    flx_ostates(143)=ppO3c
-    flx_t(144)=-1.00;flx_SS(144)=1; flx_states(144)=ppP5c
-    flx_ostates(144)=ppO3c
-    flx_t(145)=+1.00;flx_SS(145)=0; flx_states(145)=ppP6c
-    flx_ostates(145)=ppO3c
-    flx_t(146)=-1.00;flx_SS(146)=1; flx_states(146)=ppP6c
-    flx_ostates(146)=ppO3c
-    flx_t(147)=+1.00;flx_SS(147)=0; flx_states(147)=ppPcc
-    flx_ostates(147)=ppO3c
-    flx_t(148)=-1.00;flx_SS(148)=1; flx_states(148)=ppPcc
-    flx_ostates(148)=ppO3c
+    flx_calc_nr(24)= 190; flx_CalcIn(24)=iiPel; flx_option(24)=2
+    flx_t(177)=+1.00;flx_SS(177)=0; flx_states(177)=ppP1c
+    flx_ostates(177)=ppO3c
+    flx_t(178)=-1.00;flx_SS(178)=1; flx_states(178)=ppP1c
+    flx_ostates(178)=ppO3c
+    flx_t(179)=+1.00;flx_SS(179)=0; flx_states(179)=ppP2c
+    flx_ostates(179)=ppO3c
+    flx_t(180)=-1.00;flx_SS(180)=1; flx_states(180)=ppP2c
+    flx_ostates(180)=ppO3c
+    flx_t(181)=+1.00;flx_SS(181)=0; flx_states(181)=ppP3c
+    flx_ostates(181)=ppO3c
+    flx_t(182)=-1.00;flx_SS(182)=1; flx_states(182)=ppP3c
+    flx_ostates(182)=ppO3c
+    flx_t(183)=+1.00;flx_SS(183)=0; flx_states(183)=ppP4c
+    flx_ostates(183)=ppO3c
+    flx_t(184)=-1.00;flx_SS(184)=1; flx_states(184)=ppP4c
+    flx_ostates(184)=ppO3c
+    flx_t(185)=+1.00;flx_SS(185)=0; flx_states(185)=ppP5c
+    flx_ostates(185)=ppO3c
+    flx_t(186)=-1.00;flx_SS(186)=1; flx_states(186)=ppP5c
+    flx_ostates(186)=ppO3c
+    flx_t(187)=+1.00;flx_SS(187)=0; flx_states(187)=ppP6c
+    flx_ostates(187)=ppO3c
+    flx_t(188)=-1.00;flx_SS(188)=1; flx_states(188)=ppP6c
+    flx_ostates(188)=ppO3c
+    flx_t(189)=+1.00;flx_SS(189)=0; flx_states(189)=ppPcc
+    flx_ostates(189)=ppO3c
+    flx_t(190)=-1.00;flx_SS(190)=1; flx_states(190)=ppPcc
+    flx_ostates(190)=ppO3c
 
     ! jnetR6c=(R6c<-P.c+Z.c+B1c)-(R6c->B1c)        (flux perm2):
-    flx_calc_nr(13)= 162; flx_CalcIn(13)=iiPel; flx_option(13)=2
-    flx_t(149)=-1.00;flx_SS(149)=1; flx_states(149)=ppR6c
-    flx_ostates(149)=ppB1c
-    flx_t(150)=+1.00;flx_SS(150)=0; flx_states(150)=ppR6c
-    flx_ostates(150)=ppB1c
-    flx_t(151)=+1.00;flx_SS(151)=0; flx_states(151)=ppR6c
-    flx_ostates(151)=ppP1c
-    flx_t(152)=+1.00;flx_SS(152)=0; flx_states(152)=ppR6c
-    flx_ostates(152)=ppP2c
-    flx_t(153)=+1.00;flx_SS(153)=0; flx_states(153)=ppR6c
-    flx_ostates(153)=ppP3c
-    flx_t(154)=+1.00;flx_SS(154)=0; flx_states(154)=ppR6c
-    flx_ostates(154)=ppP4c
-    flx_t(155)=+1.00;flx_SS(155)=0; flx_states(155)=ppR6c
-    flx_ostates(155)=ppP5c
-    flx_t(156)=+1.00;flx_SS(156)=0; flx_states(156)=ppR6c
-    flx_ostates(156)=ppP6c
-    flx_t(157)=+1.00;flx_SS(157)=0; flx_states(157)=ppR6c
-    flx_ostates(157)=ppPcc
-    flx_t(158)=+1.00;flx_SS(158)=0; flx_states(158)=ppR6c
-    flx_ostates(158)=ppZ3c
-    flx_t(159)=+1.00;flx_SS(159)=0; flx_states(159)=ppR6c
-    flx_ostates(159)=ppZ4c
-    flx_t(160)=+1.00;flx_SS(160)=0; flx_states(160)=ppR6c
-    flx_ostates(160)=ppZ2c
-    flx_t(161)=+1.00;flx_SS(161)=0; flx_states(161)=ppR6c
-    flx_ostates(161)=ppZ5c
-    flx_t(162)=+1.00;flx_SS(162)=0; flx_states(162)=ppR6c
-    flx_ostates(162)=ppZ6c
+    flx_calc_nr(25)= 204; flx_CalcIn(25)=iiPel; flx_option(25)=2
+    flx_t(191)=-1.00;flx_SS(191)=1; flx_states(191)=ppR6c
+    flx_ostates(191)=ppB1c
+    flx_t(192)=+1.00;flx_SS(192)=0; flx_states(192)=ppR6c
+    flx_ostates(192)=ppB1c
+    flx_t(193)=+1.00;flx_SS(193)=0; flx_states(193)=ppR6c
+    flx_ostates(193)=ppP1c
+    flx_t(194)=+1.00;flx_SS(194)=0; flx_states(194)=ppR6c
+    flx_ostates(194)=ppP2c
+    flx_t(195)=+1.00;flx_SS(195)=0; flx_states(195)=ppR6c
+    flx_ostates(195)=ppP3c
+    flx_t(196)=+1.00;flx_SS(196)=0; flx_states(196)=ppR6c
+    flx_ostates(196)=ppP4c
+    flx_t(197)=+1.00;flx_SS(197)=0; flx_states(197)=ppR6c
+    flx_ostates(197)=ppP5c
+    flx_t(198)=+1.00;flx_SS(198)=0; flx_states(198)=ppR6c
+    flx_ostates(198)=ppP6c
+    flx_t(199)=+1.00;flx_SS(199)=0; flx_states(199)=ppR6c
+    flx_ostates(199)=ppPcc
+    flx_t(200)=+1.00;flx_SS(200)=0; flx_states(200)=ppR6c
+    flx_ostates(200)=ppZ3c
+    flx_t(201)=+1.00;flx_SS(201)=0; flx_states(201)=ppR6c
+    flx_ostates(201)=ppZ4c
+    flx_t(202)=+1.00;flx_SS(202)=0; flx_states(202)=ppR6c
+    flx_ostates(202)=ppZ2c
+    flx_t(203)=+1.00;flx_SS(203)=0; flx_states(203)=ppR6c
+    flx_ostates(203)=ppZ5c
+    flx_t(204)=+1.00;flx_SS(204)=0; flx_states(204)=ppR6c
+    flx_ostates(204)=ppZ6c
 
     ! jnetR6n=(R6n<-P.n+B1n)-(R6n->B1n)        (flux perm2):
-    flx_calc_nr(14)= 170; flx_CalcIn(14)=iiPel; flx_option(14)=2
-    flx_t(163)=-1.00;flx_SS(163)=1; flx_states(163)=ppR6n
-    flx_ostates(163)=ppB1n
-    flx_t(164)=+1.00;flx_SS(164)=0; flx_states(164)=ppR6n
-    flx_ostates(164)=ppB1n
-    flx_t(165)=+1.00;flx_SS(165)=0; flx_states(165)=ppR6n
-    flx_ostates(165)=ppP1n
-    flx_t(166)=+1.00;flx_SS(166)=0; flx_states(166)=ppR6n
-    flx_ostates(166)=ppP2n
-    flx_t(167)=+1.00;flx_SS(167)=0; flx_states(167)=ppR6n
-    flx_ostates(167)=ppP3n
-    flx_t(168)=+1.00;flx_SS(168)=0; flx_states(168)=ppR6n
-    flx_ostates(168)=ppP4n
-    flx_t(169)=+1.00;flx_SS(169)=0; flx_states(169)=ppR6n
-    flx_ostates(169)=ppP5n
-    flx_t(170)=+1.00;flx_SS(170)=0; flx_states(170)=ppR6n
-    flx_ostates(170)=ppP6n
+    flx_calc_nr(26)= 212; flx_CalcIn(26)=iiPel; flx_option(26)=2
+    flx_t(205)=-1.00;flx_SS(205)=1; flx_states(205)=ppR6n
+    flx_ostates(205)=ppB1n
+    flx_t(206)=+1.00;flx_SS(206)=0; flx_states(206)=ppR6n
+    flx_ostates(206)=ppB1n
+    flx_t(207)=+1.00;flx_SS(207)=0; flx_states(207)=ppR6n
+    flx_ostates(207)=ppP1n
+    flx_t(208)=+1.00;flx_SS(208)=0; flx_states(208)=ppR6n
+    flx_ostates(208)=ppP2n
+    flx_t(209)=+1.00;flx_SS(209)=0; flx_states(209)=ppR6n
+    flx_ostates(209)=ppP3n
+    flx_t(210)=+1.00;flx_SS(210)=0; flx_states(210)=ppR6n
+    flx_ostates(210)=ppP4n
+    flx_t(211)=+1.00;flx_SS(211)=0; flx_states(211)=ppR6n
+    flx_ostates(211)=ppP5n
+    flx_t(212)=+1.00;flx_SS(212)=0; flx_states(212)=ppR6n
+    flx_ostates(212)=ppP6n
 
     ! jnetR6p=(R6p<-P.p+B1p)-(R6p->B1p)        (flux perm2):
-    flx_calc_nr(15)= 178; flx_CalcIn(15)=iiPel; flx_option(15)=2
-    flx_t(171)=-1.00;flx_SS(171)=1; flx_states(171)=ppR6p
-    flx_ostates(171)=ppB1p
-    flx_t(172)=+1.00;flx_SS(172)=0; flx_states(172)=ppR6p
-    flx_ostates(172)=ppB1p
-    flx_t(173)=+1.00;flx_SS(173)=0; flx_states(173)=ppR6p
-    flx_ostates(173)=ppP1p
-    flx_t(174)=+1.00;flx_SS(174)=0; flx_states(174)=ppR6p
-    flx_ostates(174)=ppP2p
-    flx_t(175)=+1.00;flx_SS(175)=0; flx_states(175)=ppR6p
-    flx_ostates(175)=ppP3p
-    flx_t(176)=+1.00;flx_SS(176)=0; flx_states(176)=ppR6p
-    flx_ostates(176)=ppP4p
-    flx_t(177)=+1.00;flx_SS(177)=0; flx_states(177)=ppR6p
-    flx_ostates(177)=ppP5p
-    flx_t(178)=+1.00;flx_SS(178)=0; flx_states(178)=ppR6p
-    flx_ostates(178)=ppP6p
+    flx_calc_nr(27)= 220; flx_CalcIn(27)=iiPel; flx_option(27)=2
+    flx_t(213)=-1.00;flx_SS(213)=1; flx_states(213)=ppR6p
+    flx_ostates(213)=ppB1p
+    flx_t(214)=+1.00;flx_SS(214)=0; flx_states(214)=ppR6p
+    flx_ostates(214)=ppB1p
+    flx_t(215)=+1.00;flx_SS(215)=0; flx_states(215)=ppR6p
+    flx_ostates(215)=ppP1p
+    flx_t(216)=+1.00;flx_SS(216)=0; flx_states(216)=ppR6p
+    flx_ostates(216)=ppP2p
+    flx_t(217)=+1.00;flx_SS(217)=0; flx_states(217)=ppR6p
+    flx_ostates(217)=ppP3p
+    flx_t(218)=+1.00;flx_SS(218)=0; flx_states(218)=ppR6p
+    flx_ostates(218)=ppP4p
+    flx_t(219)=+1.00;flx_SS(219)=0; flx_states(219)=ppR6p
+    flx_ostates(219)=ppP5p
+    flx_t(220)=+1.00;flx_SS(220)=0; flx_states(220)=ppR6p
+    flx_ostates(220)=ppP6p
 
     ! jnetR2c=(R2c<-P.c+Z.c)-(R2c->B1c)        (flux perm2):
-    flx_calc_nr(16)= 191; flx_CalcIn(16)=iiPel; flx_option(16)=2
-    flx_t(179)=-1.00;flx_SS(179)=1; flx_states(179)=ppR2c
-    flx_ostates(179)=ppB1c
-    flx_t(180)=+1.00;flx_SS(180)=0; flx_states(180)=ppR2c
-    flx_ostates(180)=ppP1c
-    flx_t(181)=+1.00;flx_SS(181)=0; flx_states(181)=ppR2c
-    flx_ostates(181)=ppP2c
-    flx_t(182)=+1.00;flx_SS(182)=0; flx_states(182)=ppR2c
-    flx_ostates(182)=ppP3c
-    flx_t(183)=+1.00;flx_SS(183)=0; flx_states(183)=ppR2c
-    flx_ostates(183)=ppP4c
-    flx_t(184)=+1.00;flx_SS(184)=0; flx_states(184)=ppR2c
-    flx_ostates(184)=ppP5c
-    flx_t(185)=+1.00;flx_SS(185)=0; flx_states(185)=ppR2c
-    flx_ostates(185)=ppP6c
-    flx_t(186)=+1.00;flx_SS(186)=0; flx_states(186)=ppR2c
-    flx_ostates(186)=ppPcc
-    flx_t(187)=+1.00;flx_SS(187)=0; flx_states(187)=ppR2c
-    flx_ostates(187)=ppZ3c
-    flx_t(188)=+1.00;flx_SS(188)=0; flx_states(188)=ppR2c
-    flx_ostates(188)=ppZ4c
-    flx_t(189)=+1.00;flx_SS(189)=0; flx_states(189)=ppR2c
-    flx_ostates(189)=ppZ2c
-    flx_t(190)=+1.00;flx_SS(190)=0; flx_states(190)=ppR2c
-    flx_ostates(190)=ppZ5c
-    flx_t(191)=+1.00;flx_SS(191)=0; flx_states(191)=ppR2c
-    flx_ostates(191)=ppZ6c
+    flx_calc_nr(28)= 233; flx_CalcIn(28)=iiPel; flx_option(28)=2
+    flx_t(221)=-1.00;flx_SS(221)=1; flx_states(221)=ppR2c
+    flx_ostates(221)=ppB1c
+    flx_t(222)=+1.00;flx_SS(222)=0; flx_states(222)=ppR2c
+    flx_ostates(222)=ppP1c
+    flx_t(223)=+1.00;flx_SS(223)=0; flx_states(223)=ppR2c
+    flx_ostates(223)=ppP2c
+    flx_t(224)=+1.00;flx_SS(224)=0; flx_states(224)=ppR2c
+    flx_ostates(224)=ppP3c
+    flx_t(225)=+1.00;flx_SS(225)=0; flx_states(225)=ppR2c
+    flx_ostates(225)=ppP4c
+    flx_t(226)=+1.00;flx_SS(226)=0; flx_states(226)=ppR2c
+    flx_ostates(226)=ppP5c
+    flx_t(227)=+1.00;flx_SS(227)=0; flx_states(227)=ppR2c
+    flx_ostates(227)=ppP6c
+    flx_t(228)=+1.00;flx_SS(228)=0; flx_states(228)=ppR2c
+    flx_ostates(228)=ppPcc
+    flx_t(229)=+1.00;flx_SS(229)=0; flx_states(229)=ppR2c
+    flx_ostates(229)=ppZ3c
+    flx_t(230)=+1.00;flx_SS(230)=0; flx_states(230)=ppR2c
+    flx_ostates(230)=ppZ4c
+    flx_t(231)=+1.00;flx_SS(231)=0; flx_states(231)=ppR2c
+    flx_ostates(231)=ppZ2c
+    flx_t(232)=+1.00;flx_SS(232)=0; flx_states(232)=ppR2c
+    flx_ostates(232)=ppZ5c
+    flx_t(233)=+1.00;flx_SS(233)=0; flx_states(233)=ppR2c
+    flx_ostates(233)=ppZ6c
 
     ! jnetR1c=(R1c<-P.c+Z.c+B1c)-(R1c->B1c)        (flux perm2):
-    flx_calc_nr(17)= 205; flx_CalcIn(17)=iiPel; flx_option(17)=2
-    flx_t(192)=-1.00;flx_SS(192)=1; flx_states(192)=ppR1c
-    flx_ostates(192)=ppB1c
-    flx_t(193)=+1.00;flx_SS(193)=0; flx_states(193)=ppR1c
-    flx_ostates(193)=ppB1c
-    flx_t(194)=+1.00;flx_SS(194)=0; flx_states(194)=ppR1c
-    flx_ostates(194)=ppP1c
-    flx_t(195)=+1.00;flx_SS(195)=0; flx_states(195)=ppR1c
-    flx_ostates(195)=ppP2c
-    flx_t(196)=+1.00;flx_SS(196)=0; flx_states(196)=ppR1c
-    flx_ostates(196)=ppP3c
-    flx_t(197)=+1.00;flx_SS(197)=0; flx_states(197)=ppR1c
-    flx_ostates(197)=ppP4c
-    flx_t(198)=+1.00;flx_SS(198)=0; flx_states(198)=ppR1c
-    flx_ostates(198)=ppP5c
-    flx_t(199)=+1.00;flx_SS(199)=0; flx_states(199)=ppR1c
-    flx_ostates(199)=ppP6c
-    flx_t(200)=+1.00;flx_SS(200)=0; flx_states(200)=ppR1c
-    flx_ostates(200)=ppPcc
-    flx_t(201)=+1.00;flx_SS(201)=0; flx_states(201)=ppR1c
-    flx_ostates(201)=ppZ3c
-    flx_t(202)=+1.00;flx_SS(202)=0; flx_states(202)=ppR1c
-    flx_ostates(202)=ppZ4c
-    flx_t(203)=+1.00;flx_SS(203)=0; flx_states(203)=ppR1c
-    flx_ostates(203)=ppZ2c
-    flx_t(204)=+1.00;flx_SS(204)=0; flx_states(204)=ppR1c
-    flx_ostates(204)=ppZ5c
-    flx_t(205)=+1.00;flx_SS(205)=0; flx_states(205)=ppR1c
-    flx_ostates(205)=ppZ6c
+    flx_calc_nr(29)= 247; flx_CalcIn(29)=iiPel; flx_option(29)=2
+    flx_t(234)=-1.00;flx_SS(234)=1; flx_states(234)=ppR1c
+    flx_ostates(234)=ppB1c
+    flx_t(235)=+1.00;flx_SS(235)=0; flx_states(235)=ppR1c
+    flx_ostates(235)=ppB1c
+    flx_t(236)=+1.00;flx_SS(236)=0; flx_states(236)=ppR1c
+    flx_ostates(236)=ppP1c
+    flx_t(237)=+1.00;flx_SS(237)=0; flx_states(237)=ppR1c
+    flx_ostates(237)=ppP2c
+    flx_t(238)=+1.00;flx_SS(238)=0; flx_states(238)=ppR1c
+    flx_ostates(238)=ppP3c
+    flx_t(239)=+1.00;flx_SS(239)=0; flx_states(239)=ppR1c
+    flx_ostates(239)=ppP4c
+    flx_t(240)=+1.00;flx_SS(240)=0; flx_states(240)=ppR1c
+    flx_ostates(240)=ppP5c
+    flx_t(241)=+1.00;flx_SS(241)=0; flx_states(241)=ppR1c
+    flx_ostates(241)=ppP6c
+    flx_t(242)=+1.00;flx_SS(242)=0; flx_states(242)=ppR1c
+    flx_ostates(242)=ppPcc
+    flx_t(243)=+1.00;flx_SS(243)=0; flx_states(243)=ppR1c
+    flx_ostates(243)=ppZ3c
+    flx_t(244)=+1.00;flx_SS(244)=0; flx_states(244)=ppR1c
+    flx_ostates(244)=ppZ4c
+    flx_t(245)=+1.00;flx_SS(245)=0; flx_states(245)=ppR1c
+    flx_ostates(245)=ppZ2c
+    flx_t(246)=+1.00;flx_SS(246)=0; flx_states(246)=ppR1c
+    flx_ostates(246)=ppZ5c
+    flx_t(247)=+1.00;flx_SS(247)=0; flx_states(247)=ppR1c
+    flx_ostates(247)=ppZ6c
 
     ! jnetR1n=(R1n<-P.n+B1n)-(R1n->B1n)        (flux perm2):
-    flx_calc_nr(18)= 213; flx_CalcIn(18)=iiPel; flx_option(18)=2
-    flx_t(206)=-1.00;flx_SS(206)=1; flx_states(206)=ppR1n
-    flx_ostates(206)=ppB1n
-    flx_t(207)=+1.00;flx_SS(207)=0; flx_states(207)=ppR1n
-    flx_ostates(207)=ppB1n
-    flx_t(208)=+1.00;flx_SS(208)=0; flx_states(208)=ppR1n
-    flx_ostates(208)=ppP1n
-    flx_t(209)=+1.00;flx_SS(209)=0; flx_states(209)=ppR1n
-    flx_ostates(209)=ppP2n
-    flx_t(210)=+1.00;flx_SS(210)=0; flx_states(210)=ppR1n
-    flx_ostates(210)=ppP3n
-    flx_t(211)=+1.00;flx_SS(211)=0; flx_states(211)=ppR1n
-    flx_ostates(211)=ppP4n
-    flx_t(212)=+1.00;flx_SS(212)=0; flx_states(212)=ppR1n
-    flx_ostates(212)=ppP5n
-    flx_t(213)=+1.00;flx_SS(213)=0; flx_states(213)=ppR1n
-    flx_ostates(213)=ppP6n
+    flx_calc_nr(30)= 255; flx_CalcIn(30)=iiPel; flx_option(30)=2
+    flx_t(248)=-1.00;flx_SS(248)=1; flx_states(248)=ppR1n
+    flx_ostates(248)=ppB1n
+    flx_t(249)=+1.00;flx_SS(249)=0; flx_states(249)=ppR1n
+    flx_ostates(249)=ppB1n
+    flx_t(250)=+1.00;flx_SS(250)=0; flx_states(250)=ppR1n
+    flx_ostates(250)=ppP1n
+    flx_t(251)=+1.00;flx_SS(251)=0; flx_states(251)=ppR1n
+    flx_ostates(251)=ppP2n
+    flx_t(252)=+1.00;flx_SS(252)=0; flx_states(252)=ppR1n
+    flx_ostates(252)=ppP3n
+    flx_t(253)=+1.00;flx_SS(253)=0; flx_states(253)=ppR1n
+    flx_ostates(253)=ppP4n
+    flx_t(254)=+1.00;flx_SS(254)=0; flx_states(254)=ppR1n
+    flx_ostates(254)=ppP5n
+    flx_t(255)=+1.00;flx_SS(255)=0; flx_states(255)=ppR1n
+    flx_ostates(255)=ppP6n
 
     ! jnetR1p=(R1p<-P.p+B1p)-(R1p->B1p)        (flux perm2):
-    flx_calc_nr(19)= 221; flx_CalcIn(19)=iiPel; flx_option(19)=2
-    flx_t(214)=-1.00;flx_SS(214)=1; flx_states(214)=ppR1p
-    flx_ostates(214)=ppB1p
-    flx_t(215)=+1.00;flx_SS(215)=0; flx_states(215)=ppR1p
-    flx_ostates(215)=ppB1p
-    flx_t(216)=+1.00;flx_SS(216)=0; flx_states(216)=ppR1p
-    flx_ostates(216)=ppP1p
-    flx_t(217)=+1.00;flx_SS(217)=0; flx_states(217)=ppR1p
-    flx_ostates(217)=ppP2p
-    flx_t(218)=+1.00;flx_SS(218)=0; flx_states(218)=ppR1p
-    flx_ostates(218)=ppP3p
-    flx_t(219)=+1.00;flx_SS(219)=0; flx_states(219)=ppR1p
-    flx_ostates(219)=ppP4p
-    flx_t(220)=+1.00;flx_SS(220)=0; flx_states(220)=ppR1p
-    flx_ostates(220)=ppP5p
-    flx_t(221)=+1.00;flx_SS(221)=0; flx_states(221)=ppR1p
-    flx_ostates(221)=ppP6p
+    flx_calc_nr(31)= 263; flx_CalcIn(31)=iiPel; flx_option(31)=2
+    flx_t(256)=-1.00;flx_SS(256)=1; flx_states(256)=ppR1p
+    flx_ostates(256)=ppB1p
+    flx_t(257)=+1.00;flx_SS(257)=0; flx_states(257)=ppR1p
+    flx_ostates(257)=ppB1p
+    flx_t(258)=+1.00;flx_SS(258)=0; flx_states(258)=ppR1p
+    flx_ostates(258)=ppP1p
+    flx_t(259)=+1.00;flx_SS(259)=0; flx_states(259)=ppR1p
+    flx_ostates(259)=ppP2p
+    flx_t(260)=+1.00;flx_SS(260)=0; flx_states(260)=ppR1p
+    flx_ostates(260)=ppP3p
+    flx_t(261)=+1.00;flx_SS(261)=0; flx_states(261)=ppR1p
+    flx_ostates(261)=ppP4p
+    flx_t(262)=+1.00;flx_SS(262)=0; flx_states(262)=ppR1p
+    flx_ostates(262)=ppP5p
+    flx_t(263)=+1.00;flx_SS(263)=0; flx_states(263)=ppR1p
+    flx_ostates(263)=ppP6p
 
     ! jDIPTn=(P.n<-N.n)-(P.n->N.n)        (flux perm2):
-    flx_calc_nr(20)= 245; flx_CalcIn(20)=iiPel; flx_option(20)=2
-    flx_t(222)=+1.00;flx_SS(222)=0; flx_states(222)=ppP1n
-    flx_ostates(222)=ppN3n
-    flx_t(223)=+1.00;flx_SS(223)=0; flx_states(223)=ppP1n
-    flx_ostates(223)=ppN4n
-    flx_t(224)=-1.00;flx_SS(224)=1; flx_states(224)=ppP1n
-    flx_ostates(224)=ppN3n
-    flx_t(225)=-1.00;flx_SS(225)=1; flx_states(225)=ppP1n
-    flx_ostates(225)=ppN4n
-    flx_t(226)=+1.00;flx_SS(226)=0; flx_states(226)=ppP2n
-    flx_ostates(226)=ppN3n
-    flx_t(227)=+1.00;flx_SS(227)=0; flx_states(227)=ppP2n
-    flx_ostates(227)=ppN4n
-    flx_t(228)=-1.00;flx_SS(228)=1; flx_states(228)=ppP2n
-    flx_ostates(228)=ppN3n
-    flx_t(229)=-1.00;flx_SS(229)=1; flx_states(229)=ppP2n
-    flx_ostates(229)=ppN4n
-    flx_t(230)=+1.00;flx_SS(230)=0; flx_states(230)=ppP3n
-    flx_ostates(230)=ppN3n
-    flx_t(231)=+1.00;flx_SS(231)=0; flx_states(231)=ppP3n
-    flx_ostates(231)=ppN4n
-    flx_t(232)=-1.00;flx_SS(232)=1; flx_states(232)=ppP3n
-    flx_ostates(232)=ppN3n
-    flx_t(233)=-1.00;flx_SS(233)=1; flx_states(233)=ppP3n
-    flx_ostates(233)=ppN4n
-    flx_t(234)=+1.00;flx_SS(234)=0; flx_states(234)=ppP4n
-    flx_ostates(234)=ppN3n
-    flx_t(235)=+1.00;flx_SS(235)=0; flx_states(235)=ppP4n
-    flx_ostates(235)=ppN4n
-    flx_t(236)=-1.00;flx_SS(236)=1; flx_states(236)=ppP4n
-    flx_ostates(236)=ppN3n
-    flx_t(237)=-1.00;flx_SS(237)=1; flx_states(237)=ppP4n
-    flx_ostates(237)=ppN4n
-    flx_t(238)=+1.00;flx_SS(238)=0; flx_states(238)=ppP5n
-    flx_ostates(238)=ppN3n
-    flx_t(239)=+1.00;flx_SS(239)=0; flx_states(239)=ppP5n
-    flx_ostates(239)=ppN4n
-    flx_t(240)=-1.00;flx_SS(240)=1; flx_states(240)=ppP5n
-    flx_ostates(240)=ppN3n
-    flx_t(241)=-1.00;flx_SS(241)=1; flx_states(241)=ppP5n
-    flx_ostates(241)=ppN4n
-    flx_t(242)=+1.00;flx_SS(242)=0; flx_states(242)=ppP6n
-    flx_ostates(242)=ppN3n
-    flx_t(243)=+1.00;flx_SS(243)=0; flx_states(243)=ppP6n
-    flx_ostates(243)=ppN4n
-    flx_t(244)=-1.00;flx_SS(244)=1; flx_states(244)=ppP6n
-    flx_ostates(244)=ppN3n
-    flx_t(245)=-1.00;flx_SS(245)=1; flx_states(245)=ppP6n
-    flx_ostates(245)=ppN4n
+    flx_calc_nr(32)= 287; flx_CalcIn(32)=iiPel; flx_option(32)=2
+    flx_t(264)=+1.00;flx_SS(264)=0; flx_states(264)=ppP1n
+    flx_ostates(264)=ppN3n
+    flx_t(265)=+1.00;flx_SS(265)=0; flx_states(265)=ppP1n
+    flx_ostates(265)=ppN4n
+    flx_t(266)=-1.00;flx_SS(266)=1; flx_states(266)=ppP1n
+    flx_ostates(266)=ppN3n
+    flx_t(267)=-1.00;flx_SS(267)=1; flx_states(267)=ppP1n
+    flx_ostates(267)=ppN4n
+    flx_t(268)=+1.00;flx_SS(268)=0; flx_states(268)=ppP2n
+    flx_ostates(268)=ppN3n
+    flx_t(269)=+1.00;flx_SS(269)=0; flx_states(269)=ppP2n
+    flx_ostates(269)=ppN4n
+    flx_t(270)=-1.00;flx_SS(270)=1; flx_states(270)=ppP2n
+    flx_ostates(270)=ppN3n
+    flx_t(271)=-1.00;flx_SS(271)=1; flx_states(271)=ppP2n
+    flx_ostates(271)=ppN4n
+    flx_t(272)=+1.00;flx_SS(272)=0; flx_states(272)=ppP3n
+    flx_ostates(272)=ppN3n
+    flx_t(273)=+1.00;flx_SS(273)=0; flx_states(273)=ppP3n
+    flx_ostates(273)=ppN4n
+    flx_t(274)=-1.00;flx_SS(274)=1; flx_states(274)=ppP3n
+    flx_ostates(274)=ppN3n
+    flx_t(275)=-1.00;flx_SS(275)=1; flx_states(275)=ppP3n
+    flx_ostates(275)=ppN4n
+    flx_t(276)=+1.00;flx_SS(276)=0; flx_states(276)=ppP4n
+    flx_ostates(276)=ppN3n
+    flx_t(277)=+1.00;flx_SS(277)=0; flx_states(277)=ppP4n
+    flx_ostates(277)=ppN4n
+    flx_t(278)=-1.00;flx_SS(278)=1; flx_states(278)=ppP4n
+    flx_ostates(278)=ppN3n
+    flx_t(279)=-1.00;flx_SS(279)=1; flx_states(279)=ppP4n
+    flx_ostates(279)=ppN4n
+    flx_t(280)=+1.00;flx_SS(280)=0; flx_states(280)=ppP5n
+    flx_ostates(280)=ppN3n
+    flx_t(281)=+1.00;flx_SS(281)=0; flx_states(281)=ppP5n
+    flx_ostates(281)=ppN4n
+    flx_t(282)=-1.00;flx_SS(282)=1; flx_states(282)=ppP5n
+    flx_ostates(282)=ppN3n
+    flx_t(283)=-1.00;flx_SS(283)=1; flx_states(283)=ppP5n
+    flx_ostates(283)=ppN4n
+    flx_t(284)=+1.00;flx_SS(284)=0; flx_states(284)=ppP6n
+    flx_ostates(284)=ppN3n
+    flx_t(285)=+1.00;flx_SS(285)=0; flx_states(285)=ppP6n
+    flx_ostates(285)=ppN4n
+    flx_t(286)=-1.00;flx_SS(286)=1; flx_states(286)=ppP6n
+    flx_ostates(286)=ppN3n
+    flx_t(287)=-1.00;flx_SS(287)=1; flx_states(287)=ppP6n
+    flx_ostates(287)=ppN4n
 
     ! jDIPTp=(P.p<-N1p)-(P.p->N1p)        (flux perm2):
-    flx_calc_nr(21)= 257; flx_CalcIn(21)=iiPel; flx_option(21)=2
-    flx_t(246)=+1.00;flx_SS(246)=0; flx_states(246)=ppP1p
-    flx_ostates(246)=ppN1p
-    flx_t(247)=-1.00;flx_SS(247)=1; flx_states(247)=ppP1p
-    flx_ostates(247)=ppN1p
-    flx_t(248)=+1.00;flx_SS(248)=0; flx_states(248)=ppP2p
-    flx_ostates(248)=ppN1p
-    flx_t(249)=-1.00;flx_SS(249)=1; flx_states(249)=ppP2p
-    flx_ostates(249)=ppN1p
-    flx_t(250)=+1.00;flx_SS(250)=0; flx_states(250)=ppP3p
-    flx_ostates(250)=ppN1p
-    flx_t(251)=-1.00;flx_SS(251)=1; flx_states(251)=ppP3p
-    flx_ostates(251)=ppN1p
-    flx_t(252)=+1.00;flx_SS(252)=0; flx_states(252)=ppP4p
-    flx_ostates(252)=ppN1p
-    flx_t(253)=-1.00;flx_SS(253)=1; flx_states(253)=ppP4p
-    flx_ostates(253)=ppN1p
-    flx_t(254)=+1.00;flx_SS(254)=0; flx_states(254)=ppP5p
-    flx_ostates(254)=ppN1p
-    flx_t(255)=-1.00;flx_SS(255)=1; flx_states(255)=ppP5p
-    flx_ostates(255)=ppN1p
-    flx_t(256)=+1.00;flx_SS(256)=0; flx_states(256)=ppP6p
-    flx_ostates(256)=ppN1p
-    flx_t(257)=-1.00;flx_SS(257)=1; flx_states(257)=ppP6p
-    flx_ostates(257)=ppN1p
+    flx_calc_nr(33)= 299; flx_CalcIn(33)=iiPel; flx_option(33)=2
+    flx_t(288)=+1.00;flx_SS(288)=0; flx_states(288)=ppP1p
+    flx_ostates(288)=ppN1p
+    flx_t(289)=-1.00;flx_SS(289)=1; flx_states(289)=ppP1p
+    flx_ostates(289)=ppN1p
+    flx_t(290)=+1.00;flx_SS(290)=0; flx_states(290)=ppP2p
+    flx_ostates(290)=ppN1p
+    flx_t(291)=-1.00;flx_SS(291)=1; flx_states(291)=ppP2p
+    flx_ostates(291)=ppN1p
+    flx_t(292)=+1.00;flx_SS(292)=0; flx_states(292)=ppP3p
+    flx_ostates(292)=ppN1p
+    flx_t(293)=-1.00;flx_SS(293)=1; flx_states(293)=ppP3p
+    flx_ostates(293)=ppN1p
+    flx_t(294)=+1.00;flx_SS(294)=0; flx_states(294)=ppP4p
+    flx_ostates(294)=ppN1p
+    flx_t(295)=-1.00;flx_SS(295)=1; flx_states(295)=ppP4p
+    flx_ostates(295)=ppN1p
+    flx_t(296)=+1.00;flx_SS(296)=0; flx_states(296)=ppP5p
+    flx_ostates(296)=ppN1p
+    flx_t(297)=-1.00;flx_SS(297)=1; flx_states(297)=ppP5p
+    flx_ostates(297)=ppN1p
+    flx_t(298)=+1.00;flx_SS(298)=0; flx_states(298)=ppP6p
+    flx_ostates(298)=ppN1p
+    flx_t(299)=-1.00;flx_SS(299)=1; flx_states(299)=ppP6p
+    flx_ostates(299)=ppN1p
 
     ! jB1DIn=(B1n->N4n)-(B1n<-N.n)        (flux perm2):
-    flx_calc_nr(22)= 260; flx_CalcIn(22)=iiPel; flx_option(22)=2
-    flx_t(258)=+1.00;flx_SS(258)=1; flx_states(258)=ppB1n
-    flx_ostates(258)=ppN4n
-    flx_t(259)=-1.00;flx_SS(259)=0; flx_states(259)=ppB1n
-    flx_ostates(259)=ppN3n
-    flx_t(260)=-1.00;flx_SS(260)=0; flx_states(260)=ppB1n
-    flx_ostates(260)=ppN4n
+    flx_calc_nr(34)= 302; flx_CalcIn(34)=iiPel; flx_option(34)=2
+    flx_t(300)=+1.00;flx_SS(300)=1; flx_states(300)=ppB1n
+    flx_ostates(300)=ppN4n
+    flx_t(301)=-1.00;flx_SS(301)=0; flx_states(301)=ppB1n
+    flx_ostates(301)=ppN3n
+    flx_t(302)=-1.00;flx_SS(302)=0; flx_states(302)=ppB1n
+    flx_ostates(302)=ppN4n
 
     ! jB1DIp=(B1p->N1p)-(B1p<-N1p)        (flux perm2):
-    flx_calc_nr(23)= 262; flx_CalcIn(23)=iiPel; flx_option(23)=2
-    flx_t(261)=+1.00;flx_SS(261)=1; flx_states(261)=ppB1p
-    flx_ostates(261)=ppN1p
-    flx_t(262)=-1.00;flx_SS(262)=0; flx_states(262)=ppB1p
-    flx_ostates(262)=ppN1p
+    flx_calc_nr(35)= 304; flx_CalcIn(35)=iiPel; flx_option(35)=2
+    flx_t(303)=+1.00;flx_SS(303)=1; flx_states(303)=ppB1p
+    flx_ostates(303)=ppN1p
+    flx_t(304)=-1.00;flx_SS(304)=0; flx_states(304)=ppB1p
+    flx_ostates(304)=ppN1p
 
     ! jPTMec=P.c->Z4c+Z3c+Z2c        (flux perm2):
-    flx_calc_nr(24)= 283; flx_CalcIn(24)=iiPel; flx_option(24)=2
-    flx_t(263)=+1.00;flx_SS(263)=1; flx_states(263)=ppP1c
-    flx_ostates(263)=ppZ4c
-    flx_t(264)=+1.00;flx_SS(264)=1; flx_states(264)=ppP1c
-    flx_ostates(264)=ppZ3c
-    flx_t(265)=+1.00;flx_SS(265)=1; flx_states(265)=ppP1c
-    flx_ostates(265)=ppZ2c
-    flx_t(266)=+1.00;flx_SS(266)=1; flx_states(266)=ppP2c
-    flx_ostates(266)=ppZ4c
-    flx_t(267)=+1.00;flx_SS(267)=1; flx_states(267)=ppP2c
-    flx_ostates(267)=ppZ3c
-    flx_t(268)=+1.00;flx_SS(268)=1; flx_states(268)=ppP2c
-    flx_ostates(268)=ppZ2c
-    flx_t(269)=+1.00;flx_SS(269)=1; flx_states(269)=ppP3c
-    flx_ostates(269)=ppZ4c
-    flx_t(270)=+1.00;flx_SS(270)=1; flx_states(270)=ppP3c
-    flx_ostates(270)=ppZ3c
-    flx_t(271)=+1.00;flx_SS(271)=1; flx_states(271)=ppP3c
-    flx_ostates(271)=ppZ2c
-    flx_t(272)=+1.00;flx_SS(272)=1; flx_states(272)=ppP4c
-    flx_ostates(272)=ppZ4c
-    flx_t(273)=+1.00;flx_SS(273)=1; flx_states(273)=ppP4c
-    flx_ostates(273)=ppZ3c
-    flx_t(274)=+1.00;flx_SS(274)=1; flx_states(274)=ppP4c
-    flx_ostates(274)=ppZ2c
-    flx_t(275)=+1.00;flx_SS(275)=1; flx_states(275)=ppP5c
-    flx_ostates(275)=ppZ4c
-    flx_t(276)=+1.00;flx_SS(276)=1; flx_states(276)=ppP5c
-    flx_ostates(276)=ppZ3c
-    flx_t(277)=+1.00;flx_SS(277)=1; flx_states(277)=ppP5c
-    flx_ostates(277)=ppZ2c
-    flx_t(278)=+1.00;flx_SS(278)=1; flx_states(278)=ppP6c
-    flx_ostates(278)=ppZ4c
-    flx_t(279)=+1.00;flx_SS(279)=1; flx_states(279)=ppP6c
-    flx_ostates(279)=ppZ3c
-    flx_t(280)=+1.00;flx_SS(280)=1; flx_states(280)=ppP6c
-    flx_ostates(280)=ppZ2c
-    flx_t(281)=+1.00;flx_SS(281)=1; flx_states(281)=ppPcc
-    flx_ostates(281)=ppZ4c
-    flx_t(282)=+1.00;flx_SS(282)=1; flx_states(282)=ppPcc
-    flx_ostates(282)=ppZ3c
-    flx_t(283)=+1.00;flx_SS(283)=1; flx_states(283)=ppPcc
-    flx_ostates(283)=ppZ2c
+    flx_calc_nr(36)= 325; flx_CalcIn(36)=iiPel; flx_option(36)=2
+    flx_t(305)=+1.00;flx_SS(305)=1; flx_states(305)=ppP1c
+    flx_ostates(305)=ppZ4c
+    flx_t(306)=+1.00;flx_SS(306)=1; flx_states(306)=ppP1c
+    flx_ostates(306)=ppZ3c
+    flx_t(307)=+1.00;flx_SS(307)=1; flx_states(307)=ppP1c
+    flx_ostates(307)=ppZ2c
+    flx_t(308)=+1.00;flx_SS(308)=1; flx_states(308)=ppP2c
+    flx_ostates(308)=ppZ4c
+    flx_t(309)=+1.00;flx_SS(309)=1; flx_states(309)=ppP2c
+    flx_ostates(309)=ppZ3c
+    flx_t(310)=+1.00;flx_SS(310)=1; flx_states(310)=ppP2c
+    flx_ostates(310)=ppZ2c
+    flx_t(311)=+1.00;flx_SS(311)=1; flx_states(311)=ppP3c
+    flx_ostates(311)=ppZ4c
+    flx_t(312)=+1.00;flx_SS(312)=1; flx_states(312)=ppP3c
+    flx_ostates(312)=ppZ3c
+    flx_t(313)=+1.00;flx_SS(313)=1; flx_states(313)=ppP3c
+    flx_ostates(313)=ppZ2c
+    flx_t(314)=+1.00;flx_SS(314)=1; flx_states(314)=ppP4c
+    flx_ostates(314)=ppZ4c
+    flx_t(315)=+1.00;flx_SS(315)=1; flx_states(315)=ppP4c
+    flx_ostates(315)=ppZ3c
+    flx_t(316)=+1.00;flx_SS(316)=1; flx_states(316)=ppP4c
+    flx_ostates(316)=ppZ2c
+    flx_t(317)=+1.00;flx_SS(317)=1; flx_states(317)=ppP5c
+    flx_ostates(317)=ppZ4c
+    flx_t(318)=+1.00;flx_SS(318)=1; flx_states(318)=ppP5c
+    flx_ostates(318)=ppZ3c
+    flx_t(319)=+1.00;flx_SS(319)=1; flx_states(319)=ppP5c
+    flx_ostates(319)=ppZ2c
+    flx_t(320)=+1.00;flx_SS(320)=1; flx_states(320)=ppP6c
+    flx_ostates(320)=ppZ4c
+    flx_t(321)=+1.00;flx_SS(321)=1; flx_states(321)=ppP6c
+    flx_ostates(321)=ppZ3c
+    flx_t(322)=+1.00;flx_SS(322)=1; flx_states(322)=ppP6c
+    flx_ostates(322)=ppZ2c
+    flx_t(323)=+1.00;flx_SS(323)=1; flx_states(323)=ppPcc
+    flx_ostates(323)=ppZ4c
+    flx_t(324)=+1.00;flx_SS(324)=1; flx_states(324)=ppPcc
+    flx_ostates(324)=ppZ3c
+    flx_t(325)=+1.00;flx_SS(325)=1; flx_states(325)=ppPcc
+    flx_ostates(325)=ppZ2c
 
     ! jPTMic=P.c->Z5c+Z6c        (flux perm2):
-    flx_calc_nr(25)= 297; flx_CalcIn(25)=iiPel; flx_option(25)=2
-    flx_t(284)=+1.00;flx_SS(284)=1; flx_states(284)=ppP1c
-    flx_ostates(284)=ppZ5c
-    flx_t(285)=+1.00;flx_SS(285)=1; flx_states(285)=ppP1c
-    flx_ostates(285)=ppZ6c
-    flx_t(286)=+1.00;flx_SS(286)=1; flx_states(286)=ppP2c
-    flx_ostates(286)=ppZ5c
-    flx_t(287)=+1.00;flx_SS(287)=1; flx_states(287)=ppP2c
-    flx_ostates(287)=ppZ6c
-    flx_t(288)=+1.00;flx_SS(288)=1; flx_states(288)=ppP3c
-    flx_ostates(288)=ppZ5c
-    flx_t(289)=+1.00;flx_SS(289)=1; flx_states(289)=ppP3c
-    flx_ostates(289)=ppZ6c
-    flx_t(290)=+1.00;flx_SS(290)=1; flx_states(290)=ppP4c
-    flx_ostates(290)=ppZ5c
-    flx_t(291)=+1.00;flx_SS(291)=1; flx_states(291)=ppP4c
-    flx_ostates(291)=ppZ6c
-    flx_t(292)=+1.00;flx_SS(292)=1; flx_states(292)=ppP5c
-    flx_ostates(292)=ppZ5c
-    flx_t(293)=+1.00;flx_SS(293)=1; flx_states(293)=ppP5c
-    flx_ostates(293)=ppZ6c
-    flx_t(294)=+1.00;flx_SS(294)=1; flx_states(294)=ppP6c
-    flx_ostates(294)=ppZ5c
-    flx_t(295)=+1.00;flx_SS(295)=1; flx_states(295)=ppP6c
-    flx_ostates(295)=ppZ6c
-    flx_t(296)=+1.00;flx_SS(296)=1; flx_states(296)=ppPcc
-    flx_ostates(296)=ppZ5c
-    flx_t(297)=+1.00;flx_SS(297)=1; flx_states(297)=ppPcc
-    flx_ostates(297)=ppZ6c
+    flx_calc_nr(37)= 339; flx_CalcIn(37)=iiPel; flx_option(37)=2
+    flx_t(326)=+1.00;flx_SS(326)=1; flx_states(326)=ppP1c
+    flx_ostates(326)=ppZ5c
+    flx_t(327)=+1.00;flx_SS(327)=1; flx_states(327)=ppP1c
+    flx_ostates(327)=ppZ6c
+    flx_t(328)=+1.00;flx_SS(328)=1; flx_states(328)=ppP2c
+    flx_ostates(328)=ppZ5c
+    flx_t(329)=+1.00;flx_SS(329)=1; flx_states(329)=ppP2c
+    flx_ostates(329)=ppZ6c
+    flx_t(330)=+1.00;flx_SS(330)=1; flx_states(330)=ppP3c
+    flx_ostates(330)=ppZ5c
+    flx_t(331)=+1.00;flx_SS(331)=1; flx_states(331)=ppP3c
+    flx_ostates(331)=ppZ6c
+    flx_t(332)=+1.00;flx_SS(332)=1; flx_states(332)=ppP4c
+    flx_ostates(332)=ppZ5c
+    flx_t(333)=+1.00;flx_SS(333)=1; flx_states(333)=ppP4c
+    flx_ostates(333)=ppZ6c
+    flx_t(334)=+1.00;flx_SS(334)=1; flx_states(334)=ppP5c
+    flx_ostates(334)=ppZ5c
+    flx_t(335)=+1.00;flx_SS(335)=1; flx_states(335)=ppP5c
+    flx_ostates(335)=ppZ6c
+    flx_t(336)=+1.00;flx_SS(336)=1; flx_states(336)=ppP6c
+    flx_ostates(336)=ppZ5c
+    flx_t(337)=+1.00;flx_SS(337)=1; flx_states(337)=ppP6c
+    flx_ostates(337)=ppZ6c
+    flx_t(338)=+1.00;flx_SS(338)=1; flx_states(338)=ppPcc
+    flx_ostates(338)=ppZ5c
+    flx_t(339)=+1.00;flx_SS(339)=1; flx_states(339)=ppPcc
+    flx_ostates(339)=ppZ6c
 
     ! jPTRTc=P.c->R1c+R2c+R3c+R6c        (flux perm2):
-    flx_calc_nr(26)= 325; flx_CalcIn(26)=iiPel; flx_option(26)=2
-    flx_t(298)=+1.00;flx_SS(298)=1; flx_states(298)=ppP1c
-    flx_ostates(298)=ppR1c
-    flx_t(299)=+1.00;flx_SS(299)=1; flx_states(299)=ppP1c
-    flx_ostates(299)=ppR2c
-    flx_t(300)=+1.00;flx_SS(300)=1; flx_states(300)=ppP1c
-    flx_ostates(300)=ppR3c
-    flx_t(301)=+1.00;flx_SS(301)=1; flx_states(301)=ppP1c
-    flx_ostates(301)=ppR6c
-    flx_t(302)=+1.00;flx_SS(302)=1; flx_states(302)=ppP2c
-    flx_ostates(302)=ppR1c
-    flx_t(303)=+1.00;flx_SS(303)=1; flx_states(303)=ppP2c
-    flx_ostates(303)=ppR2c
-    flx_t(304)=+1.00;flx_SS(304)=1; flx_states(304)=ppP2c
-    flx_ostates(304)=ppR3c
-    flx_t(305)=+1.00;flx_SS(305)=1; flx_states(305)=ppP2c
-    flx_ostates(305)=ppR6c
-    flx_t(306)=+1.00;flx_SS(306)=1; flx_states(306)=ppP3c
-    flx_ostates(306)=ppR1c
-    flx_t(307)=+1.00;flx_SS(307)=1; flx_states(307)=ppP3c
-    flx_ostates(307)=ppR2c
-    flx_t(308)=+1.00;flx_SS(308)=1; flx_states(308)=ppP3c
-    flx_ostates(308)=ppR3c
-    flx_t(309)=+1.00;flx_SS(309)=1; flx_states(309)=ppP3c
-    flx_ostates(309)=ppR6c
-    flx_t(310)=+1.00;flx_SS(310)=1; flx_states(310)=ppP4c
-    flx_ostates(310)=ppR1c
-    flx_t(311)=+1.00;flx_SS(311)=1; flx_states(311)=ppP4c
-    flx_ostates(311)=ppR2c
-    flx_t(312)=+1.00;flx_SS(312)=1; flx_states(312)=ppP4c
-    flx_ostates(312)=ppR3c
-    flx_t(313)=+1.00;flx_SS(313)=1; flx_states(313)=ppP4c
-    flx_ostates(313)=ppR6c
-    flx_t(314)=+1.00;flx_SS(314)=1; flx_states(314)=ppP5c
-    flx_ostates(314)=ppR1c
-    flx_t(315)=+1.00;flx_SS(315)=1; flx_states(315)=ppP5c
-    flx_ostates(315)=ppR2c
-    flx_t(316)=+1.00;flx_SS(316)=1; flx_states(316)=ppP5c
-    flx_ostates(316)=ppR3c
-    flx_t(317)=+1.00;flx_SS(317)=1; flx_states(317)=ppP5c
-    flx_ostates(317)=ppR6c
-    flx_t(318)=+1.00;flx_SS(318)=1; flx_states(318)=ppP6c
-    flx_ostates(318)=ppR1c
-    flx_t(319)=+1.00;flx_SS(319)=1; flx_states(319)=ppP6c
-    flx_ostates(319)=ppR2c
-    flx_t(320)=+1.00;flx_SS(320)=1; flx_states(320)=ppP6c
-    flx_ostates(320)=ppR3c
-    flx_t(321)=+1.00;flx_SS(321)=1; flx_states(321)=ppP6c
-    flx_ostates(321)=ppR6c
-    flx_t(322)=+1.00;flx_SS(322)=1; flx_states(322)=ppPcc
-    flx_ostates(322)=ppR1c
-    flx_t(323)=+1.00;flx_SS(323)=1; flx_states(323)=ppPcc
-    flx_ostates(323)=ppR2c
-    flx_t(324)=+1.00;flx_SS(324)=1; flx_states(324)=ppPcc
-    flx_ostates(324)=ppR3c
-    flx_t(325)=+1.00;flx_SS(325)=1; flx_states(325)=ppPcc
-    flx_ostates(325)=ppR6c
+    flx_calc_nr(38)= 367; flx_CalcIn(38)=iiPel; flx_option(38)=2
+    flx_t(340)=+1.00;flx_SS(340)=1; flx_states(340)=ppP1c
+    flx_ostates(340)=ppR1c
+    flx_t(341)=+1.00;flx_SS(341)=1; flx_states(341)=ppP1c
+    flx_ostates(341)=ppR2c
+    flx_t(342)=+1.00;flx_SS(342)=1; flx_states(342)=ppP1c
+    flx_ostates(342)=ppR3c
+    flx_t(343)=+1.00;flx_SS(343)=1; flx_states(343)=ppP1c
+    flx_ostates(343)=ppR6c
+    flx_t(344)=+1.00;flx_SS(344)=1; flx_states(344)=ppP2c
+    flx_ostates(344)=ppR1c
+    flx_t(345)=+1.00;flx_SS(345)=1; flx_states(345)=ppP2c
+    flx_ostates(345)=ppR2c
+    flx_t(346)=+1.00;flx_SS(346)=1; flx_states(346)=ppP2c
+    flx_ostates(346)=ppR3c
+    flx_t(347)=+1.00;flx_SS(347)=1; flx_states(347)=ppP2c
+    flx_ostates(347)=ppR6c
+    flx_t(348)=+1.00;flx_SS(348)=1; flx_states(348)=ppP3c
+    flx_ostates(348)=ppR1c
+    flx_t(349)=+1.00;flx_SS(349)=1; flx_states(349)=ppP3c
+    flx_ostates(349)=ppR2c
+    flx_t(350)=+1.00;flx_SS(350)=1; flx_states(350)=ppP3c
+    flx_ostates(350)=ppR3c
+    flx_t(351)=+1.00;flx_SS(351)=1; flx_states(351)=ppP3c
+    flx_ostates(351)=ppR6c
+    flx_t(352)=+1.00;flx_SS(352)=1; flx_states(352)=ppP4c
+    flx_ostates(352)=ppR1c
+    flx_t(353)=+1.00;flx_SS(353)=1; flx_states(353)=ppP4c
+    flx_ostates(353)=ppR2c
+    flx_t(354)=+1.00;flx_SS(354)=1; flx_states(354)=ppP4c
+    flx_ostates(354)=ppR3c
+    flx_t(355)=+1.00;flx_SS(355)=1; flx_states(355)=ppP4c
+    flx_ostates(355)=ppR6c
+    flx_t(356)=+1.00;flx_SS(356)=1; flx_states(356)=ppP5c
+    flx_ostates(356)=ppR1c
+    flx_t(357)=+1.00;flx_SS(357)=1; flx_states(357)=ppP5c
+    flx_ostates(357)=ppR2c
+    flx_t(358)=+1.00;flx_SS(358)=1; flx_states(358)=ppP5c
+    flx_ostates(358)=ppR3c
+    flx_t(359)=+1.00;flx_SS(359)=1; flx_states(359)=ppP5c
+    flx_ostates(359)=ppR6c
+    flx_t(360)=+1.00;flx_SS(360)=1; flx_states(360)=ppP6c
+    flx_ostates(360)=ppR1c
+    flx_t(361)=+1.00;flx_SS(361)=1; flx_states(361)=ppP6c
+    flx_ostates(361)=ppR2c
+    flx_t(362)=+1.00;flx_SS(362)=1; flx_states(362)=ppP6c
+    flx_ostates(362)=ppR3c
+    flx_t(363)=+1.00;flx_SS(363)=1; flx_states(363)=ppP6c
+    flx_ostates(363)=ppR6c
+    flx_t(364)=+1.00;flx_SS(364)=1; flx_states(364)=ppPcc
+    flx_ostates(364)=ppR1c
+    flx_t(365)=+1.00;flx_SS(365)=1; flx_states(365)=ppPcc
+    flx_ostates(365)=ppR2c
+    flx_t(366)=+1.00;flx_SS(366)=1; flx_states(366)=ppPcc
+    flx_ostates(366)=ppR3c
+    flx_t(367)=+1.00;flx_SS(367)=1; flx_states(367)=ppPcc
+    flx_ostates(367)=ppR6c
 
     ! jPTRTn=P.n->R1n+R6n        (flux perm2):
-    flx_calc_nr(27)= 337; flx_CalcIn(27)=iiPel; flx_option(27)=2
-    flx_t(326)=+1.00;flx_SS(326)=1; flx_states(326)=ppP1n
-    flx_ostates(326)=ppR1n
-    flx_t(327)=+1.00;flx_SS(327)=1; flx_states(327)=ppP1n
-    flx_ostates(327)=ppR6n
-    flx_t(328)=+1.00;flx_SS(328)=1; flx_states(328)=ppP2n
-    flx_ostates(328)=ppR1n
-    flx_t(329)=+1.00;flx_SS(329)=1; flx_states(329)=ppP2n
-    flx_ostates(329)=ppR6n
-    flx_t(330)=+1.00;flx_SS(330)=1; flx_states(330)=ppP3n
-    flx_ostates(330)=ppR1n
-    flx_t(331)=+1.00;flx_SS(331)=1; flx_states(331)=ppP3n
-    flx_ostates(331)=ppR6n
-    flx_t(332)=+1.00;flx_SS(332)=1; flx_states(332)=ppP4n
-    flx_ostates(332)=ppR1n
-    flx_t(333)=+1.00;flx_SS(333)=1; flx_states(333)=ppP4n
-    flx_ostates(333)=ppR6n
-    flx_t(334)=+1.00;flx_SS(334)=1; flx_states(334)=ppP5n
-    flx_ostates(334)=ppR1n
-    flx_t(335)=+1.00;flx_SS(335)=1; flx_states(335)=ppP5n
-    flx_ostates(335)=ppR6n
-    flx_t(336)=+1.00;flx_SS(336)=1; flx_states(336)=ppP6n
-    flx_ostates(336)=ppR1n
-    flx_t(337)=+1.00;flx_SS(337)=1; flx_states(337)=ppP6n
-    flx_ostates(337)=ppR6n
+    flx_calc_nr(39)= 379; flx_CalcIn(39)=iiPel; flx_option(39)=2
+    flx_t(368)=+1.00;flx_SS(368)=1; flx_states(368)=ppP1n
+    flx_ostates(368)=ppR1n
+    flx_t(369)=+1.00;flx_SS(369)=1; flx_states(369)=ppP1n
+    flx_ostates(369)=ppR6n
+    flx_t(370)=+1.00;flx_SS(370)=1; flx_states(370)=ppP2n
+    flx_ostates(370)=ppR1n
+    flx_t(371)=+1.00;flx_SS(371)=1; flx_states(371)=ppP2n
+    flx_ostates(371)=ppR6n
+    flx_t(372)=+1.00;flx_SS(372)=1; flx_states(372)=ppP3n
+    flx_ostates(372)=ppR1n
+    flx_t(373)=+1.00;flx_SS(373)=1; flx_states(373)=ppP3n
+    flx_ostates(373)=ppR6n
+    flx_t(374)=+1.00;flx_SS(374)=1; flx_states(374)=ppP4n
+    flx_ostates(374)=ppR1n
+    flx_t(375)=+1.00;flx_SS(375)=1; flx_states(375)=ppP4n
+    flx_ostates(375)=ppR6n
+    flx_t(376)=+1.00;flx_SS(376)=1; flx_states(376)=ppP5n
+    flx_ostates(376)=ppR1n
+    flx_t(377)=+1.00;flx_SS(377)=1; flx_states(377)=ppP5n
+    flx_ostates(377)=ppR6n
+    flx_t(378)=+1.00;flx_SS(378)=1; flx_states(378)=ppP6n
+    flx_ostates(378)=ppR1n
+    flx_t(379)=+1.00;flx_SS(379)=1; flx_states(379)=ppP6n
+    flx_ostates(379)=ppR6n
 
     ! jPTRTp=P.n->R1p+R6p        (flux perm2):
-    flx_calc_nr(28)= 349; flx_CalcIn(28)=iiPel; flx_option(28)=2
-    flx_t(338)=+1.00;flx_SS(338)=1; flx_states(338)=ppP1n
-    flx_ostates(338)=ppR1p
-    flx_t(339)=+1.00;flx_SS(339)=1; flx_states(339)=ppP1n
-    flx_ostates(339)=ppR6p
-    flx_t(340)=+1.00;flx_SS(340)=1; flx_states(340)=ppP2n
-    flx_ostates(340)=ppR1p
-    flx_t(341)=+1.00;flx_SS(341)=1; flx_states(341)=ppP2n
-    flx_ostates(341)=ppR6p
-    flx_t(342)=+1.00;flx_SS(342)=1; flx_states(342)=ppP3n
-    flx_ostates(342)=ppR1p
-    flx_t(343)=+1.00;flx_SS(343)=1; flx_states(343)=ppP3n
-    flx_ostates(343)=ppR6p
-    flx_t(344)=+1.00;flx_SS(344)=1; flx_states(344)=ppP4n
-    flx_ostates(344)=ppR1p
-    flx_t(345)=+1.00;flx_SS(345)=1; flx_states(345)=ppP4n
-    flx_ostates(345)=ppR6p
-    flx_t(346)=+1.00;flx_SS(346)=1; flx_states(346)=ppP5n
-    flx_ostates(346)=ppR1p
-    flx_t(347)=+1.00;flx_SS(347)=1; flx_states(347)=ppP5n
-    flx_ostates(347)=ppR6p
-    flx_t(348)=+1.00;flx_SS(348)=1; flx_states(348)=ppP6n
-    flx_ostates(348)=ppR1p
-    flx_t(349)=+1.00;flx_SS(349)=1; flx_states(349)=ppP6n
-    flx_ostates(349)=ppR6p
+    flx_calc_nr(40)= 391; flx_CalcIn(40)=iiPel; flx_option(40)=2
+    flx_t(380)=+1.00;flx_SS(380)=1; flx_states(380)=ppP1n
+    flx_ostates(380)=ppR1p
+    flx_t(381)=+1.00;flx_SS(381)=1; flx_states(381)=ppP1n
+    flx_ostates(381)=ppR6p
+    flx_t(382)=+1.00;flx_SS(382)=1; flx_states(382)=ppP2n
+    flx_ostates(382)=ppR1p
+    flx_t(383)=+1.00;flx_SS(383)=1; flx_states(383)=ppP2n
+    flx_ostates(383)=ppR6p
+    flx_t(384)=+1.00;flx_SS(384)=1; flx_states(384)=ppP3n
+    flx_ostates(384)=ppR1p
+    flx_t(385)=+1.00;flx_SS(385)=1; flx_states(385)=ppP3n
+    flx_ostates(385)=ppR6p
+    flx_t(386)=+1.00;flx_SS(386)=1; flx_states(386)=ppP4n
+    flx_ostates(386)=ppR1p
+    flx_t(387)=+1.00;flx_SS(387)=1; flx_states(387)=ppP4n
+    flx_ostates(387)=ppR6p
+    flx_t(388)=+1.00;flx_SS(388)=1; flx_states(388)=ppP5n
+    flx_ostates(388)=ppR1p
+    flx_t(389)=+1.00;flx_SS(389)=1; flx_states(389)=ppP5n
+    flx_ostates(389)=ppR6p
+    flx_t(390)=+1.00;flx_SS(390)=1; flx_states(390)=ppP6n
+    flx_ostates(390)=ppR1p
+    flx_t(391)=+1.00;flx_SS(391)=1; flx_states(391)=ppP6n
+    flx_ostates(391)=ppR6p
 
     ! jZ4Z3c=Z3c<-Z2c+Z4c        (flux perm2):
-    flx_calc_nr(29)= 351; flx_CalcIn(29)=iiPel; flx_option(29)=2
-    flx_t(350)=+1.00;flx_SS(350)=0; flx_states(350)=ppZ3c
-    flx_ostates(350)=ppZ2c
-    flx_t(351)=+1.00;flx_SS(351)=0; flx_states(351)=ppZ3c
-    flx_ostates(351)=ppZ4c
+    flx_calc_nr(41)= 393; flx_CalcIn(41)=iiPel; flx_option(41)=2
+    flx_t(392)=+1.00;flx_SS(392)=0; flx_states(392)=ppZ3c
+    flx_ostates(392)=ppZ2c
+    flx_t(393)=+1.00;flx_SS(393)=0; flx_states(393)=ppZ3c
+    flx_ostates(393)=ppZ4c
 
     ! jZIR6c=Z.c->R6c        (flux perm2):
-    flx_calc_nr(30)= 356; flx_CalcIn(30)=iiPel; flx_option(30)=2
-    flx_t(352)=+1.00;flx_SS(352)=1; flx_states(352)=ppZ3c
-    flx_ostates(352)=ppR6c
-    flx_t(353)=+1.00;flx_SS(353)=1; flx_states(353)=ppZ4c
-    flx_ostates(353)=ppR6c
-    flx_t(354)=+1.00;flx_SS(354)=1; flx_states(354)=ppZ2c
-    flx_ostates(354)=ppR6c
-    flx_t(355)=+1.00;flx_SS(355)=1; flx_states(355)=ppZ5c
-    flx_ostates(355)=ppR6c
-    flx_t(356)=+1.00;flx_SS(356)=1; flx_states(356)=ppZ6c
-    flx_ostates(356)=ppR6c
+    flx_calc_nr(42)= 398; flx_CalcIn(42)=iiPel; flx_option(42)=2
+    flx_t(394)=+1.00;flx_SS(394)=1; flx_states(394)=ppZ3c
+    flx_ostates(394)=ppR6c
+    flx_t(395)=+1.00;flx_SS(395)=1; flx_states(395)=ppZ4c
+    flx_ostates(395)=ppR6c
+    flx_t(396)=+1.00;flx_SS(396)=1; flx_states(396)=ppZ2c
+    flx_ostates(396)=ppR6c
+    flx_t(397)=+1.00;flx_SS(397)=1; flx_states(397)=ppZ5c
+    flx_ostates(397)=ppR6c
+    flx_t(398)=+1.00;flx_SS(398)=1; flx_states(398)=ppZ6c
+    flx_ostates(398)=ppR6c
 
     ! jZ6Z5c=Z5c<-Z6c        (flux perm2):
-    flx_calc_nr(31)= 357; flx_CalcIn(31)=iiPel; flx_option(31)=2
-    flx_t(357)=+1.00;flx_SS(357)=0; flx_states(357)=ppZ5c
-    flx_ostates(357)=ppZ6c
+    flx_calc_nr(43)= 399; flx_CalcIn(43)=iiPel; flx_option(43)=2
+    flx_t(399)=+1.00;flx_SS(399)=0; flx_states(399)=ppZ5c
+    flx_ostates(399)=ppZ6c
 
     ! jPTR2c=R2c<-P.c        (flux perm2):
-    flx_calc_nr(32)= 364; flx_CalcIn(32)=iiPel; flx_option(32)=2
-    flx_t(358)=+1.00;flx_SS(358)=0; flx_states(358)=ppR2c
-    flx_ostates(358)=ppP1c
-    flx_t(359)=+1.00;flx_SS(359)=0; flx_states(359)=ppR2c
-    flx_ostates(359)=ppP2c
-    flx_t(360)=+1.00;flx_SS(360)=0; flx_states(360)=ppR2c
-    flx_ostates(360)=ppP3c
-    flx_t(361)=+1.00;flx_SS(361)=0; flx_states(361)=ppR2c
-    flx_ostates(361)=ppP4c
-    flx_t(362)=+1.00;flx_SS(362)=0; flx_states(362)=ppR2c
-    flx_ostates(362)=ppP5c
-    flx_t(363)=+1.00;flx_SS(363)=0; flx_states(363)=ppR2c
-    flx_ostates(363)=ppP6c
-    flx_t(364)=+1.00;flx_SS(364)=0; flx_states(364)=ppR2c
-    flx_ostates(364)=ppPcc
+    flx_calc_nr(44)= 406; flx_CalcIn(44)=iiPel; flx_option(44)=2
+    flx_t(400)=+1.00;flx_SS(400)=0; flx_states(400)=ppR2c
+    flx_ostates(400)=ppP1c
+    flx_t(401)=+1.00;flx_SS(401)=0; flx_states(401)=ppR2c
+    flx_ostates(401)=ppP2c
+    flx_t(402)=+1.00;flx_SS(402)=0; flx_states(402)=ppR2c
+    flx_ostates(402)=ppP3c
+    flx_t(403)=+1.00;flx_SS(403)=0; flx_states(403)=ppR2c
+    flx_ostates(403)=ppP4c
+    flx_t(404)=+1.00;flx_SS(404)=0; flx_states(404)=ppR2c
+    flx_ostates(404)=ppP5c
+    flx_t(405)=+1.00;flx_SS(405)=0; flx_states(405)=ppR2c
+    flx_ostates(405)=ppP6c
+    flx_t(406)=+1.00;flx_SS(406)=0; flx_states(406)=ppR2c
+    flx_ostates(406)=ppPcc
 
     ! J1_PTc=P.c        (sedimentation 1):
-    flx_calc_nr(33)= 371; flx_CalcIn(33)=iiBen; flx_option(33)=20
-    flx_t(365)=+1.00;flx_SS(365)=1; flx_states(365)=ppP1c;flx_ostates(365)=1
-    flx_t(366)=+1.00;flx_SS(366)=1; flx_states(366)=ppP2c;flx_ostates(366)=1
-    flx_t(367)=+1.00;flx_SS(367)=1; flx_states(367)=ppP3c;flx_ostates(367)=1
-    flx_t(368)=+1.00;flx_SS(368)=1; flx_states(368)=ppP4c;flx_ostates(368)=1
-    flx_t(369)=+1.00;flx_SS(369)=1; flx_states(369)=ppP5c;flx_ostates(369)=1
-    flx_t(370)=+1.00;flx_SS(370)=1; flx_states(370)=ppP6c;flx_ostates(370)=1
-    flx_t(371)=+1.00;flx_SS(371)=1; flx_states(371)=ppPcc;flx_ostates(371)=1
+    flx_calc_nr(45)= 413; flx_CalcIn(45)=iiBen; flx_option(45)=20
+    flx_t(407)=+1.00;flx_SS(407)=1; flx_states(407)=ppP1c;flx_ostates(407)=1
+    flx_t(408)=+1.00;flx_SS(408)=1; flx_states(408)=ppP2c;flx_ostates(408)=1
+    flx_t(409)=+1.00;flx_SS(409)=1; flx_states(409)=ppP3c;flx_ostates(409)=1
+    flx_t(410)=+1.00;flx_SS(410)=1; flx_states(410)=ppP4c;flx_ostates(410)=1
+    flx_t(411)=+1.00;flx_SS(411)=1; flx_states(411)=ppP5c;flx_ostates(411)=1
+    flx_t(412)=+1.00;flx_SS(412)=1; flx_states(412)=ppP6c;flx_ostates(412)=1
+    flx_t(413)=+1.00;flx_SS(413)=1; flx_states(413)=ppPcc;flx_ostates(413)=1
 
     ! J1_R6c=R6c        (sedimentation 1):
-    flx_calc_nr(34)= 372; flx_CalcIn(34)=iiBen; flx_option(34)=20
-    flx_t(372)=+1.00;flx_SS(372)=1; flx_states(372)=ppR6c;flx_ostates(372)=1
+    flx_calc_nr(46)= 414; flx_CalcIn(46)=iiBen; flx_option(46)=20
+    flx_t(414)=+1.00;flx_SS(414)=1; flx_states(414)=ppR6c;flx_ostates(414)=1
 
     ! J1_R2c=R2c        (sedimentation 1):
-    flx_calc_nr(35)= 373; flx_CalcIn(35)=iiBen; flx_option(35)=20
-    flx_t(373)=+1.00;flx_SS(373)=1; flx_states(373)=ppR2c;flx_ostates(373)=1
+    flx_calc_nr(47)= 415; flx_CalcIn(47)=iiBen; flx_option(47)=20
+    flx_t(415)=+1.00;flx_SS(415)=1; flx_states(415)=ppR2c;flx_ostates(415)=1
 
     ! J0_Ndn=N.n        (sum bot):
-    flx_calc_nr(36)= 375; flx_CalcIn(36)=iiBen; flx_option(36)=12
-    flx_t(374)=+1.00;flx_SS(374)=1; flx_states(374)=ppN3n
-    flx_ostates(374)=ppN3n
-    flx_t(375)=+1.00;flx_SS(375)=1; flx_states(375)=ppN4n
-    flx_ostates(375)=ppN4n
+    flx_calc_nr(48)= 417; flx_CalcIn(48)=iiBen; flx_option(48)=12
+    flx_t(416)=+1.00;flx_SS(416)=1; flx_states(416)=ppN3n
+    flx_ostates(416)=ppN3n
+    flx_t(417)=+1.00;flx_SS(417)=1; flx_states(417)=ppN4n
+    flx_ostates(417)=ppN4n
 
     ! J0_Ntn=N.n+P.n+R6n        (sum bot):
-    flx_calc_nr(37)= 384; flx_CalcIn(37)=iiBen; flx_option(37)=12
-    flx_t(376)=+1.00;flx_SS(376)=1; flx_states(376)=ppN3n
-    flx_ostates(376)=ppN3n
-    flx_t(377)=+1.00;flx_SS(377)=1; flx_states(377)=ppN4n
-    flx_ostates(377)=ppN4n
-    flx_t(378)=+1.00;flx_SS(378)=1; flx_states(378)=ppP1n
-    flx_ostates(378)=ppP1n
-    flx_t(379)=+1.00;flx_SS(379)=1; flx_states(379)=ppP2n
-    flx_ostates(379)=ppP2n
-    flx_t(380)=+1.00;flx_SS(380)=1; flx_states(380)=ppP3n
-    flx_ostates(380)=ppP3n
-    flx_t(381)=+1.00;flx_SS(381)=1; flx_states(381)=ppP4n
-    flx_ostates(381)=ppP4n
-    flx_t(382)=+1.00;flx_SS(382)=1; flx_states(382)=ppP5n
-    flx_ostates(382)=ppP5n
-    flx_t(383)=+1.00;flx_SS(383)=1; flx_states(383)=ppP6n
-    flx_ostates(383)=ppP6n
-    flx_t(384)=+1.00;flx_SS(384)=1; flx_states(384)=ppR6n
-    flx_ostates(384)=ppR6n
+    flx_calc_nr(49)= 426; flx_CalcIn(49)=iiBen; flx_option(49)=12
+    flx_t(418)=+1.00;flx_SS(418)=1; flx_states(418)=ppN3n
+    flx_ostates(418)=ppN3n
+    flx_t(419)=+1.00;flx_SS(419)=1; flx_states(419)=ppN4n
+    flx_ostates(419)=ppN4n
+    flx_t(420)=+1.00;flx_SS(420)=1; flx_states(420)=ppP1n
+    flx_ostates(420)=ppP1n
+    flx_t(421)=+1.00;flx_SS(421)=1; flx_states(421)=ppP2n
+    flx_ostates(421)=ppP2n
+    flx_t(422)=+1.00;flx_SS(422)=1; flx_states(422)=ppP3n
+    flx_ostates(422)=ppP3n
+    flx_t(423)=+1.00;flx_SS(423)=1; flx_states(423)=ppP4n
+    flx_ostates(423)=ppP4n
+    flx_t(424)=+1.00;flx_SS(424)=1; flx_states(424)=ppP5n
+    flx_ostates(424)=ppP5n
+    flx_t(425)=+1.00;flx_SS(425)=1; flx_states(425)=ppP6n
+    flx_ostates(425)=ppP6n
+    flx_t(426)=+1.00;flx_SS(426)=1; flx_states(426)=ppR6n
+    flx_ostates(426)=ppR6n
 
     ! qqrivO3c=O3c        (riv):
-    flx_calc_nr(38)= 385; flx_CalcIn(38)=iiBen; flx_option(38)=50
-    flx_t(385)=+1.00;flx_SS(385)=1; flx_states(385)=ppO3c;flx_ostates(385)=0
+    flx_calc_nr(50)= 427; flx_CalcIn(50)=iiBen; flx_option(50)=50
+    flx_t(427)=+1.00;flx_SS(427)=1; flx_states(427)=ppO3c;flx_ostates(427)=0
 
     ! qqrivO3h=O3h        (riv):
-    flx_calc_nr(39)= 386; flx_CalcIn(39)=iiBen; flx_option(39)=50
-    flx_t(386)=+1.00;flx_SS(386)=1; flx_states(386)=ppO3h;flx_ostates(386)=0
+    flx_calc_nr(51)= 428; flx_CalcIn(51)=iiBen; flx_option(51)=50
+    flx_t(428)=+1.00;flx_SS(428)=1; flx_states(428)=ppO3h;flx_ostates(428)=0
 
     ! qqriv_w= 1        (riv):
-    flx_calc_nr(40)= 387; flx_CalcIn(40)=iiBen; flx_option(40)=50
-    flx_t(387)=+1.00;flx_SS(387)=1; flx_states(387)=0;flx_ostates(387)=0
+    flx_calc_nr(52)= 429; flx_CalcIn(52)=iiBen; flx_option(52)=50
+    flx_t(429)=+1.00;flx_SS(429)=1; flx_states(429)=0;flx_ostates(429)=0
 
     ! qqrivNtn=N3n+N4n+R1n+R6n        (riv):
-    flx_calc_nr(41)= 391; flx_CalcIn(41)=iiBen; flx_option(41)=50
-    flx_t(388)=+1.00;flx_SS(388)=1; flx_states(388)=ppN3n;flx_ostates(388)=0
-    flx_t(389)=+1.00;flx_SS(389)=1; flx_states(389)=ppN4n;flx_ostates(389)=0
-    flx_t(390)=+1.00;flx_SS(390)=1; flx_states(390)=ppR1n;flx_ostates(390)=0
-    flx_t(391)=+1.00;flx_SS(391)=1; flx_states(391)=ppR6n;flx_ostates(391)=0
+    flx_calc_nr(53)= 433; flx_CalcIn(53)=iiBen; flx_option(53)=50
+    flx_t(430)=+1.00;flx_SS(430)=1; flx_states(430)=ppN3n;flx_ostates(430)=0
+    flx_t(431)=+1.00;flx_SS(431)=1; flx_states(431)=ppN4n;flx_ostates(431)=0
+    flx_t(432)=+1.00;flx_SS(432)=1; flx_states(432)=ppR1n;flx_ostates(432)=0
+    flx_t(433)=+1.00;flx_SS(433)=1; flx_states(433)=ppR6n;flx_ostates(433)=0
 
     ! qqrivNtp=N1p+R1p+R6p        (riv):
-    flx_calc_nr(42)= 394; flx_CalcIn(42)=iiBen; flx_option(42)=50
-    flx_t(392)=+1.00;flx_SS(392)=1; flx_states(392)=ppN1p;flx_ostates(392)=0
-    flx_t(393)=+1.00;flx_SS(393)=1; flx_states(393)=ppR1p;flx_ostates(393)=0
-    flx_t(394)=+1.00;flx_SS(394)=1; flx_states(394)=ppR6p;flx_ostates(394)=0
+    flx_calc_nr(54)= 436; flx_CalcIn(54)=iiBen; flx_option(54)=50
+    flx_t(434)=+1.00;flx_SS(434)=1; flx_states(434)=ppN1p;flx_ostates(434)=0
+    flx_t(435)=+1.00;flx_SS(435)=1; flx_states(435)=ppR1p;flx_ostates(435)=0
+    flx_t(436)=+1.00;flx_SS(436)=1; flx_states(436)=ppR6p;flx_ostates(436)=0
 
     ! qqrivR6n=R6n        (riv):
-    flx_calc_nr(43)= 395; flx_CalcIn(43)=iiBen; flx_option(43)=50
-    flx_t(395)=+1.00;flx_SS(395)=1; flx_states(395)=ppR6n;flx_ostates(395)=0
+    flx_calc_nr(55)= 437; flx_CalcIn(55)=iiBen; flx_option(55)=50
+    flx_t(437)=+1.00;flx_SS(437)=1; flx_states(437)=ppR6n;flx_ostates(437)=0
 
     ! qqrivR6p=R6p        (riv):
-    flx_calc_nr(44)= 396; flx_CalcIn(44)=iiBen; flx_option(44)=50
-    flx_t(396)=+1.00;flx_SS(396)=1; flx_states(396)=ppR6p;flx_ostates(396)=0
+    flx_calc_nr(56)= 438; flx_CalcIn(56)=iiBen; flx_option(56)=50
+    flx_t(438)=+1.00;flx_SS(438)=1; flx_states(438)=ppR6p;flx_ostates(438)=0
 
     ! qqrivR6c=R6c        (riv):
-    flx_calc_nr(45)= 397; flx_CalcIn(45)=iiBen; flx_option(45)=50
-    flx_t(397)=+1.00;flx_SS(397)=1; flx_states(397)=ppR6c;flx_ostates(397)=0
+    flx_calc_nr(57)= 439; flx_CalcIn(57)=iiBen; flx_option(57)=50
+    flx_t(439)=+1.00;flx_SS(439)=1; flx_states(439)=ppR6c;flx_ostates(439)=0
 
     ! jBPQ2c=Q2c<-BP.c        (flux):
-    flx_calc_nr(46)= 398; flx_CalcIn(46)=iiBen; flx_option(46)=0
-    flx_t(398)=+1.00;flx_SS(398)=0; flx_states(398)=ppQ2c
-    flx_ostates(398)=ppBP1c
+    flx_calc_nr(58)= 440; flx_CalcIn(58)=iiBen; flx_option(58)=0
+    flx_t(440)=+1.00;flx_SS(440)=0; flx_states(440)=ppQ2c
+    flx_ostates(440)=ppBP1c
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Start the allocation of vars for  track of constituents

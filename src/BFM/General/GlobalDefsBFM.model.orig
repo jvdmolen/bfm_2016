@@ -905,6 +905,24 @@ end
   trPtn=trP.n: total tracked N in PhytoPlankton : mmol N/m3
 end
 
+3d-calc u 
+  qqutZIc=Z.c: net u transp Zooplankton across cell width             : mg C/m/s
+  qqutPIc=P.c: net u transp phytoplankton across cell width          : mg C/m/s
+  qqutRc=R1c+R2c+R3c+R6c+RZc: net u transp detritus across cell width : mg C/m/s
+  qqutDIc=O3c: net u transp DIC across cell width                     : mg mg C/m/s
+  qqutBc=B1c+Bac: net u transp bacteria across cell width             : mg mg C/m/s
+  qqut_w=1:  net u transport water across cell width                    : m2/s
+end
+
+3d-calc v 
+  qqvtZIc=Z.c: net v transp Zooplankton across cell width             : mg C/m/s
+  qqvtPIc=P.c: net v transp phytoplankton across cell width          : mg C/m/s
+  qqvtRc=R1c+R2c+R3c+R6c+RZc: net v transp detritus across cell width : mg C/m/s
+  qqvtDIc=O3c: net v transp DIC across cell width                     : mg mg C/m/s
+  qqvtBc=B1c+Bac: net v transp bacteria across cell width             : mg mg C/m/s
+  qqvt_w=1:  net v transport water across cell width                    : m2/s
+end
+
 3d-calc u -if-exist INCLUDE_TRACK
   qqut_Ndn=N3n+N4n: u-DIN : mmol N/s
   qqut_R1n=R1n:     u-DON: mmol N/s

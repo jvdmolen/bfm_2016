@@ -125,7 +125,7 @@
 
       integer,parameter,public  ::NO_D3_BOX_DIAGNOSS_PRF=13
 
-      integer,parameter,public  ::NO_D3_BOX_FLUX =10
+      integer,parameter,public  ::NO_D3_BOX_FLUX =22
 
       integer,parameter,public  ::NO_D2_BOX_FLUX =36
 
@@ -1968,6 +1968,8 @@
                 do i=1,size(flux)
                   if (flux(i)< 0.0D+00)  then
                     write(LOGUNIT,'(''Error flux_vector: negative flux at level:'',I4)') i
+                    write(LOGUNIT,'(''In '',A,'':origin='',i4,'' destination='',i4)') &
+                      D23, origin,destination
                     write(LOGUNIT,'(''In '',A,'':origin='',i4,'' destination='',i4)') &
                       D23, origin,destination
                     write(LOGUNIT,'(''flux='',(G16.8))') flux(i)
