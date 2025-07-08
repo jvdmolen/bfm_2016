@@ -1337,7 +1337,7 @@
                        if (az(m,n).ge.1) then
                          do z=1,kmax
                            cc3d_out(m,n,z,k)=&
-                             cc3d_out(m,n,z,k)+cut(m,n,z) !*dyu(m,n)  !JM ffluxu is the full flux, i.e. U*dyu, where U=uu*h
+                             cc3d_out(m,n,z,k)+cut(m,n,z)*dyu(m,n)  
 !if (m.eq.2 .and. n.eq.2 .and. z.eq.25) then
 !LEVEL1 "m,n,z,k",m,n,z,k
 !LEVEL1 "cut, dyu",cut(m,n,z),dyu(m,n)
@@ -1353,7 +1353,7 @@
                        if (az(m,n).ge.1 )  then
                          do z=1,kmax
                            cc3d_out(m,n,z,k)=cc3d_out(m,n,z,k) &
-                            +max(_ZERO_,cut(m,n,z) ) ! *dyu(m,n))  
+                            +max(_ZERO_,cut(m,n,z) )*dyu(m,n))  
                          enddo
                        endif
                      enddo
@@ -1363,7 +1363,7 @@
                      do m=imin,imax
                        if (az(m,n).ge.1)  then
                          do z=1,kmax
-                            cc3d_out(m,n,z,k)=cc3d_out(m,n,z,k)+cvt(m,n,z) !*dxv(m,n) !JM ffluxu is the full flux, i.e. U*dyu, where U=uu*h
+                            cc3d_out(m,n,z,k)=cc3d_out(m,n,z,k)+cvt(m,n,z)*dxv(m,n) 
 !if (m.eq.2 .and. n.eq.2 .and. z.eq.25) then
 !LEVEL1 "m,n,z,k",m,n,z,k
 !LEVEL1 "cvt, dxu",cvt(m,n,z),dxv(m,n)
@@ -1379,7 +1379,7 @@
                        if (az(m,n).ge.1 )  then
                          do z=1,kmax
                              cc3d_out(m,n,z,k)= &
-                               cc3d_out(m,n,z,k)+max(_ZERO_,cvt(m,n,z) ) !*dxv(m,n))
+                               cc3d_out(m,n,z,k)+max(_ZERO_,cvt(m,n,z) )*dxv(m,n))
                          enddo
                        endif
                      enddo
