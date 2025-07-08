@@ -1353,7 +1353,7 @@
                        if (az(m,n).ge.1 )  then
                          do z=1,kmax
                            cc3d_out(m,n,z,k)=cc3d_out(m,n,z,k) &
-                            +max(_ZERO_,cut(m,n,z) )*dyu(m,n))  
+                            +max(_ZERO_,cut(m,n,z) )*dyu(m,n)  
                          enddo
                        endif
                      enddo
@@ -1379,7 +1379,7 @@
                        if (az(m,n).ge.1 )  then
                          do z=1,kmax
                              cc3d_out(m,n,z,k)= &
-                               cc3d_out(m,n,z,k)+max(_ZERO_,cvt(m,n,z) )*dxv(m,n))
+                               cc3d_out(m,n,z,k)+max(_ZERO_,cvt(m,n,z) )*dxv(m,n)
                          enddo
                        endif
                      enddo
