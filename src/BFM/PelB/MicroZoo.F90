@@ -197,6 +197,7 @@
       rump  =   rump+ rumPIc(:,i)* phytonps/(NZERO+phytoc)
       if ( i==iiP6) then
       !TEP material in colony`
+        rumR3c(:)=ZERO   !JM initialise
         where (insw_vector(phytoc) >NZERO )
          rumR3c =  rumPIc(:,i) *R3c/(NZERO+ phytoc)
          rumc= rumc+ rumR3c
@@ -308,7 +309,7 @@
         flR3R2c=flR3R2c+ruPIc/(NZERO+rumPIc(:,i)) * rumR3c
         call findnan(flR3R2c,NO_BOXES,iout)
         if ( iout>0) write(LOGUNIT,*) 'MicroZoo flR3R2=NAN', &
-                 iout,rumR3c(iout),ruPIc(iout),rumPIc(iout,i),put_u(iout)
+                 iout,rumR3c(iout),ruPIc(iout),rumPIc(iout,i),put_u(iout),R3c(iout),phytoc(iout)
       endif
    else
      rx_any=ZERO
