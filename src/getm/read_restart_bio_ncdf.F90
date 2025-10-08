@@ -120,7 +120,7 @@
 !LEVEL1 "start",start
 !LEVEL1 "edges",edges
        status = &
-          nf90_get_var(ncid,iout,ffb(iloc:ilen,jloc:jlen),start(1:3),edges(1:3))
+          nf90_get_var(ncid,iout,ffb(iloc:ilen,jloc:jlen),start(1:2),edges(1:2))
        if (status .NE. NF90_NOERR) then
           LEVEL3 "read_restart_bio_ncdf(): setting",name,"=0"
           ffb=_ZERO_
