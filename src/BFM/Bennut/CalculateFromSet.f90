@@ -41,12 +41,13 @@
 !
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       REAL(RLEN) FUNCTION CalculateFromSet(NUTR,mode,input,from,to)
-        USE global_mem, ONLY:RLEN,ZERO,DONE
+        USE global_mem, ONLY:RLEN,ZERO,DONE,LOGUNIT
         USE constants
         USE bennut_interface,ONLY: CalculateFromLayer,FindLayerNr,CalculateShift
         IMPLICIT  NONE
         integer,intent(IN) ::mode ! Specification
-        integer,intent(IN) ::nutr ! Specification
+!JM        integer,intent(IN) ::nutr ! Specification
+        integer,intent(IN) ::NUTR ! Specification
         integer,intent(IN) ::input ! Specification
         REAL(RLEN),intent(IN) ::from ! Specification
         REAL(RLEN),intent(IN) ::to ! Specification
@@ -96,6 +97,10 @@
                !calculate integration (mode=1) of equation for nutrient NUTR,
                !equation nr j between the boundaries xo and xb
                r=r+CalculateFromLayer(NUTR,j,mode,input,xo,xb)
+!if (isnan(r)) then
+!         write(LOGUNIT,*) '2: r,xo,xb,j=',r,xo,xb,j
+!         write(LOGUNIT,*) 'NUTR,mode,input',NUTR,mode,input
+!endif
                !make under border of the next equation equal to the upper border
                !of the actual equation
                xo=xb
@@ -103,7 +108,15 @@
                !get upper border of the next equation/layer.
                call FindLayerNr(NUTR,j+1,xo,j,xb)
              enddo
+!if (isnan(r)) then
+!         write(LOGUNIT,*) '1: r=',r
+!endif
              r=r+CalculateFromLayer(NUTR,j,mode,input,xo,x_to)
+!if (isnan(sign(r,s))) then
+!         write(LOGUNIT,*) 'r,s,j=',r,s,j
+!         write(LOGUNIT,*) 'xo,x_to=',xo,x_to
+!         write(LOGUNIT,*) 'NUTR,mode,input',NUTR,mode,input
+!endif
              CalculateFromSet=sign(r,s)
           !calculation the equation or 1 derivative or 2 derivative
           case (EQUATION,DERIVATIVE,SDERIVATIVE)

@@ -407,12 +407,21 @@
      ! Calculate flux at the sediment/water interface:
      !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       r= CalculateFromSet( KSiO3(BoxNumberXY),INTEGRAL, MASS, ZERO, cD1m)
+!JM dirty fix for a single point far in the atlantic in the nwes model...
+!JM originates from NaNs in sets(NUTR)%factor(l:l+m) in CalculateFromLayer. 
+!JM need to check code above to see where this really comes from 
+if (r.eq.ZERO .and. K5s(BoxNumberXY).gt.200.0) then
+  write(LOGUNIT,*) 'NaN from CalculateFromSet and large K5s, K5s set to 28.0'
+  K5s(BoxNumberXY)=28.0
+endif
       K0s= (chM5s-N5s_Ben(BoxNumberXY))* cD1m*tom2_ae-r
       R0s= r+N5s_Ben(BoxNumberXY)* cD1m*tom2_ae
 
        if (isnan(K0s)) then
          write(LOGUNIT,*) 'K0s=',K0s
          write(LOGUNIT,*) 'chM5s,tom2_ae,r=',chM5s,tom2_ae,r
+         write(LOGUNIT,*) 'cD1m=',cD1m
+         write(LOGUNIT,*) 'KSiO3 ',KSiO3(BoxNumberXY)
        endif
 
      if ( dry) then

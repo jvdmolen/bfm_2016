@@ -58,7 +58,8 @@
         integer,intent(IN) ::mode ! Specification
         integer,intent(IN) ::option ! Specification
         integer,intent(IN) ::input ! Specification
-        integer,intent(IN) ::nutr ! Specification
+!JM        integer,intent(IN) ::nutr ! Specification
+        integer,intent(IN) ::NUTR ! Specification
         REAL(RLEN),intent(IN) ::xinput ! Specification
         REAL(RLEN),intent(IN) ::yinput ! Specification
 
@@ -83,7 +84,8 @@
         !Get last equation number:
         m=sets(NUTR)%lfi(mode)-l+1
         bC=sets(NUTR)%b(mode)
-        fC(1:m)=sets(NUTR)%factor(l:l+m)
+!JM        fC(1:m)=sets(NUTR)%factor(l:l+m)
+        fC(1:m)=sets(NUTR)%factor(l:l+m-1)
         r=calculate_equation(option,xinput,sets(NUTR)%coeffs(l), &
                                                              bC,fC,m)
         if (option == INTEGRAL.or.option == EXPONENTIAL_INTEGRAL) then
@@ -103,6 +105,19 @@
           write(LOGUNIT,*) 'xinput,yinput:',xinput,yinput
           call BFM_ERROR("CalculateFromLayer","")
         endif
+if (isnan(r)) then
+         write(LOGUNIT,*) 'CalculateFromLayer: r',r
+         write(LOGUNIT,*) 'NUTR,l,m,bC',NUTR,l,m,bC
+         write(LOGUNIT,*) 'fC',fC(1:m)
+         write(LOGUNIT,*) 'sets',sets(NUTR)%factor(l:l+m)
+         write(LOGUNIT,*) 'CalculateFromLayer set to zero, this is a dirty fix, CalculateSet in Bensilica needs checking'
+endif
+!JM        CalculateFromLayer=r
+!JM set result to zero of r is NaN; this lets the code continue.
+        if (isnan(r)) then
+           CalculateFromLayer=0
+        else
+           CalculateFromLayer=r
+        endif
 
-        CalculateFromLayer=r
       end
