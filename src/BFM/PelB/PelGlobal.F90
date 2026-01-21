@@ -121,6 +121,7 @@
   integer,parameter               :: sw_mode=1
   real(RLEN)                      :: rscalar
   real(RLEN),parameter            :: xlow_mass_c=1.0D-5
+  real(RLEN),parameter            :: xlow_mass_c_phyto=3.0D+0
   real(RLEN),dimension(NO_BOXES)  :: cx_any,rx_any,px_any,mx_any,ex_any,sx_any
   real(RLEN),dimension(NO_BOXES)  :: r,h,dummy,rec_qR2P1
   real(RLEN),dimension(NO_BOXES)  :: iNN
@@ -554,13 +555,15 @@
     sediR6s(:)=(sediR6s(:)*max(ZERO,R6s(:)-RZc(:)*qsR6c) &
              +p_raRZm*(NZERO+RZc(:)*qsR6c))/ (NZERO+ max(RZc(:)*qsR6c,R6s(:)))
 
-    !limit sedimentation at very small values of R2 (avoid problems in GOTM)
+    !limit sedimentation at very small values of P2 (avoid problems in GOTM)
     do i = 1 , iiPhytoPlankton
      if (CalcPhytoPlankton(i) ) then
        cx_any=PhytoPlankton(i,iiC)
        rscalar=max(ZERO,sum(cx_any*Depth))/OCDepth(1)
+!JM       sediPI(:,i)= sediPI(:,i) *max(ZERO, &
+!JM         (rscalar/(rscalar+ xlow_mass_c))- (xlow_mass_c/(rscalar+ xlow_mass_c)))
        sediPI(:,i)= sediPI(:,i) *max(ZERO, &
-         (rscalar/(rscalar+ xlow_mass_c))- (xlow_mass_c/(rscalar+ xlow_mass_c)))
+         (rscalar/(rscalar+ xlow_mass_c_phyto))- (xlow_mass_c_phyto/(rscalar+ xlow_mass_c_phyto)))
      else
        sediPI(:,i)=ZERO
      endif
