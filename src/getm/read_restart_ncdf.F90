@@ -155,6 +155,10 @@
 !possibility to use "old" netcdf restart files...
       if (ioff_0_from_file .eq.-9999) then
          ioff_0=0;joff_0=0
+         joff_l=jmax*(joff/jmax+1)
+         if (joff.le.0) then
+           joff_l=0
+         endif
       else
 !       [ij]off_0 : relative difference of position the sw-corner of the
 !                          subdomain in the sw corner of the domain.
