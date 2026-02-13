@@ -467,9 +467,9 @@
 !                  ccb3d_out(k,ig,jg,0:1) = reshape(ccb(0:1,j), (/numbc,2/), order=(/2,1/))
                case(5)
                  !
-                    print *, "ig:", ig, " jg:", jg, " k:", k, " j:", j
-                    print *, "ccb3d_out dimensions:", size(ccb3d_out, 1), size(ccb3d_out, 2), size(ccb3d_out, 3), size(ccb3d_out, 4)
-                    print *, "diagb dimensions:", size(diagb, 1), size(diagb, 2)
+!                    print *, "ig:", ig, " jg:", jg, " k:", k, " j:", j
+!                    print *, "ccb3d_out dimensions:", size(ccb3d_out, 1), size(ccb3d_out, 2), size(ccb3d_out, 3), size(ccb3d_out, 4)
+!                    print *, "diagb dimensions:", size(diagb, 1), size(diagb, 2)
 
 !JM                    ccb3d_out(ig,jg,0:1,k) = diagb(j,0:1)
                     ccb3d_out(ig,jg,0:1,k) = diagb(0:1,j)

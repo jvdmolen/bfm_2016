@@ -466,7 +466,7 @@
      endif
 !    sediPI(iiP5,:)=35.0*P5c**(0.9647)
 !    sediPI(iiP5,:)=2.0*sediR9
-     sediPI(:,iiP5)=86400.0*0.002
+     sediPI(:,iiP5)=86400.0*0.0022
     ! Calculate sinking rate (dummy is here a dummy variable) on basis of size and wight of colonies.
     ! Compare sinking with siinkin due to sticking to macroaggregates produced by diatoms.
 !write(LOGUNIT,*)'pelglobal pheocystis calc_sedimentation',rx_any
