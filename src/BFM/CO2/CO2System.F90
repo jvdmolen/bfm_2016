@@ -49,7 +49,11 @@
 
   integer,parameter   :: ISTATIC=1
   integer,parameter   :: DYNAMIC=2
-  real(RLEN),parameter:: HplusBASIS=2225.0
+!JM  real(RLEN),parameter:: HplusBASIS=2225.0
+!JM as far as I understand this is an emergency cap for the alkalinity.
+!JM according to observations, offshore alkalinities can be larger than this (mean 2325, Margaux Brandon).
+!JM so value is raised here.
+  real(RLEN),parameter:: HplusBASIS=2500.0
   real(RLEN),parameter:: DICBasis=25212.0
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
