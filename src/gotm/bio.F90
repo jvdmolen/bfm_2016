@@ -629,8 +629,12 @@ LEVEL1 'namelist file opened: ',fname
       call get_d3_model_flag_from_getm(d3_model_flag)
       ! Somtimes it happens that a concentration become negative
       ! after calculations of the 3d-transport
-      llsumh2=(sum(h_l(1:nlev)) .gt. 0.21D+00) 
-      llsumh=(sum(h_l(1:nlev)) .gt. 0.21D+00) 
+!JM CG: it's ok to let the ecosystem calculations continue for small water depth/dry cells
+!JM so always do this - flags disabled
+!JM      llsumh2=(sum(h_l(1:nlev)) .gt. 0.21D+00) 
+!JM      llsumh=(sum(h_l(1:nlev)) .gt. 0.21D+00) 
+        llsumh2=.true.
+        llsumh=.true.
         if (bio_model==6.and.nega_test_after_horadv) then
           call test_on_all_negative_states (d3_model_flag, llsumh2,bio_setup, &
                       h_l, numcc,nlev,warning_level, 'hor_adv', cc, kt )
