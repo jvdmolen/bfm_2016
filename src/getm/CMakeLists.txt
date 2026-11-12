@@ -52,6 +52,14 @@ add_library(output_2d_bfm
            )
 target_link_libraries(output_2d_bfm ${NetCDF_LIBRARIES})
 
+add_library(atmdep_bfm
+            atmdep.F90
+            ncdf_atmdep.F90
+            init_atmdep_input.F90
+            get_atmdep_data.F90)
+
+target_link_libraries(atmdep_bfm variables_bio_3d bio global_mod ${NetCDF_LIBRARIES})
+
 add_library(modify_meteo_bfm 
             modify_meteo_input.F90
           )
@@ -74,8 +82,9 @@ set(coupling_getm_bfm_rivers ${coupling_getm_bfm_rivers} PARENT_SCOPE)
 set(restart_bfm ${restart_bfm} PARENT_SCOPE)
 set(read_restart_bfm ${read_restart_bfm} PARENT_SCOPE)
 set(output_2d_bfm ${output_2d_bfm} PARENT_SCOPE)
+set(atmdep_bfm ${atmdep_bfm} PARENT_SCOPE)
 
-set(bfm_getmlibs variables_bio_3d modify_meteo_bfm coupling_getm_bfm coupling_getm_bfm_rivers restart_bfm read_restart_bfm output_2d_bfm)
+set(bfm_getmlibs variables_bio_3d modify_meteo_bfm coupling_getm_bfm coupling_getm_bfm_rivers restart_bfm read_restart_bfm output_2d_bfm atmdep_bfm)
 set(bfm_getmlibs ${bfm_getmlibs} PARENT_SCOPE)
 
 

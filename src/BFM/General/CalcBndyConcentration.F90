@@ -78,17 +78,17 @@
   real(RLEN)                             :: old_DIC(0:kmax)
   real(RLEN)                             :: p(0:kmax)
   real(RLEN)                             :: mDepth
-  character(len=4),dimension(4)          :: bdy_side 
+  !character(len=4),dimension(4)          :: bdy_side 
   integer                                :: m,n(1),j
-  logical                                :: llNorthSea
+  !logical                                :: llNorthSea
 
-  data bdy_side/'west','north','east','south'/ 
+  !data bdy_side/'west','north','east','south'/ 
 
   error=0
   
   if ( mode.eq.0) return
-  llNorthSea=.true.
-  if (trim(area) .eq. "WaddenSea") llNorthSea=.false.
+  !llNorthSea=.true.
+  !if (trim(area) .eq. "WaddenSea") llNorthSea=.false.
   if(mode.eq.depend.and.multi.gt.0.0) then
         cc_inout(0:kmax,mode)=cc_inout(0:kmax,mode) *multi
   elseif (mode.gt.0.and.depend>0.and.depend<=numc) then
@@ -100,24 +100,28 @@
      return
   elseif (mode.eq.ppbac) then
         cc_inout(0:kmax,mode)=min(cc_inout(0:kmax,mode),cc_inout(0:kmax,ppB1c))
-  elseif (mode.eq.ppO3h.or.mode.eq.ppO3c) then
-       j=getseq_number(side,bdy_side,4,.true.)
-       if (j.eq.3.and.llNorthSea ) then
-          ! From Lesly Salt
-          cc_inout(:,ppO3h)= salt(:)*28.1D+00+ 1391.0D+00
-       else
-       ! Calculated according 
-       !Lee et al. GeoPhysical Research Letters, Vol. 33 L19605
-       ! Equation is only valid for range salt range 31-37 and temp-range 0-20
-       salt_corr=min(max(31.0D+00,salt(:)),37.0D+00)
-       temp_corr=min(max(0.0D+00,temp(:)),20.0D+00)
-       mDepth=OCDepth(1)
-       p=OCDepth/mDepth
-       cc_inout(:,ppO3h)=(DONE-p)*cc_inout(:,ppO3h)+ &
-         p*(2305.0D+00+53.97D+00*(salt_corr(:)-35.0D+00) &
-          +2.74D+00*(salt_corr(:)-35.0D+00)**2 - 1.16D+00*(temp_corr(:)-20.0D+00)- &
-           0.04D+00*(temp_corr(:)-20.0D+00)**2 )
-       endif
+!  elseif (mode.eq.ppO3h.or.mode.eq.ppO3c) then
+!       j=getseq_number(side,bdy_side,4,.true.)
+!       if (j.eq.3.and.llNorthSea ) then
+!          ! From Lesly Salt
+!          cc_inout(:,ppO3h)= salt(:)*28.1D+00+ 1391.0D+00
+!       else
+!       ! Calculated according 
+!       !Lee et al. GeoPhysical Research Letters, Vol. 33 L19605
+!       ! Equation is only valid for range salt range 31-37 and temp-range 0-20
+!       salt_corr=min(max(31.0D+00,salt(:)),37.0D+00)
+!       temp_corr=min(max(0.0D+00,temp(:)),20.0D+00)
+!       mDepth=OCDepth(1)
+!       p=OCDepth/mDepth
+!       cc_inout(:,ppO3h)=(DONE-p)*cc_inout(:,ppO3h)+ &
+!         p*(2305.0D+00+53.97D+00*(salt_corr(:)-35.0D+00) &
+!          +2.74D+00*(salt_corr(:)-35.0D+00)**2 - 1.16D+00*(temp_corr(:)-20.0D+00)- &
+!           0.04D+00*(temp_corr(:)-20.0D+00)**2 )
+!       endif
+! new method by KLL
+  elseif (mode.eq.ppO3h) then
+       call CalcBoundaryAlkalinityFromSalinity(kmax,salt,temp,rho, &
+                                                   cc_inout(:,ppO3h))
   elseif (mode.eq.ppR3c) then
     p=DONE
     where(cc_inout(:,ppP6c) >1.0D-10)p=cc_inout(:,ppP6c)/(NZERO+ cc_inout(:,ppPcc))
@@ -149,7 +153,54 @@
 #endif
   end select
 
-  end
+  end subroutine CalcBndyConcentration
+
+  subroutine CalcBoundaryAlkalinityFromSalinity(kmax,salt,temp,rho,alk)
+  use global_mem, ONLY:RLEN
+  IMPLICIT NONE
+  integer,intent(IN)                     :: kmax
+  real(RLEN),intent(IN)                  :: salt(0:kmax)
+  real(RLEN),intent(IN)                  :: temp(0:kmax)
+  real(RLEN),intent(IN)                  :: rho(0:kmax)
+  real(RLEN),intent(OUT)                 :: alk(0:kmax)
+  real(RLEN),parameter                   :: S_CRIT_ALK=32.0_RLEN
+  real(RLEN)                             :: salinity
+  real(RLEN)                             :: temp_eff
+  real(RLEN)                             :: alk_umol_kg
+  integer                                :: k
+
+  do k=1,kmax
+        ! Restricts values to the interpretable range of the equations
+        salinity=max(0.0_RLEN,min(37.0_RLEN,salt(k)))
+        temp_eff=max(0.0_RLEN,min(20.0_RLEN,temp(k)))
+
+        if (salinity.lt.S_CRIT_ALK) then
+           alk_umol_kg=1470.0_RLEN + 25.3_RLEN*salinity
+
+             ! Low-salinity relationship:
+             ! Beldowski et al. (2010), J. Marine Systems 81, 252-259.
+             ! doi:10.1016/j.jmarsys.2009.12.020
+
+        else
+           alk_umol_kg=2305.0_RLEN &
+             +53.97_RLEN*(salinity-35.0_RLEN) &
+             +2.74_RLEN*(salinity-35.0_RLEN)**2 &
+             -1.16_RLEN*(temp_eff-20.0_RLEN) &
+             -0.040_RLEN*(temp_eff-20.0_RLEN)**2
+
+             ! North Atlantic marine relationship:
+             ! Lee et al. (2006), Geophys. Res. Lett. 33, L19605.
+             ! doi:10.1029/2006GL027207
+
+        endif
+
+        alk(k)=alk_umol_kg*rho(k)/1000.0_RLEN
+  end do
+  alk(0)=alk(1)
+
+  end subroutine CalcBoundaryAlkalinityFromSalinity
+
+
 !BOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model version 2.50
